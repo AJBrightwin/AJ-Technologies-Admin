@@ -22,6 +22,12 @@ API (all JSON; everything except login needs the admin to be signed in)
     DELETE /api/projects/<id>/      delete (its image is deleted too)
     POST   /api/projects/reorder/   {ids: [...]} in the new order
 
+    GET    /api/reviews/            list all client reviews (including hidden)
+    POST   /api/reviews/            add a review
+    PATCH  /api/reviews/<id>/       edit / show / hide
+    DELETE /api/reviews/<id>/       delete
+    POST   /api/reviews/reorder/    {ids: [...]} in the new order
+
     GET    /api/images/             images in Storage (project-images/projects/)
     POST   /api/images/             upload (form field "file")
     DELETE /api/images/             {path}
@@ -32,14 +38,14 @@ import logging
 import re
 import secrets
 import time
-from datetime import date
+from datetime import date, datetime
 from functools import wraps
 
 from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.db import DatabaseError, connection, transaction
+from django.db import DatabaseError, ProgrammingError, connection, transaction
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -47,7 +53,7 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from . import storage
-from .models import ContactEnquiry, ShowcaseProject
+from .models import ClientReview, ContactEnquiry, ShowcaseProject
 
 log = logging.getLogger(__name__)
 
@@ -254,6 +260,53 @@ PROJECT_FIELDS = {
 }
 
 
+def _date(v, rule):
+    try:
+        d = datetime.strptime(str(v or '').strip(), '%Y-%m-%d').date()
+    except ValueError:
+        raise ValueError('must be a date like 2026-10-28')
+    if d > date.today():
+        raise ValueError('cannot be in the future')
+    return d
+
+
+def _rating(v, rule):
+    try:
+        n = int(v)
+    except (TypeError, ValueError):
+        raise ValueError('must be 1 to 5')
+    if not 1 <= n <= 5:
+        raise ValueError('must be 1 to 5')
+    return n
+
+
+def _project_ref(v, rule):
+    if v in (None, '', 0, '0'):
+        return None
+    try:
+        pk = int(v)
+    except (TypeError, ValueError):
+        raise ValueError('invalid project')
+    if not ShowcaseProject.objects.filter(pk=pk).exists():
+        raise ValueError('project not found')
+    return pk
+
+
+REVIEW_FIELDS = {
+    'client_name':   (_text,        {'max': 120, 'required': True}),
+    'business_name': (_text,        {'max': 160}),
+    'location':      (_text,        {'max': 120}),
+    'rating':        (_rating,      {}),
+    'review_en':     (_text,        {'max': 2000, 'required': True}),
+    'review_ta':     (_text,        {'max': 2000}),
+    'project_id':    (_project_ref, {}),
+    'source':        (_choice,      {'choices': ClientReview.SOURCES}),
+    'review_date':   (_date,        {}),
+    'is_published':  (_bool,        {}),
+    'sort_order':    (_int,         {}),
+}
+
+
 def _clean(fields, data, partial):
     values, errors = {}, {}
     for key, (convert, rule) in fields.items():
@@ -445,6 +498,62 @@ def projects_reorder(request):
         for position, pk in enumerate(ids, start=1):
             ShowcaseProject.objects.filter(pk=pk).update(sort_order=position * 10, updated_at=now)
     return ok(items=[p.to_dict() for p in ShowcaseProject.objects.all()])
+
+
+# ---------------------------------------------------------------------------
+# Client reviews (client_reviews table, created by supabase_reviews.sql)
+# ---------------------------------------------------------------------------
+NO_REVIEWS_TABLE = ('The reviews table does not exist yet. In Supabase, open SQL Editor and run '
+                    'supabase_reviews.sql, then refresh this page.')
+
+
+def _reviews_table_guard(view):
+    @wraps(view)
+    def inner(request, *args, **kwargs):
+        try:
+            return view(request, *args, **kwargs)
+        except ProgrammingError as e:
+            if 'client_reviews' in str(e):
+                raise ApiError(NO_REVIEWS_TABLE, 503, code='no_table')
+            raise
+    return inner
+
+
+@api(['GET', 'POST'])
+@_reviews_table_guard
+def reviews(request):
+    if request.method == 'GET':
+        return ok(items=[r.to_dict() for r in ClientReview.objects.all()])
+    values = _clean(REVIEW_FIELDS, _json_body(request), partial=False)
+    item = ClientReview.objects.create(**values)
+    log.info('Review %s added', item.pk)
+    return ok(201, item=item.to_dict())
+
+
+@api(['PATCH', 'DELETE'])
+@_reviews_table_guard
+def review_detail(request, pk):
+    item = _get(ClientReview, pk)
+    if request.method == 'DELETE':
+        item.delete()
+        return ok()
+    values = _clean(REVIEW_FIELDS, _json_body(request), partial=True)
+    if values:
+        _save(item, values)
+    return ok(item=item.to_dict())
+
+
+@api(['POST'])
+@_reviews_table_guard
+def reviews_reorder(request):
+    ids = _json_body(request).get('ids')
+    if not isinstance(ids, list) or not all(isinstance(i, int) for i in ids):
+        raise ApiError('Invalid order.')
+    now = timezone.now()
+    with transaction.atomic():
+        for position, pk in enumerate(ids, start=1):
+            ClientReview.objects.filter(pk=pk).update(sort_order=position * 10, updated_at=now)
+    return ok(items=[r.to_dict() for r in ClientReview.objects.all()])
 
 
 # ---------------------------------------------------------------------------

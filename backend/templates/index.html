@@ -245,6 +245,50 @@ table.tbl{width:100%;border-collapse:collapse;min-width:760px}
 .notice{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:12px;background:var(--warn-soft);color:var(--warn);font-size:13px;margin-bottom:16px;border:1px solid color-mix(in srgb,var(--warn) 25%,transparent)}
 .notice.info{background:var(--brand-soft);color:var(--brand);border-color:color-mix(in srgb,var(--brand) 22%,transparent)}
 
+/* ---------- Reviews ---------- */
+.rv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.rcard{display:flex;flex-direction:column;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.rcard:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.rcard.off{opacity:.62}
+.rc-in{padding:18px 18px 14px;flex:1;display:flex;flex-direction:column;gap:12px;position:relative}
+.rc-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rc-top .spacer{flex:1}
+.stars{display:inline-flex;gap:2px;color:#f59e0b}
+.stars svg{width:17px;height:17px;fill:currentColor;stroke:none}
+.stars svg.off{color:var(--line)}
+.rc-ord{font-size:11px;font-weight:700;color:var(--muted);background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:2px 7px}
+.rc-text{font-size:14px;line-height:1.65;color:var(--text);display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.rc-text::before{content:"“";font-size:26px;line-height:0;vertical-align:-8px;margin-right:2px;color:var(--brand2);font-weight:800}
+.rc-person{display:flex;align-items:center;gap:10px;margin-top:auto}
+.rc-person .avatar{flex:none}
+.rc-person b{display:block;font-size:13.5px}
+.rc-person small{display:block;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-person div{min-width:0}
+.rc-meta{display:flex;flex-wrap:wrap;gap:6px}
+.rc-meta span{font-size:11.5px;padding:3px 8px;border-radius:6px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);display:inline-flex;align-items:center;gap:5px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-meta svg{width:12px;height:12px}
+.rv-sum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.rv-sum .card{padding:14px 16px}
+.rv-sum b{font-size:22px;display:flex;align-items:center;gap:6px;line-height:1.2}
+.rv-sum b svg{width:18px;height:18px;fill:#f59e0b;stroke:none}
+.rv-sum small{color:var(--muted);font-size:12px;font-weight:600}
+.star-pick{display:inline-flex;gap:4px;padding:4px 6px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.star-pick button{width:32px;height:30px;display:grid;place-items:center;border-radius:7px;color:var(--line);transition:transform .15s,color .15s}
+.star-pick button svg{width:22px;height:22px;fill:currentColor;stroke:none}
+.star-pick button.on{color:#f59e0b}
+.star-pick button:hover{transform:scale(1.15)}
+.rv-prev{border-radius:18px;padding:20px;background:#070b22;color:#fff;position:relative;overflow:hidden;isolation:isolate}
+.rv-prev::before{content:"";position:absolute;width:220px;height:220px;right:-80px;top:-90px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.55),transparent 70%);z-index:-1}
+.rv-prev .stars svg.off{color:rgba(255,255,255,.18)}
+.rv-prev p{color:#cbd5f5;font-size:13.5px;line-height:1.65;margin:12px 0 16px;white-space:pre-wrap}
+.rv-prev .who{display:flex;align-items:center;gap:10px}
+.rv-prev .who i{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#2563eb,#7c3aed);font-style:normal;font-weight:700}
+.rv-prev .who b{display:block;font-size:13.5px}
+.rv-prev .who small{color:#a5b4fc;font-size:12px}
+.chars{font-size:11.5px;color:var(--muted);text-align:right;margin-top:4px}
+@media (max-width:1180px){.rv-sum{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:720px){.rv-grid{grid-template-columns:minmax(0,1fr)}}
+
 /* ---------- Image picker ---------- */
 .media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
 .mcard{overflow:hidden}
@@ -456,6 +500,9 @@ table.tbl{width:100%;border-collapse:collapse;min-width:760px}
   <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></symbol>
   <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.9 5.8L20 10.7l-6.1 1.9L12 18.5l-1.9-5.9L4 10.7l6.1-1.9z"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
   <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36L21 8"/><path d="M21 3v5h-5"/></symbol>
   <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></symbol>
 </svg>
@@ -495,6 +542,7 @@ table.tbl{width:100%;border-collapse:collapse;min-width:760px}
       <div class="nav-label">Manage</div>
       <a href="#/enquiries" data-nav="enquiries"><svg class="i"><use href="#i-inbox"/></svg>Enquiries<span class="count" id="navNew">0</span></a>
       <a href="#/projects" data-nav="projects"><svg class="i"><use href="#i-folder"/></svg>Projects</a>
+      <a href="#/reviews" data-nav="reviews"><svg class="i"><use href="#i-chat"/></svg>Reviews</a>
       <div class="nav-label">System</div>
       <a href="#/settings" data-nav="settings"><svg class="i"><use href="#i-settings"/></svg>Settings</a>
     </nav>
@@ -559,6 +607,7 @@ const VIA      = { form: 'Quote form', whatsapp: 'WhatsApp button' };
 const LANG     = { en: 'English', ta: 'Tamil' };
 const CATEGORY = { web: 'Websites', shop: 'E-commerce', app: 'Apps', mkt: 'Marketing' };
 const KIND     = { site: 'Website', app: 'Mobile app' };
+const REVIEW_SOURCE = { direct: 'Told us directly', google: 'Google review', whatsapp: 'WhatsApp', email: 'Email', website: 'Website' };
 const SERVICES = ['Business Websites', 'E-commerce Stores', 'Mobile Apps', 'Digital Marketing', 'Website Redesign', 'Maintenance & AMC'];
 
 /* =====================================================================
@@ -610,6 +659,13 @@ const API = {
   updateProject:   (id, patch) => request('PATCH', `/api/projects/${id}/`, patch).then(d => warnIf(d).item),
   deleteProject:   id          => request('DELETE', `/api/projects/${id}/`).then(warnIf),
   reorderProjects: ids         => request('POST', '/api/projects/reorder/', { ids }).then(d => d.items),
+
+  // ----- Reviews (table: client_reviews) -----
+  listReviews:    ()          => request('GET', '/api/reviews/').then(d => d.items),
+  createReview:   data        => request('POST', '/api/reviews/', data).then(d => d.item),
+  updateReview:   (id, patch) => request('PATCH', `/api/reviews/${id}/`, patch).then(d => d.item),
+  deleteReview:   id          => request('DELETE', `/api/reviews/${id}/`),
+  reorderReviews: ids         => request('POST', '/api/reviews/reorder/', { ids }).then(d => d.items),
 
   // ----- Images (Supabase Storage: bucket "project-images", folder "projects/") -----
   listImages:  () => request('GET', '/api/images/').then(d => d.items),
@@ -725,14 +781,16 @@ function confirmBox({ title, text, ok = 'Delete', danger = true }) {
    APP STATE + ROUTER
    ===================================================================== */
 const state = {
-  user: null, enquiries: [], projects: [], media: [], storageError: '',
+  user: null, enquiries: [], projects: [], media: [], reviews: [], storageError: '', reviewsError: '',
   eq: { status: 'all', q: '', source: 'all', lang: 'all', sort: 'new', page: 1, selected: new Set() },
   pj: { cat: 'all', vis: 'all', q: '' },
+  rv: { vis: 'all', stars: 'all', q: '' },
 };
 const PAGES = {
   dashboard: { title: 'Dashboard', crumb: 'Overview', render: renderDashboard },
   enquiries: { title: 'Enquiries', crumb: 'Manage · contact_enquiries', render: renderEnquiries },
   projects:  { title: 'Projects', crumb: 'Manage · showcase_projects', render: renderProjects },
+  reviews:   { title: 'Reviews', crumb: 'Manage · client_reviews', render: renderReviews },
   settings:  { title: 'Settings', crumb: 'System', render: renderSettings },
 };
 function currentPage() { const p = location.hash.replace(/^#\/?/, '').split('?')[0]; return PAGES[p] ? p : 'dashboard'; }
@@ -752,7 +810,7 @@ function refreshBadge() {
   $('#navNew').textContent = n; $('#navNew').classList.toggle('hidden', !n);
 }
 async function loadAll() {
-  const [e, p, m] = await Promise.allSettled([API.listEnquiries(), API.listProjects(), API.listImages()]);
+  const [e, p, m, r] = await Promise.allSettled([API.listEnquiries(), API.listProjects(), API.listImages(), API.listReviews()]);
   if (e.status === 'rejected' || p.status === 'rejected') {
     paintConn('err', 'Database not reachable');
     throw (e.status === 'rejected' ? e.reason : p.reason);
@@ -760,6 +818,8 @@ async function loadAll() {
   state.enquiries = e.value; state.projects = p.value;
   state.media = m.status === 'fulfilled' ? m.value : [];
   state.storageError = m.status === 'rejected' ? m.reason.message : '';
+  state.reviews = r.status === 'fulfilled' ? r.value : [];
+  state.reviewsError = r.status === 'rejected' ? r.reason.message : '';
   paintConn(state.storageError ? 'warn' : 'ok', state.storageError ? 'Connected · image storage not set up' : 'Connected to Supabase');
   refreshBadge();
 }
@@ -1365,6 +1425,205 @@ function imagePicker(onPick) {
   back.onclick = e => { if (e.target === back) close(); };
   $('[data-x]', back).onclick = close;
   $$('[data-pick]', back).forEach(b => b.onclick = () => { onPick(b.dataset.pick); close(); });
+}
+
+/* =====================================================================
+   REVIEWS
+   ===================================================================== */
+const starIcons = (n, cls = 'stars') => `<span class="${cls}" aria-label="${n} out of 5 stars">${[1, 2, 3, 4, 5].map(i => `<svg class="${i <= n ? '' : 'off'}"><use href="#i-star"/></svg>`).join('')}</span>`;
+const sortedReviews = () => state.reviews.slice().sort((a, b) => a.sort_order - b.sort_order || (b.review_date > a.review_date ? 1 : b.review_date < a.review_date ? -1 : 0) || new Date(b.created_at) - new Date(a.created_at));
+const todayISO = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
+const fmtDay = iso => iso ? new Date(iso + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+
+function renderReviews() {
+  const f = state.rv, q = f.q.trim().toLowerCase();
+  if (state.reviewsError) {
+    $('#content').innerHTML = `<div class="view"><div class="card"><div class="empty">${icon('db')}<b>Reviews are not set up yet</b>${esc(state.reviewsError)}<br><br><button class="btn primary" id="rvRetry">${icon('refresh')}Check again</button></div></div></div>`;
+    $('#rvRetry').onclick = async () => {
+      try { state.reviews = await API.listReviews(); state.reviewsError = ''; renderReviews(); toast('Reviews connected'); }
+      catch (err) { state.reviewsError = err.message; toast(err.message, 'err'); }
+    };
+    return;
+  }
+  const all = sortedReviews();
+  const pub = all.filter(r => r.is_published);
+  const avg = pub.length ? (pub.reduce((a, r) => a + r.rating, 0) / pub.length) : 0;
+  const rows = all.filter(r =>
+    (f.vis === 'all' || (f.vis === 'pub' && r.is_published) || (f.vis === 'hid' && !r.is_published)) &&
+    (f.stars === 'all' || r.rating === +f.stars) &&
+    (!q || [r.client_name, r.business_name, r.location, r.review_en, r.review_ta].join(' ').toLowerCase().includes(q)));
+  const proj = id => state.projects.find(p => p.id === id);
+
+  $('#content').innerHTML = `<div class="view">
+    <div class="rv-sum">
+      <div class="card"><b>${all.length}</b><small>Total reviews</small></div>
+      <div class="card"><b>${pub.length}</b><small>Shown on the website</small></div>
+      <div class="card"><b>${avg ? avg.toFixed(1) : '–'} ${avg ? '<svg><use href="#i-star"/></svg>' : ''}</b><small>Average rating (shown)</small></div>
+      <div class="card"><b>${all.length - pub.length}</b><small>Hidden</small></div>
+    </div>
+    ${pub.length ? '' : `<div class="notice info">${icon('alert')}<span>The <b>“What our clients say”</b> section is hidden on your website until at least one review is published.</span></div>`}
+    <div class="toolbar">
+      <div class="chips">
+        <button class="chip ${f.vis === 'all' ? 'on' : ''}" data-rvis="all">All <span class="n">${all.length}</span></button>
+        <button class="chip ${f.vis === 'pub' ? 'on' : ''}" data-rvis="pub">Published <span class="n">${pub.length}</span></button>
+        <button class="chip ${f.vis === 'hid' ? 'on' : ''}" data-rvis="hid">Hidden <span class="n">${all.length - pub.length}</span></button>
+      </div>
+    </div>
+    <div class="toolbar">
+      <div class="search">${icon('search')}<input class="inp" id="rvSearch" placeholder="Search name, business, review…" value="${esc(f.q)}"></div>
+      <select class="inp" id="rvStars" style="width:auto"><option value="all">All ratings</option>${[5, 4, 3, 2, 1].map(n => `<option value="${n}">${n} star${n > 1 ? 's' : ''}</option>`).join('')}</select>
+      <div class="spacer"></div>
+      <button class="btn primary" id="rvAdd">${icon('plus')}Add review</button>
+    </div>
+    ${rows.length ? `<div class="rv-grid">${rows.map(r => {
+      const i = all.indexOf(r), pj = r.project_id ? proj(r.project_id) : null;
+      return `<article class="card rcard ${r.is_published ? '' : 'off'}">
+        <div class="rc-in">
+          <div class="rc-top">${starIcons(r.rating)}${r.is_published ? '' : '<span class="badge b-closed">Hidden</span>'}<span class="spacer"></span><span class="rc-ord">#${r.sort_order}</span></div>
+          <p class="rc-text ${taCls(r.review_en)}">${esc(r.review_en)}</p>
+          <div class="rc-meta">
+            <span>${icon('cal')}${fmtDay(r.review_date)}</span>
+            <span>${esc(REVIEW_SOURCE[r.source] || r.source)}</span>
+            ${r.review_ta ? '<span>தமிழ் ✓</span>' : ''}
+            ${pj ? `<span title="${esc(pj.title_en)}">${icon('folder')}${esc(pj.title_en)}</span>` : ''}
+          </div>
+          <div class="rc-person"><div class="avatar">${esc(initials(r.client_name))}</div>
+            <div><b class="${taCls(r.client_name)}">${esc(r.client_name)}</b><small class="${taCls(r.business_name)}">${esc([r.business_name, r.location].filter(Boolean).join(', ') || '—')}</small></div></div>
+        </div>
+        <div class="pfoot">
+          <button class="btn sm icon ghost" data-rup="${r.id}" ${i === 0 ? 'disabled' : ''} title="Move up">${icon('up')}</button>
+          <button class="btn sm icon ghost" data-rdown="${r.id}" ${i === all.length - 1 ? 'disabled' : ''} title="Move down">${icon('down')}</button>
+          <button class="btn sm icon ghost" data-rvisbtn="${r.id}" title="${r.is_published ? 'Hide from website' : 'Show on website'}">${icon(r.is_published ? 'eye' : 'eye-off')}</button>
+          <div class="spacer"></div>
+          <button class="btn sm icon ghost" data-rdel="${r.id}" title="Delete">${icon('trash')}</button>
+          <button class="btn sm" data-redit="${r.id}">${icon('edit')}Edit</button>
+        </div>
+      </article>`; }).join('')}</div>`
+    : `<div class="card"><div class="empty">${icon('chat')}<b>${all.length ? 'No reviews match' : 'No reviews yet'}</b>${all.length ? 'Try a different filter or search.' : 'Add your first genuine client review. Ask happy clients on WhatsApp and add what they say here.'}</div></div>`}
+  </div>`;
+
+  $('#rvStars').value = f.stars;
+  $$('[data-rvis]').forEach(b => b.onclick = () => { f.vis = b.dataset.rvis; renderReviews(); });
+  $('#rvStars').onchange = e => { f.stars = e.target.value; renderReviews(); };
+  const s = $('#rvSearch');
+  s.oninput = () => { f.q = s.value; clearTimeout(s._t); s._t = setTimeout(() => { renderReviews(); const n = $('#rvSearch'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }, 250); };
+  $('#rvAdd').onclick = () => reviewForm();
+  $$('[data-redit]').forEach(b => b.onclick = () => reviewForm(state.reviews.find(r => r.id === +b.dataset.redit)));
+  $$('[data-rdel]').forEach(b => b.onclick = () => deleteReview(+b.dataset.rdel));
+  $$('[data-rvisbtn]').forEach(b => b.onclick = async () => {
+    const r = state.reviews.find(x => x.id === +b.dataset.rvisbtn);
+    Object.assign(r, await API.updateReview(r.id, { is_published: !r.is_published }));
+    toast(r.is_published ? 'Review is now on the website' : 'Review hidden from the website'); renderReviews();
+  });
+  $$('[data-rup],[data-rdown]').forEach(b => b.onclick = async () => {
+    const id = +(b.dataset.rup || b.dataset.rdown), dir = b.dataset.rup ? -1 : 1;
+    const list = sortedReviews(), i = list.findIndex(r => r.id === id), j = i + dir;
+    if (j < 0 || j >= list.length) return;
+    [list[i], list[j]] = [list[j], list[i]];
+    state.reviews = await API.reorderReviews(list.map(r => r.id)); renderReviews();
+  });
+}
+
+async function deleteReview(id) {
+  const r = state.reviews.find(x => x.id === id);
+  const ok = await confirmBox({ title: 'Delete this review?', text: `The review by <b>${esc(r.client_name)}</b> will be removed permanently.<br><br>Tip: to take it off the website but keep it, use <b>Hide</b> instead.` });
+  if (!ok) return;
+  await API.deleteReview(id);
+  state.reviews = state.reviews.filter(x => x.id !== id);
+  toast('Review deleted'); renderReviews();
+}
+
+function reviewForm(r = null) {
+  const maxOrder = Math.max(0, ...state.reviews.map(x => x.sort_order));
+  const v = r ? clone(r) : { client_name: '', business_name: '', location: '', rating: 5, review_en: '', review_ta: '', project_id: null, source: 'whatsapp', review_date: todayISO(), is_published: true, sort_order: maxOrder + 10 };
+  let rating = v.rating, prevLang = 'en';
+  const projOpts = '<option value="">Not linked</option>' + sortedProjects().map(p => `<option value="${p.id}" ${p.id === v.project_id ? 'selected' : ''}>${esc(p.title_en)}</option>`).join('');
+
+  openModal(`
+    <div class="m-h"><h3>${r ? 'Edit review' : 'Add review'}</h3>${r ? `<span class="badge b-soft plain">#${r.id}</span>` : ''}<div class="spacer"></div><button class="icon-btn" data-x aria-label="Close">${icon('x')}</button></div>
+    <div class="m-b"><form class="pf" id="rvForm" novalidate>
+      <div style="min-width:0">
+        ${r ? '' : `<div class="notice info">${icon('alert')}<span>Only add <b>genuine reviews from real clients</b>, in their own words and with their permission.</span></div>`}
+        <div class="pf-sec"><h4><span class="n">1</span>Client</h4>
+          <div class="grid2">
+            ${fld('client_name', 'Client name', `<input class="inp" name="client_name" maxlength="120" value="${esc(v.client_name)}" placeholder="e.g. Deva R">`, true, 'Client name is required.')}
+            ${fld('business_name', 'Business name', `<input class="inp" name="business_name" maxlength="160" value="${esc(v.business_name)}" placeholder="e.g. Diecast Dreamscapes">`)}
+            ${fld('location', 'City / location', `<input class="inp" name="location" maxlength="120" value="${esc(v.location)}" placeholder="e.g. Thoothukudi">`)}
+            ${fld('project_id', 'Linked project', `<select class="inp" name="project_id">${projOpts}</select>`)}
+          </div>
+        </div>
+        <div class="pf-sec"><h4><span class="n">2</span>Review</h4>
+          <div class="field" data-f="rating" style="margin-bottom:14px"><label>Rating <span class="req">*</span></label>
+            <div class="star-pick" id="starPick">${[1, 2, 3, 4, 5].map(n => `<button type="button" data-star="${n}" aria-label="${n} star${n > 1 ? 's' : ''}"><svg><use href="#i-star"/></svg></button>`).join('')}</div></div>
+          <div class="grid2">
+            <div class="field" data-f="review_en"><label>What the client said <span class="lang-tag">EN</span> <span class="req">*</span></label><textarea class="inp" name="review_en" maxlength="2000" style="min-height:120px">${esc(v.review_en)}</textarea><div class="chars" id="cEn"></div><div class="msg">Please enter the review.</div></div>
+            <div class="field" data-f="review_ta"><label>What the client said <span class="lang-tag">TA</span></label><textarea class="inp ta" name="review_ta" maxlength="2000" style="min-height:120px">${esc(v.review_ta)}</textarea><div class="chars" id="cTa"></div><div class="hint">Optional. If empty, Tamil visitors see the English review.</div></div>
+          </div>
+          <div class="grid3" style="margin-top:14px">
+            ${fld('source', 'Where it came from', sel('source', REVIEW_SOURCE, v.source))}
+            ${fld('review_date', 'Review date', `<input class="inp" type="date" name="review_date" max="${todayISO()}" value="${esc(v.review_date)}">`, false, 'Choose a date (not in the future).')}
+            ${fld('sort_order', 'Order', `<input class="inp" name="sort_order" type="number" min="0" step="1" value="${v.sort_order}">`, false, 'Must be 0 or more.')}
+          </div>
+        </div>
+        <div class="pf-sec" style="margin-bottom:0"><h4><span class="n">3</span>Visibility</h4>
+          <label class="switch"><div><b>Show on website</b><small>Appears in “What our clients say” on the home page</small></div><input type="checkbox" name="is_published" ${v.is_published ? 'checked' : ''}><span class="tgl"></span></label>
+        </div>
+      </div>
+      <div class="preview-col">
+        <div class="sec-t">Live preview</div>
+        <div class="seg" id="rvLang"><button type="button" class="on" data-l="en">English</button><button type="button" data-l="ta">தமிழ்</button></div>
+        <div id="rvPrev"></div>
+        ${r ? `<div class="timeline-log">Added ${fmtDate(r.created_at)}<br>Last updated ${fmtDate(r.updated_at)}</div>` : ''}
+      </div>
+    </form></div>
+    <div class="m-f">${r ? `<button class="btn danger" data-del>${icon('trash')}Delete</button>` : ''}<div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-save>${icon('check')}${r ? 'Save changes' : 'Add review'}</button></div>`, 'lg');
+
+  const fm = $('#rvForm');
+  const read = () => {
+    const g = n => fm.elements[n].value.trim();
+    return { client_name: g('client_name'), business_name: g('business_name'), location: g('location'), rating,
+      review_en: g('review_en'), review_ta: g('review_ta'), project_id: g('project_id') ? +g('project_id') : null,
+      source: g('source'), review_date: g('review_date'), sort_order: parseInt(g('sort_order'), 10), is_published: fm.elements.is_published.checked };
+  };
+  const paintStars = () => $$('#starPick button').forEach(b => b.classList.toggle('on', +b.dataset.star <= rating));
+  const preview = () => {
+    const d = read(), ta = prevLang === 'ta';
+    const text = ta && d.review_ta ? d.review_ta : d.review_en;
+    $('#rvPrev').innerHTML = `<div class="rv-prev ${ta ? 'ta' : ''}">${starIcons(d.rating)}
+      <p>${esc(text) || '<span style="opacity:.5">The review text appears here…</span>'}</p>
+      <div class="who"><i>${esc(initials(d.client_name || '?'))}</i><div><b>${esc(d.client_name || 'Client name')}</b><small>${esc([d.business_name, d.location].filter(Boolean).join(', '))}</small></div></div>
+      ${d.is_published ? '' : '<div style="margin-top:12px"><span class="badge b-closed">Hidden from website</span></div>'}</div>`;
+    $('#cEn').textContent = `${d.review_en.length} / 2000`;
+    $('#cTa').textContent = `${d.review_ta.length} / 2000`;
+  };
+  $$('#starPick button').forEach(b => {
+    b.onclick = () => { rating = +b.dataset.star; paintStars(); preview(); };
+    b.onmouseenter = () => $$('#starPick button').forEach(x => x.classList.toggle('on', +x.dataset.star <= +b.dataset.star));
+  });
+  $('#starPick').onmouseleave = paintStars;
+  $$('#rvLang button').forEach(b => b.onclick = () => { prevLang = b.dataset.l; $$('#rvLang button').forEach(x => x.classList.toggle('on', x === b)); preview(); });
+  fm.addEventListener('input', preview); fm.addEventListener('change', preview);
+  // a field's red error clears as soon as you type in it
+  fm.addEventListener('input', e => { const fl = e.target.closest('.field'); if (fl) fl.classList.remove('has-err'); e.target.classList.remove('err'); });
+  $$('[data-x]', modal).forEach(b => b.onclick = closeModal);
+  if (r) $('[data-del]', modal).onclick = () => { closeModal(); deleteReview(r.id); };
+
+  $('[data-save]', modal).onclick = async ev => {
+    const d = read(), errs = {};
+    if (!d.client_name) errs.client_name = 1;
+    if (!d.review_en) errs.review_en = 1;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d.review_date) || d.review_date > todayISO()) errs.review_date = 1;
+    if (isNaN(d.sort_order) || d.sort_order < 0) errs.sort_order = 1;
+    $$('.field[data-f]', fm).forEach(x => x.classList.toggle('has-err', !!errs[x.dataset.f]));
+    $$('.inp', fm).forEach(i => i.classList.toggle('err', !!errs[i.name]));
+    if (Object.keys(errs).length) { toast('Please fix the highlighted fields', 'err'); fm.querySelector('.has-err')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+    ev.currentTarget.disabled = true;
+    if (r) { Object.assign(state.reviews.find(x => x.id === r.id), await API.updateReview(r.id, d)); toast('Review saved'); }
+    else { state.reviews.push(await API.createReview(d)); toast('Review added'); }
+    closeModal(); renderReviews();
+  };
+  paintStars(); preview();
+  setTimeout(() => fm.elements.client_name.focus(), 80);
 }
 
 /* =====================================================================

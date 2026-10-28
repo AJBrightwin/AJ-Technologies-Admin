@@ -25,6 +25,11 @@ urlpatterns = [
     path('api/projects/reorder/', views.projects_reorder, name='api_projects_reorder'),
     path('api/projects/<int:pk>/', views.project_detail, name='api_project'),
 
+    # Client reviews (client_reviews table)
+    path('api/reviews/', views.reviews, name='api_reviews'),
+    path('api/reviews/reorder/', views.reviews_reorder, name='api_reviews_reorder'),
+    path('api/reviews/<int:pk>/', views.review_detail, name='api_review'),
+
     # Images (Supabase Storage bucket "project-images")
     path('api/images/', views.images, name='api_images'),
 ]

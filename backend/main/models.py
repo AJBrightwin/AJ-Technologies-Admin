@@ -5,6 +5,8 @@ These are the SAME Supabase tables the website uses. They are created by
 supabase_schema.sql in Supabase, NOT by Django (managed = False), so there are
 no migrations and `python manage.py migrate` is never needed.
 """
+from datetime import date
+
 from django.db import models
 
 
@@ -126,6 +128,53 @@ class ShowcaseProject(models.Model):
             'is_sample': self.is_sample,
             'is_published': self.is_published,
             'show_on_home': self.show_on_home,
+            'sort_order': self.sort_order,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat(),
+        }
+
+
+class ClientReview(models.Model):
+    """Genuine client reviews shown in "What our clients say" on the website home page."""
+
+    SOURCES = ('direct', 'google', 'whatsapp', 'email', 'website')
+
+    id = models.BigAutoField(primary_key=True)
+    client_name = models.CharField(max_length=120)
+    business_name = models.CharField(max_length=160, blank=True, default='')
+    location = models.CharField(max_length=120, blank=True, default='')
+    rating = models.SmallIntegerField(default=5)
+    review_en = models.TextField()
+    review_ta = models.TextField(blank=True, default='')
+    project_id = models.BigIntegerField(null=True, blank=True)
+    source = models.CharField(max_length=10, default='direct')
+    review_date = models.DateField(default=date.today)
+    is_published = models.BooleanField(default=True)
+    sort_order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = 'client_reviews'
+        ordering = ['sort_order', '-review_date', '-created_at']
+
+    def __str__(self):
+        return f'{self.client_name} ({self.rating})'
+
+    def to_dict(self):
+        return {
+            'id': self.pk,
+            'client_name': self.client_name,
+            'business_name': self.business_name,
+            'location': self.location,
+            'rating': self.rating,
+            'review_en': self.review_en,
+            'review_ta': self.review_ta,
+            'project_id': self.project_id,
+            'source': self.source,
+            'review_date': self.review_date.isoformat(),
+            'is_published': self.is_published,
             'sort_order': self.sort_order,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
