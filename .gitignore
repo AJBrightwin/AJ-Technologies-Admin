@@ -1,0 +1,15 @@
+# Secrets: never upload
+.env
+**/.env
+
+# Python / Django
+venv/
+**/venv/
+__pycache__/
+*.py[cod]
+*.sqlite3
+backend/staticfiles/
+backend/media/
+
+# Editor
+.vscode/
