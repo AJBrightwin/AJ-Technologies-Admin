@@ -32,4 +32,18 @@ urlpatterns = [
 
     # Images (Supabase Storage bucket "project-images")
     path('api/images/', views.images, name='api_images'),
+
+    # WhatsApp (tables from supabase_whatsapp.sql, filled by the WhatsApp bot)
+    path('api/wa/chats/', views.wa_chats, name='api_wa_chats'),
+    path('api/wa/chats/<str:wa_id>/', views.wa_chat, name='api_wa_chat'),
+    path('api/wa/chats/<str:wa_id>/read/', views.wa_read, name='api_wa_read'),
+    path('api/wa/chats/<str:wa_id>/send/', views.wa_send, name='api_wa_send'),
+    path('api/wa/chats/<str:wa_id>/review/', views.wa_review_request, name='api_wa_review'),
+    path('api/wa/templates/', views.wa_templates, name='api_wa_templates'),
+    path('api/wa/templates/send/', views.wa_send_template, name='api_wa_template_send'),
+    path('api/wa/media/<str:media_id>/', views.wa_media, name='api_wa_media'),
+    path('api/wa/bookings/', views.wa_bookings, name='api_wa_bookings'),
+    path('api/wa/bookings/<int:pk>/', views.wa_booking, name='api_wa_booking'),
+    path('api/wa/broadcasts/', views.wa_broadcasts, name='api_wa_broadcasts'),
+    path('api/wa/broadcasts/<int:pk>/cancel/', views.wa_broadcast_cancel, name='api_wa_broadcast_cancel'),
 ]

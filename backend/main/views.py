@@ -31,6 +31,23 @@ API (all JSON; everything except login needs the admin to be signed in)
     GET    /api/images/             images in Storage (project-images/projects/)
     POST   /api/images/             upload (form field "file")
     DELETE /api/images/             {path}
+
+    WhatsApp (tables from supabase_whatsapp.sql, filled by the WhatsApp bot)
+    GET    /api/wa/chats/                       all chats (newest first)
+    GET    /api/wa/chats/<wa_id>/               one chat: messages (?before=<id> older, ?after=<id> newer)
+    PATCH  /api/wa/chats/<wa_id>/               {bot_enabled, needs_reply, name}
+    DELETE /api/wa/chats/<wa_id>/               delete the chat and its messages
+    POST   /api/wa/chats/<wa_id>/read/          mark as read
+    POST   /api/wa/chats/<wa_id>/send/          {text} your reply (inside the 24-hour window)
+    POST   /api/wa/chats/<wa_id>/review/        ask the customer for a review
+    POST   /api/wa/templates/send/              {phone, template, language, params, header_image, body}
+    GET    /api/wa/templates/                   approved templates from Meta
+    GET    /api/wa/media/<media_id>/            a customer's photo / voice note / file
+    GET    /api/wa/bookings/                    calls booked through the bot
+    PATCH  /api/wa/bookings/<id>/               {status, notes}
+    GET    /api/wa/broadcasts/                  offer broadcasts
+    POST   /api/wa/broadcasts/                  queue a broadcast (the bot sends it)
+    POST   /api/wa/broadcasts/<id>/cancel/      stop a broadcast
 """
 import hmac
 import json
@@ -45,15 +62,17 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.db import DatabaseError, ProgrammingError, connection, transaction
-from django.http import JsonResponse
+from django.db import DatabaseError, IntegrityError, ProgrammingError, connection, transaction
+from django.db.models import F
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import ensure_csrf_cookie
 
-from . import storage
-from .models import ClientReview, ContactEnquiry, ShowcaseProject
+from . import storage, whatsapp
+from .models import (ClientReview, ContactEnquiry, ShowcaseProject, WaBooking, WaBroadcast, WaBroadcastRecipient,
+                     WaContact, WaMessage)
 
 log = logging.getLogger(__name__)
 
@@ -119,6 +138,9 @@ def api(methods, login_required=True):
             except storage.StorageError as e:
                 log.warning('Storage: %s', e)
                 return JsonResponse({'ok': False, 'error': str(e), 'code': 'storage'}, status=502)
+            except whatsapp.WhatsAppError as e:
+                log.warning('WhatsApp: %s', e)
+                return JsonResponse({'ok': False, 'error': str(e), 'code': 'whatsapp'}, status=502)
             except DatabaseError:
                 log.exception('Database error')
                 return JsonResponse({'ok': False, 'error': 'Could not reach the database. Check your internet and DATABASE_URL, then try again.', 'code': 'db'}, status=503)
@@ -390,6 +412,8 @@ def status(request):
         storage={'configured': storage.is_configured(), 'bucket': settings.SUPABASE_STORAGE_BUCKET,
                  'folder': settings.SUPABASE_IMAGE_FOLDER, 'url': settings.SUPABASE_URL},
         counts={'enquiries': ContactEnquiry.objects.count(), 'projects': ShowcaseProject.objects.count()},
+        whatsapp={'configured': whatsapp.is_configured(), 'templates': bool(settings.WABA_ID),
+                  'review_template': settings.REVIEW_TEMPLATE_NAME, 'admin_number': settings.ADMIN_WA_NUMBER},
     )
 
 
@@ -607,3 +631,324 @@ def images(request):
     if used_by:
         ShowcaseProject.objects.filter(image_path=path).update(image_path='', updated_at=timezone.now())
     return ok()
+
+
+
+# ---------------------------------------------------------------------------
+# WhatsApp (chats with the bot, your replies, calls, broadcasts)
+# ---------------------------------------------------------------------------
+NO_WA_TABLES = ('The WhatsApp tables do not exist yet. In Supabase, open SQL Editor and run supabase_whatsapp.sql '
+                '(from the WhatsApp bot project), then refresh this page.')
+
+
+def _wa_guard(view):
+    @wraps(view)
+    def inner(request, *args, **kwargs):
+        try:
+            return view(request, *args, **kwargs)
+        except ProgrammingError as e:
+            if 'wa_' in str(e):
+                raise ApiError(NO_WA_TABLES, 503, code='no_table')
+            raise
+    return inner
+
+
+def _wa_number(value):
+    d = re.sub(r'\D', '', str(value or ''))
+    if len(d) == 10:
+        d = '91' + d
+    if len(d) == 11 and d.startswith('0'):
+        d = '91' + d[1:]
+    if not 10 <= len(d) <= 15:
+        raise ApiError('Enter a valid WhatsApp number with country code, e.g. +91 98765 43210.', 400,
+                       errors={'phone': 'invalid'})
+    return d
+
+
+def _chat(wa_id):
+    try:
+        return WaContact.objects.get(pk=wa_id)
+    except WaContact.DoesNotExist:
+        raise ApiError('This chat no longer exists. Refresh the page.', 404)
+
+
+def _record_out(contact, sender, msg_type, body, wamid):
+    now = timezone.now()
+    fields = dict(wa_id=contact.wa_id, direction='out', sender=sender, msg_type=msg_type, body=body,
+                  status='sent', created_at=now)
+    try:
+        with transaction.atomic():
+            msg = WaMessage.objects.create(wamid=wamid, **fields)
+    except IntegrityError:                      # already saved (the message was sent, so never fail here)
+        msg = WaMessage.objects.create(wamid=None, **fields)
+    WaContact.objects.filter(pk=contact.wa_id).update(
+        last_outbound_at=now, last_message_at=now, last_message_preview=' '.join(body.split())[:200],
+        needs_reply=False, unread_count=0, updated_at=now)
+    contact.refresh_from_db()
+    return msg
+
+
+def _phone_enquiries(wa_id):
+    with connection.cursor() as cur:
+        cur.execute("""SELECT id, status, created_at, services FROM contact_enquiries
+                       WHERE right(regexp_replace(phone, '\\D', '', 'g'), 10) = %s
+                       ORDER BY created_at DESC LIMIT 10""", [wa_id[-10:]])
+        return [{'id': r[0], 'status': r[1], 'created_at': r[2].isoformat(),
+                 'services': r[3] if isinstance(r[3], list) else json.loads(r[3] or '[]')} for r in cur.fetchall()]
+
+
+@api(['GET'])
+@_wa_guard
+def wa_chats(request):
+    now = timezone.now()
+    rows = WaContact.objects.order_by(F('last_message_at').desc(nulls_last=True))[:500]
+    return ok(items=[c.to_dict(now) for c in rows], configured=whatsapp.is_configured(),
+              admin=settings.ADMIN_WA_NUMBER, review_template=settings.REVIEW_TEMPLATE_NAME)
+
+
+@api(['GET', 'PATCH', 'DELETE'])
+@_wa_guard
+def wa_chat(request, wa_id):
+    contact = _chat(wa_id)
+    now = timezone.now()
+    if request.method == 'DELETE':
+        contact.delete()
+        return ok()
+    if request.method == 'PATCH':
+        data = _json_body(request)
+        values = {}
+        for key in ('bot_enabled', 'needs_reply'):
+            if key in data:
+                if not isinstance(data[key], bool):
+                    raise ApiError('Invalid value.')
+                values[key] = data[key]
+        if 'name' in data:
+            values['name'] = _text(data['name'], {'max': 120}) if len(str(data['name'] or '')) <= 120 else None
+            if values['name'] is None:
+                raise ApiError('Name is too long (max 120 characters).', errors={'name': 'max 120 characters'})
+        if values:
+            WaContact.objects.filter(pk=wa_id).update(**values, updated_at=now)
+            contact.refresh_from_db()
+        return ok(contact=contact.to_dict(now))
+
+    msgs = WaMessage.objects.filter(wa_id=wa_id)
+    after, before = request.GET.get('after'), request.GET.get('before')
+    if after and after.isdigit():
+        items, has_more = list(msgs.filter(id__gt=int(after)).order_by('id')[:300]), None
+    else:
+        if before and before.isdigit():
+            msgs = msgs.filter(id__lt=int(before))
+        items = list(msgs.order_by('-id')[:80])
+        has_more = len(items) == 80
+        items.reverse()
+    extra = {}
+    if not after:
+        extra = {'enquiries': _phone_enquiries(wa_id),
+                 'bookings': [b.to_dict() for b in WaBooking.objects.filter(wa_id=wa_id)[:10]]}
+    return ok(contact=contact.to_dict(now), messages=[m.to_dict() for m in items], has_more=has_more, **extra)
+
+
+@api(['POST'])
+@_wa_guard
+def wa_read(request, wa_id):
+    WaContact.objects.filter(pk=wa_id).update(unread_count=0)
+    return ok()
+
+
+@api(['POST'])
+@_wa_guard
+def wa_send(request, wa_id):
+    contact = _chat(wa_id)
+    text = str(_json_body(request).get('text') or '').strip()
+    if not text:
+        raise ApiError('Type a message first.')
+    if len(text) > 4096:
+        raise ApiError('The message is too long (max 4096 characters).')
+    now = timezone.now()
+    if not contact.window_open(now):
+        raise ApiError('More than 24 hours have passed since this customer last messaged, so WhatsApp only allows '
+                       'an approved template. Use "Send template".', 409, code='window')
+    wamid = whatsapp.send(contact.wa_id, whatsapp.text_payload(text))
+    msg = _record_out(contact, 'admin', 'text', text, wamid)
+    return ok(message=msg.to_dict(), contact=contact.to_dict(now))
+
+
+TEMPLATE_NAME_RE = re.compile(r'^[a-z0-9_]{1,512}$')
+LANG_CODE_RE = re.compile(r'^[A-Za-z]{2,3}(_[A-Za-z]{2,4})?$')
+
+
+def _template_values(data):
+    name = str(data.get('template') or '').strip()
+    language = str(data.get('language') or '').strip()
+    if not TEMPLATE_NAME_RE.match(name):
+        raise ApiError('Choose a template.', errors={'template': 'required'})
+    if not LANG_CODE_RE.match(language):
+        raise ApiError('Invalid template language.')
+    params = data.get('params') or []
+    if not isinstance(params, list) or len(params) > 20:
+        raise ApiError('Invalid template values.')
+    params = [str(p if p is not None else '').strip() for p in params]
+    missing = [i + 1 for i, p in enumerate(params) if not p]
+    if missing:
+        raise ApiError('Fill in every template value: ' + ', '.join('{{%d}}' % n for n in missing) + '.',
+                       errors={f'p{n}': 'required' for n in missing})
+    if any(len(p) > 300 for p in params):
+        raise ApiError('Each template value can be up to 300 characters.')
+    header_image = str(data.get('header_image') or '').strip()
+    if header_image and not re.match(r'^https://\S+\.\S+$', header_image):
+        raise ApiError('The header image must be an https:// link to a JPG or PNG.', errors={'header_image': 'invalid'})
+    body = str(data.get('body') or '')[:2000]
+    return name, language, params, header_image, body
+
+
+def _render(body, params):
+    for i, p in enumerate(params, start=1):
+        body = re.sub(r'\{\{\s*%d\s*\}\}' % i, p, body)
+    return body
+
+
+@api(['POST'])
+@_wa_guard
+def wa_send_template(request):
+    data = _json_body(request)
+    wa_id = _wa_number(data.get('phone') or data.get('wa_id'))
+    name, language, params, header_image, body = _template_values(data)
+    if wa_id == settings.ADMIN_WA_NUMBER:
+        raise ApiError('That is your own alerts number. Use a customer number.', errors={'phone': 'own number'})
+    contact, _ = WaContact.objects.get_or_create(pk=wa_id)
+    customer = (contact.name or contact.profile_name or '').split(' ')[0] or ('நண்பரே' if language.startswith('ta') else 'there')
+    params = [p.replace('{name}', customer) for p in params]
+    payloads = ['rv:start'] if name == settings.REVIEW_TEMPLATE_NAME else []
+    wamid = whatsapp.send(wa_id, whatsapp.template_payload(name, language, params, header_image, payloads))
+    preview = _render(body, params) if body else f'[Template: {name}]'
+    msg = _record_out(contact, 'admin', 'template', preview, wamid)
+    return ok(201, message=msg.to_dict(), contact=contact.to_dict(timezone.now()))
+
+
+REVIEW_ASK = {
+    'en': "Hello {name}! 🙏 Thank you for choosing AJ Technologies. Could you share a short review of your experience? It really helps us.",
+    'ta': "வணக்கம் {name}! 🙏 AJ Technologies-ஐத் தேர்ந்தெடுத்ததற்கு நன்றி. உங்கள் அனுபவத்தைப் பற்றி ஒரு சிறு விமர்சனம் பகிர முடியுமா? இது எங்களுக்குப் பெரிதும் உதவும்.",
+    'tanglish': "Vanakkam {name}! 🙏 AJ Technologies-ah choose pannadhukku nandri. Unga experience pathi oru chinna review share panna mudiyumaa? Engalukku romba help-ah irukkum.",
+}
+REVIEW_BUTTON = {'en': '⭐ Write a review', 'ta': '⭐ விமர்சனம் எழுது', 'tanglish': '⭐ Review ezhudhu'}
+
+
+@api(['POST'])
+@_wa_guard
+def wa_review_request(request, wa_id):
+    contact = _chat(wa_id)
+    now = timezone.now()
+    first = (contact.name or contact.profile_name or '').split(' ')[0]
+    if contact.window_open(now):
+        lang = contact.language if contact.language in REVIEW_ASK else 'en'
+        text = REVIEW_ASK[lang].format(name=first or ('there' if lang == 'en' else '')).replace(' !', '!')
+        wamid = whatsapp.send(wa_id, whatsapp.buttons_payload(text, [('rv:start', REVIEW_BUTTON[lang])]))
+        msg = _record_out(contact, 'admin', 'interactive', f'{text}\n[{REVIEW_BUTTON[lang]}]', wamid)
+        via = 'message'
+    else:
+        wamid = whatsapp.send(wa_id, whatsapp.template_payload(
+            settings.REVIEW_TEMPLATE_NAME, settings.REVIEW_TEMPLATE_LANG, [first or 'there'], '', ['rv:start']))
+        msg = _record_out(contact, 'admin', 'template', f'[Template: {settings.REVIEW_TEMPLATE_NAME}] Review request', wamid)
+        via = 'template'
+    return ok(message=msg.to_dict(), contact=contact.to_dict(now), via=via)
+
+
+@api(['GET'])
+def wa_templates(request):
+    return ok(items=[t for t in whatsapp.list_templates() if t['name'] != settings.ADMIN_TEMPLATE_NAME])
+
+
+@api(['GET'])
+@_wa_guard
+def wa_media(request, media_id):
+    if not re.fullmatch(r'[A-Za-z0-9_.-]{1,100}', media_id):
+        raise ApiError('Invalid file.', 404)
+    msg = WaMessage.objects.filter(media_id=media_id).first()
+    if not msg:
+        raise ApiError('File not found.', 404)
+    content, ctype = whatsapp.fetch_media(media_id)
+    response = HttpResponse(content, content_type=ctype)
+    response['Cache-Control'] = 'private, max-age=3600'
+    response['X-Content-Type-Options'] = 'nosniff'
+    if msg.media_filename:
+        safe = re.sub(r'[^\w.\- ]', '_', msg.media_filename)[:120]
+        response['Content-Disposition'] = f'inline; filename="{safe}"'
+    return response
+
+
+@api(['GET'])
+@_wa_guard
+def wa_bookings(request):
+    return ok(items=[b.to_dict() for b in WaBooking.objects.all()[:500]])
+
+
+@api(['PATCH'])
+@_wa_guard
+def wa_booking(request, pk):
+    booking = _get(WaBooking, pk)
+    data = _json_body(request)
+    values = {}
+    if 'status' in data:
+        if data['status'] not in WaBooking.STATUSES:
+            raise ApiError('Choose a valid status.')
+        values['status'] = data['status']
+    if 'notes' in data:
+        try:
+            values['notes'] = _text(data['notes'], {'max': 5000})
+        except ValueError:
+            raise ApiError('Notes are too long (max 5000 characters).')
+    if not values:
+        return ok(item=booking.to_dict())
+    try:
+        with transaction.atomic():
+            _save(booking, values)
+    except IntegrityError:
+        raise ApiError('Another call is already booked at this time.', 409)
+    if values.get('status') and values['status'] != 'booked':
+        with connection.cursor() as cur:
+            cur.execute("""UPDATE wa_admin_alerts SET status = 'skipped', error = 'Changed in the dashboard'
+                           WHERE kind IN ('call_reminder', 'cust_call_reminder') AND ref_id = %s AND status = 'pending'""",
+                        [booking.pk])
+    return ok(item=booking.to_dict())
+
+
+def _audience():
+    return (WaContact.objects.filter(opted_out=False).exclude(pk=settings.ADMIN_WA_NUMBER)
+            .values_list('wa_id', flat=True))
+
+
+@api(['GET', 'POST'])
+@_wa_guard
+def wa_broadcasts(request):
+    if request.method == 'GET':
+        return ok(items=[b.to_dict() for b in WaBroadcast.objects.all()[:100]], audience=_audience().count(),
+                  opted_out=WaContact.objects.filter(opted_out=True).count())
+    data = _json_body(request)
+    name, language, params, header_image, body = _template_values(data)
+    try:
+        title = _text(data.get('title') or name, {'max': 120})
+    except ValueError:
+        raise ApiError('The title can be up to 120 characters.', errors={'title': 'max 120 characters'})
+    numbers = list(_audience())
+    if not numbers:
+        raise ApiError('There is nobody to send to yet. Customers appear here after they message the bot.')
+    with transaction.atomic():
+        item = WaBroadcast.objects.create(title=title, template_name=name, template_language=language,
+                                          body_preview=body, params=params, header_image_url=header_image,
+                                          status='queued', total=len(numbers))
+        WaBroadcastRecipient.objects.bulk_create(
+            [WaBroadcastRecipient(broadcast_id=item.pk, wa_id=n) for n in numbers], batch_size=500)
+    log.info('Broadcast %s queued for %s customers', item.pk, len(numbers))
+    return ok(201, item=item.to_dict())
+
+
+@api(['POST'])
+@_wa_guard
+def wa_broadcast_cancel(request, pk):
+    item = _get(WaBroadcast, pk)
+    if item.status in ('queued', 'sending'):
+        with transaction.atomic():
+            WaBroadcast.objects.filter(pk=pk).update(status='cancelled', finished_at=timezone.now())
+            WaBroadcastRecipient.objects.filter(broadcast_id=pk, status='queued').update(status='skipped', error='Cancelled')
+        item.refresh_from_db()
+    return ok(item=item.to_dict())

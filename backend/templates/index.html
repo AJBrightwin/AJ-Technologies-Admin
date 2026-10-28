@@ -7,6 +7,10 @@
 <meta name="dashboard-version" content="mobile-menu-fix-2">
 <meta name="csrf-token" content="{{ csrf_token }}">
 <title>AJ Technologies · Admin Dashboard</title>
+<!-- Favicon: the AJ Technologies gear logo (built into this file, so no static files are needed) -->
+<link rel="icon" type="image/png" sizes="64x64" href="data:image/png;base64,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">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,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xMcNQyccCTNs2En8+suvGRVbtgV1NBojFotywAH9GTXqDEaMPIF+++6D1+ut9+/Ky8tZsuQTZs58k7nvzKestJy8vFwnP5yZV9apqQkjhMYVV17Cbbf+kfz8fKvSiEBPueWv18a4480E7620pgjYtRZpSj69JcRBPQzkLh5+tAtAf/HFl4wadaETy4bDYaSUdO3ajaOOGsxJJ43khBOOo3PnTlsRjGpqwpx88pmsWPFj2hodDQnchMMRYrEo+fl59O27J/3796dXrx4UFORjGAaRSITi4s2sWvUzy5d/z4YNG0kkEuTk5GAYRhO8ciUDB/Zn4sR7GD58e6+clJJH3o/y0PuSqpggL5Bi7SkQGsTikjnXBji4p77LA9poLwSiuiLm1nxsQU1NNa+//iYzZ85mt+678eILzzFw4ABM08QwDL766usmg9m+QUzTJBDwEwwGSCaTLF++gq+/+pakmUzleTWkNFObSi8+n5dgMOh45EzBbHnlCEIIfnftVdx66x8pLCjAlFaZ2w5rvlob464343ywSpDjE+T6IWnWtgoIBaZ0uRxtugxumsoJBwoL8615J/EEBflbj56YNXM2sVgsY47EzhpaNU1zwF13am3dOS+NTffZXrmkpIyBAwcwYcJdHH/88B165Uc/iPLgeyaVMY3CIJgKTOkODcqayKIQWrM2glpeG6qqqjn11JPovXsvxztXVlaw4L0PmpTn3Zl8QPPrjtixsuC6667mlltvprDAmuSl6mw2v14b584347y/CnL8Onl+RbKFgGw7d5FKk3Z4QNuEGPvDaO7hkHYYcuppJ29ViVu48EN+/vkXcnJy2rw8QF2vfMABA7j33jsYMeL47bxywjR5fFGMvy8wqUh5ZSlVi3nl2njb2mHapfQOWym0c7YbN27i2mtvZPmy79E00Wxj1mxyft++ezB0yDFbqQnNmvWWo7jfttWgrLmDsViUa6/9LW+99RojRlg6dKa0qp66Bt+sizHq3xHumC2JS408vxVetFR0bEoLzIv/G+OsJ6tZURxHiNYPaYzWBLOu6xQXF3PJJVfw/vuL+OSTz5g2bQr77devWSiati7d8OFDycvLc8acbdq0iUWLPsyIQto6XtkqBg0Y0J/x4+9k5MgTduCVJY8vivL390wqorZXbllgmRJ0DT76OcblU+OsLtNYUx7j+ctg325e5+cdxkPXgnkzY8aM5fPPv6RPn91ZvXo1o0dfxg8/rHA0ktPZiNX3ezbf94wzTnHCGYB33lnA+vUbGz3KLRsafZFIhGg0yjXXXMXbb7/ByJEnYJqyjldWLF0f55x/hy2vbOpN8spSpfe3dcF88bNxyqMaPQtgVanGhc/E+LE4jq61nqfWWgvMmzdv5qKLLueLL76koKCAaDRKTk4Oa9asY8zoy1mx4sd6QW2nyWxPlp+fX493jrJ//34MGnQYSikMw/L4c+a8g65rDm2yrYQd9npKS8vYa++9mDr1KR544H7y8/NTXllD1wRJafLw+xFOfSLOwv8KioICXTQ+VlYocv0KXQM9FTbsKJNng/njX2Jc/GyCiphGwAPRJOT54OcSjQunxFjZiqDWsl0I0XWd4s2bGT3mcj7/3AKzXZpOJk1yckKsWbuW0aMvY8WKlVuBui7f2WbMfbd0GS+++MoOS8zxeIyRI07A7/eTTFr54O+//4F3330PwzCIxWIOqck6p7ZVr13daVbp8DOaGitHo1Ei0ShXX30Fb81+jZEjT7CeQFKhpWLl71Je+c7ZkrhM5ZWbGCtrmsbkhXHmr4hTHTPRNYWW4kvbwK4L5oueiVMREwQ81vcF1hpy/fBzqcYFU6L8tDkFatVOK4V2Va+4eDMXXTSWzz//wgEzOygn19TU0Lt3L1544Vn23XcfEomE0/u2bt16Zs6czaxZb7Hsu2VUVVfvUKrLNCVvv/0aBx10oBM/f7f0O/73ljsoKyunorKCeCxBPB5PHQkSibhT+bMArTve3AZ3c49ykFJSUVHB/v33Y+LEuxlxwvYZDFOaTF4U5e/vKsqjVrXPZso1ffMMVRGFx4C+RXDS/oJzDvZwcC8PIBwwf/JLjDHPxB3PvCMPrGtQFRX07WTy8lgfe3XxYirL87cbQG8F5ovH8tmnX6YKHkka4kjYoH7+hWfpt+8+rFz5E//5zzO8/vqbrFu3Hq/Xg9/v365srOs6VVVVHHXUEcyY8cJ23d5KKWLRGJFYlLKyckpLSykrKaW0tJzSslJKSssoKSmhtKSMkpJSSkpKqK6uJhaLEYvFU19jTQaT1TWi8Pn8XHLpaP7fbbdQ1KlwOw7Gt+vj3D07xvwfNXJ8Ao/e/Kk4XbNukFgSonHI9ytO2E9wzVEejurr4eNf4k7MXB+Y656rOgp9O0leskGdpY1iiwO6FszFXHTRlXz++ef1eub6prX2778fxx03jBdeeJmNG4vJyQk5ZP0dFTGswZhl/P73v+O++8YTj8cdpp2dl84kdEgmk9TU1FBWWk5ZeTllZaWUl1c44yHqnmpHuVj7e9v/TJBIJNl9914cffSR1mulvLKhWT2MkxdG+dsCk7KI1qxeuaGbTEvF0VVRyPFJTukv+Gw1rC0XhHzpxcaGBlUx6FskeXGsj727eLPCE2lRQNuxaXHxFi6++HI+/fQLCgvTA3Pd+C4ejxMOh8nJycHj8Ww3dri+UQuDBh3KzJkvN9imv+0YY3vNdtUyW/12SkpkHa+8dH2cu96MMX+lSHnl7G+y7I1dVQyCHvDoO94sNgjqlKe2Qd3SxZcWA7R92nXr1nPllb/j008/p6AgPyMwb8tm2xmQt/2baDTK8OFDOPmUk+jWpTOdu3SmoKCAYDBIKBQiFApmpElhg9+On51G3NTmqZGdfwihITQNIxUrP7E4yt8WSEojVoGkpb1yuuFIY9Zge+q9iiRTL/XRbzdvi3bItBig7fTcnDnvcNZZ59O9e/cWaSrdGahrasIoJR1P6/P5yMvLJS8vzzkKCvLo1KkTXbp0onPnTnTu0oXOnTqRn5dLKCeHnJwQOTk5DfKbm8OWrY9zx+w4766AkF9rkViZrDMhrdCqMmIy40oPI/bzt2g83aIhh51ie+yxf3DXXRPIz89L6VuorOZ263pDKVVq0Lw1bN7yuiZgp+VqFYsCgQC5ubnk5uaQl5eLz++n//5WJsKS5bJ4J0t+jjJnuYnfk9kjua4HLK6CWUslxTUa+YHW98rNo2kNphLEE5JHzxGMGRREKtGicXSLbwrtmHTSw5MZf8+fUlzl1p1DXdtEu6O8snKAZFchTVMipfU1kYgxf/7bHH74IOIJidejMXFuDXfPUhSEBEmpdiJ5u+37Fg65J+gDr067oHjaoVg8oXj4bJ2LB/uRUtDS0oBGNsBjmiY33XgdKMX48fc5rUatBeq6G8B0ytCGgdOTWFpaxgcfLOTwwwc54BzRT+cfi5JY1JOduR9R7/damoPRGp550tk6Fw8OZC1tZ2TrsW+aJjfd9HsAxo+/LzUzpPk99bZVvfrI9em+bl3w2+zAj5Z8muJVW5/QgT089C5IsqoUfEbbCBXs9Jtg+zBIs7qvWiSsccAclzx0tsYlgwMkpbU5pL2w7ewsRS2oFePH39+sntre9CUSCWKxOPF4DCltURkrvysQeL1W+5PH43GeHpnsCYLBAN8uXcraNevos8fuJE1F0KsxeA+NZZuUVXRoJUALQKtbIElYhCyvDrpugdeUkDBB1wV+A7yGBULZDFRTQa1nfuhsnUsPzy6Ys0ofrQW15KabrkcB946/j7y8vGbY9Cmqq6uRUtK5cycOOeQg9tuvHz16dCc3NxchoLq6ho0bN/Hjjyv5/vsf2LSpGICcnBznZkvHW1thRzlLPvqYPnvsjiklhq5z7F4az32WBCVaLbWWMKEyrPB7oG8nxSE9Bft21emeL8jxChRQFVWsr5B8v0ny9VrFr2WChBTk+mgSoUgAEgvMD47SufRwK5thaO2YD22B2krp/eGm6xEI7rvvLylesmrUDVJdXYPQBMceexTnnDOKYcOG0LNnzwa7XjZtKmbRog+ZMeMN3nvvA2KxGHl5eWnnuaWULFy4mNGjz8dIvc5Re+p0DiaoTmjoQmVteISdFisPKzqHFOcfLDj7IA+D+xgEvQ3xzySVUcmH/03y8lcmc3+QVKTy3opGhCICEgnJX8/UuOxwP0kpsg7mViH4180q9OzZM8WSExnND9E0gZSK8vJyjjhiMDfffKPTksQOpMG2FXnp1q0r5547inPPHcXHH3/Cgw8+wrx57xEMBjEMvUHSv5SSQMDP559/QWVlFXl5uUil6JlvcFBPjXk/KvID2dnc6RrEEgJTmlw8SHDjUB/7dTNqN5n1FHwUoAuNPL/Gyf0NTu4v+WJNkr8viDF7mSDg1TA0lVEKUmB1k6d2LK3WiqW1RoZB0zQqKyt54IG/Z9yVomkaiUSSRCLB7bf/kTdef9kBczJpOhu+HY1isATDazd4SimOOOJwXnppGg888Cc8hiUa09CalFJ4vV5+/XUt337zbep1rXz70X2zl7nRNaiJCYqCJk+NMfjH+SH26+ZBKoGpLGBpwnrk69schpbilmBznzUO7e1l+mVBHhql49FNosnMGHIKMHTBg++ZbK5OOvTTdg9ou9jyyiuv8eOPKwkGg2m3Qdm8Dq/Xy7/+NZlbb/0jPr/PiX8NY+eazXbhxOZTm6YVZvz2t1fw/AvP0KVrZ8LhcIOg1nWNaDTKBwsXb/X9IfsYBD3WBqulwVwVhX26JHntt17OOjCAKYVD/tFFemV4kTqX5pTvda44MsALl3vpEpREEumn2pSCgBd+LRNM+zyOQCHbO6CVskAZi8WYNu0FvF5fRtyMZDKJx+NhypR/cvrpp5JMJh1v3Ghw6JrTXHDkkUfw/PRn6NKlM9FotF7Os5QKr9fDkiUfI00Tj8f6vf276ezTBSLJluMqaBrUxGGfzpIXx/rZv5uPpKwFZlPSbZqwiPpH7+lj+mVeCgOSaAbvRSnwGYIXv5RUxySaln0vneWOFSuPu+SjT/h26bKMm1RjsRgPPfgXhg8f6hD2m4sJZxg6yaTJwIEDePLJyRiGx8k7b//BSfx+P8uX/8DPv/yKQJAwJSGvzqDddeLJlpn4KgQkk5Dvk/znIg97FHmbPS1maBaoD+nt44kLPQglkRn0JQY88P0mWPRTcoc58F0G0LX8iIYPpRSz33ybeDSWtv6GrutUVFRy1VVjOefcUQ6YW6INKplMcvTRR3L7beOorq7eoZe2xB4NysrKWbx4iUP/BBi+r0BvofhRANGEYsIpOgN7+Fssx2uD+vh9/YwbplEZUWmHHiJVWJn5XdLizqiUYtOODtn8ak7NdjnsHryGDq/XixCCRQs/JBAMOAT5nYUakUiUfvvuza23jnOKJS0Wn6Z6GK/5n6s46qgj6gW1jWwb0HrqEz9sd53ueZAwRbMOMdaFRcM8oR9cPNjf4qVkPRVXXz/MzyE9FeFYeqQipcBvwEe/SqIJE49unWuHh1b7tc2l7V55ZQalpeVourbDDJw9wHLN2rWsW78hbQkBTdOIRaNce93VFBYWYpommqa3eFrRMDyMG3cDo0dfWn/6Lhjgs8++oKKikvz8PKRUdM83OLBnnDnfK/ICoJrJ+0gEPl3yh+EGAg3S3Pg1iVwkIeTVuWGohyufTxAU2k6zq1JZBKuNFYJb3ojTPd8kae6YLG411wq65kiuPTbQtth2hYXdSSQSzgQq6uGU6bruMO7SAVc8Hqd37168++5b5ObmbpfLbqnUoq23d+aZ5/HJJ58SCuXssLM8Go3y/PNPc/zxxxFPmHg9Oo8tDHPbLElhUDTL41RLeefheytmXBUENCtbk4VNPEA4kWTE5AgrijX8nvTDqepYis8tGnoNgUczqXggr2156Pz8/LSAVldTI53HfyQS5qSTRjiVvGyMJrYlbg3D4IzTT2Hxhx/t8L1Z64vy4eKPOP7445yN4LF7GeT6YphSZFgyaiAulZKzDjTQhObIcGWjCmmmvPTJ+2t8sx6C3vS5KvmBnb9/ATRncNasm8JkMrnTI30ykD3p1M/w4UNbTNFzZ6HHsOFDya9n3olpmvj9PhYt/ggpTTyGVbjp101n366CaKLp/XMWsQo6heCoPY3tmnKzkm5FMHxfD35dZpS1MKW1uTQbOOyft/uxbkJAPJ6gS9cuDBjQf6vhOtkE9O59dmfPvfYgFovt8PV9Ph8rV/7EihUrAUiaEr+hc0QfjYTZ9PSdwFIm2rNIsEeR5oQg2eQ2C2CfLho98yFutg3Z3F0Q0FYhZbduXenWrWtWYuftww5FwO9njz59iMfj272+zb4rKytjyUcfO+OTAYbtozdLYcF+7PcuEHgNPet5Xfstd87R2C1PkEi2fOzebgdvmqbJbt13a7WWLXuERJfOXepNMVrcFJ2FHyy2prSmUoq/6SXolQ/xZNM9mlKwW57YYQNXVq6DAl0IS9lUuR66SXNTQsFgq68llBNE1POcV0rh9/v46qtvKCkpcZiA3fIMDu5pEe2bHiIogl5FqyE6FfwEveCORm6muSWt+6SQ9SLJZt+tX7+Bzz77womjQWPYPhrJ5hqbLBtoSczWdZAuoJtIMxWUV1S0end4ZUVlg55R0wTxeMKpGtp/d8yeBoVBC4yiiYFsaY1oNTzbwU55OJWGUy6gaWwZev26DSSTiVbRcLZnm2zctAldNxp4ilhhx+IPP7JUUg1LfX+/3QwG7S6IxJoQd6YooWvKFUrJrANapTaGNTGTLTXW9FnXQzfSQ3s8HjZv3swvv6zOevhh64lUVFTy00//xefz1fv6VhztZ8UPP/LFF19Z45hNa6rXGQN1TNX49J3CamRdXabYXG06oo/ZpPyCdUOtLVd4jQ7iobeVD2joyAzQJXz11TdZL6zY/YXLly9n7dp1eL31c0/sLpyamjAzZ85OvU/rd0/cz0OPfNXobIdU4NNhbZli6QbpyA9kG9CfrU5SFrb6BFUGoYrVUNHw0Zx59WYDdCKRSIs+2hgvO3fOvFYZHSGEYM7c+cRi0Z0WdWyJg3nz3qWysgpD15FS0SNfZ8jeGuF44z84ISAuNd5eZmY95LAuuWT2MrPeTE+9PYbSKsQkdnJEE20Q0F27dMHv9xEMBgjs6AgECGao9imlJBQK8t77i1i16r+NGuzelL7H8vJyZr85J63hnJZwuY9Vq/7LwoWLnGyHAs4aaKBrqtGPaqksDsVbyyUbKxNOy1Q28s9CwHcbkixaBTm+9DMdUlmi6d1Cii7Beo6Qosiv2LeLanv00bnvzHS4w2qH+sfW0J5ffl3N5Zdd7cxVSSfs2LJlC0/952nuv29CVgBtz4KZ/vxL/PTTTw5tNd3c+euvz+K0005B1wUCwdC9DfbuEueXUkvcJVMwWq1NsLpcMOWTBLePMJCy5el2luyt4onFcSqjUBDcOaAFFnkpYEhevsLH3l0M4vXl4oX93tSuN2Olrp188hl89tlXhEI7b5C1vbKmCWbPnsHAgQMxTekQ6ltq4sCGDRsZMeJUSkvLMAwjrfjdLtfn5eXx7ruz6dmzJ0lTYuiCO9+M8ND7iqJQ4/K5dYEy9zof+7awIr7dQLB4VYyzn4rj0bW0Yme7gffYvopZ1wSznnfQmnted0NHIpFAKcVxxw3fITeiIbWimpoIt956N7FY3OFZtAwP2vr3nXfek5rj4s1IB8/r9bJhw0bmzp1fZzai4IyBHkI+hdlIYXSFpaBfGtG49Y24U7BRLVXq1qAskuTWmXFMqWW0oU1KxYj9NEA4E7qUauBoq1kOezpUfYctHXDG6adkNJrCNE1yc3NYsuQj7rjj7lQvYvNmPWyetq5rPPjQI8yY8UbtfMAMz2MYOrNmvZXiVFuX+NDeOgf1UETjjc9JmxLy/DB/Bdz5ZgRNKAcUzT2/WyqTP7waZel6jaAvvTDJFpvpElKcfoA1Qctm6zWY6dhV89D2WIl++/VjyJBjqKmpSbs/0DRNCgoK+Pe/n+HeCfc74oxmM9Rj7bDHMAz+9a//cP99D5Cbm9eomeNWtiPI559/yfff/4AmBImkRNc0TjtAJ95ESqkpLeL844sUE+eE0YRsthnbduNAUprc8EqYV7+B/GD659Y0qI7BCf009uxkIGV2qa6tpJxkfb3iyksxDCOjTZ5pmuTn5zHpoUf5w7hbCIcj6LrW6HSgreZvp+T+/Oe/ctttdxEIBJtc4ayoqGLWzNlbiZyfNsBD56AiaTbNKykFeQHBAwsUN7wapiZuOkMuGxOJ2ZNjdQ02Vye47LkwT38qyA9k1kJmSoHfUFx1pOWdW0O3UmutcvLQIcdy3HFDqampyYi4L6UkPz+f/zz1LGefcwGfff6FM/HVDhvqE1204/za4T+WgtLKlSsZM+Yy/vKXvxMKhZz5gU0JX3w+L3PmziMSiWAYGlLBXp0NjthTUBNvmueyiysFfsF/PoYznoyweFUMXSjnvHZHiB2jbnWo2p/jqCdJZn8X5eR/RJm1TKMwKDK6OTQBNTHFGQMFg/oYKcpp9gHdKlmOZNLEMHQWLfqQUaMuIBQKZexhdV2nurqaQMDP+Recy9jLL+GAAwZkdI5Vq37muanTmfrcdEpLy8jLa1yY0dAUrpdfnsbQoccST0q8hsb0LyL8zwum5f1U88iCVcfAp0tGHahxxREeBvUx0vZVpjL5cFWSJz+M8/b3IIROwJv5sCJNQDguee0qD0P39mddF7rVAG2nxSoqK7nm6ut4771F+P2+RoUMdkxeWVlFYWEBRx99JCeeeAKHHHIwe+21J4FAYKtMSiwa45fVv/L1V98yf967fLBwMZs2bSYnJ4TH42k2MNcO/yznyisv5cEHH0il7zS21CQZ9nCU4hoNj9Y8srt2oaUqBiGPZNDughP66RzSS7BXF4NOIeu1QBCXUFxl8mOx5Is1JvN/kHy9DuKmNTe8sWpHQkAiCQN7KKZe4qN7vicrgzZbFdA2mCsrK7l87NXMn7eAwsLCJhVL7OxKMpkkHA5jmiaFhYUUFhay225dycvLQwhBdXUVGzcWU1paRllZGUrhzCnMZP5hJpK/8XiCbt26smDB2xQVFWGaCl2H618JM+UTKAzSrBxjW7A8nIB4UpHrg3w/5PoUIZ8VblRHoSomqIhATVzg9wgCXuVMj23qjVURhUN6mrx4eaBVQJ314fWVlZWMHXsN8+e/R1FRYaMGcdYPbGHlPut0mNs3ixAahmEpONnl95YA8o5GO//zn49x3nlnO7od766Icd6UOEGv1uwlbLHNeONkSm7Lfpu2KKOh16ojNecaDA3Ko3BwD5MXLg/QI9+T1eH1WlbBXFXJ2LFXNzuYa/PI0slaeL1egsEgOTk55OTkEAoF8Xq9jtRXNoaA2gzBmalsh5Gqbh7V12D/bhBJNL/3sjeMdkHD0K2yecBjHV6D1Bxx63ea+4ZKSijww9frdUZPibC+IoEusjd3RssWmKuqqlKe+f1mB3NDykd1j9agoIZCIZYs+ZhffvkVTbNy0gGPzkn7a8RaSKV02xSfUrWeuLkrcw2B+qv1OqOfjmYV1Fo2WGvV1dWWZ573XouDua2ZNWSolDlz3rFZWgCcMdBDrk+1i7mE9YI6CF+t07YCdUv7E62lh1tu2VLC2CuuYd68BR0OzHUJS9OnvUQ8HsdIqSsd0N3gsN6iSTzpNg9qEwoC8PU6jYueifJLaWKr4touBWh79MTHH3/C66/NolOnTh0OzPbT6aCDDqTvXns6lFlTKnRN4/QDdJIys7Cj9ZpkaTz/JCD46BfFsg1JZ2TyLgdoXbemSZ144gjuvPNWSkpKHHJSY9u7sikFZnNFGtslYxg6paVlnHvuKOa98yZPP/0kwZTGiC30ftL+OrvlKhJJkfZAZUl2RgzXncHSWHEZkUq5VERM/n6WwakDfE6JfZeMoTVNw+PxcM89d3DjTddRVlbmACUTMMdiMeLxOFVV1VsN/GmZG1FzPGssFiMajWX8WoZhUFJSykVjLmDy5EkEthm9YRdCdi/ycMxeGuGEanCou1XssCizBpLyiKXYqWst47GFqAVyeUTh1SWJpGqEVxdURU3+dKrOdUP8SKW1eHilZaOdSUrJhHvv5sYba0Gd/oaqjPPOO5uXXprKiBHHEYlGqaiocLpKmsNr29RWgMrKaqqqqxk8+DCmTp3C9df/D2Vl5WmzAi0wlzBm9PlMfnySU83cdp1WHCkYdaCOaCDvYH/+NTHJXSM1Zl3j5awDFEnTpDxsjX+wx7WJZvDG1kRaQVkYdCG5dJBg7rVerjnaGu6pp4FIkborLDBr3DA0kDGnuk0XVux0maZp3H33BCY9PJnCggKkqn/AtA2MCy88j8ceewiv19KhWrDgfZ59dhoffLCYkpJSvF4Pfr+/0R5bKUUsFiMWi5OXl8uRRx7OJZeM5tRTT3K0OO6+509MeuhRiooKGqSrGobBli0ljBlzPpMnT0rNRVQ7ntOS+uDLIwmOezTKmnJtO4kAe0psdVQy4WSdG4f7Hen4JT/HeO4zk/k/KDZWWU+yoLfxG0y7wiiA3gWSU/prXDrYy8AeHifYuX1mmEcWQlGofhae/TFURSUTT9W4MQVmTctO/J+1SmFdUN919wQemTTZ6tVT5nagth/ZF15wLpMfn+TwLOp6yRUrVvL2W3OY/+77LF/+PYlEotEhxt777MVxw4dxyikncvDBB21FV7Vj97vvmZgCdRFSmtvt1GvBfF4KzEa9YK4lBlkVtFveCPP44q0V/20vVx2VTDhF48ZhAaQSW1UDQbGmPMnc5Unm/yj5co2kKmY91lWGuerCoGRwH8GIfTVG7u+lS47hEP5rQyXJbTPDPLoQioIa5raTelP/qQVzEFOKrMX8WedybA3qe3lk0uMWl0PVlqBtMF9wwTk8/vjDTj+fDQxTSrQ6mzWlFHPmvMNVV12bUfih6zrl5RU88sjfGHPRBRh1lJHsaqPd9LrV02XSZIqKCrcqm9d9mkyePAnD8Fgy4Tt5ath9ex/+N8ZZ/47jTSku2cCojiomnKxx43BrsGZdLyfrlLJtn//SlzGuedEk5Es/kyAExBOS13/r5+i+tWOV7VYx+/zKmU5rctsbER5dZHlqKWufNg6YT9G5cVjACofaM8HfzhpIKZk44R6uv/FaysrtjeLWYJ78+CRndFtdoOopoEkpicctibBevXo2KpZWStKzZw8M3SAejzsbt7qbzrprnjDB2geUlm675hIuvOA8Jk9+KG0w22QipeCw3T0M2M0qhRtayjNHFPfWA+a6nAylLMlehSDX13j05AU0lBIkTOuc+jYCMHa7lFQ6/3dmkN8PgdIaS3/Qzma0NphbheBfFyB/mngP199wLWVlZei6h5KSMs4//xwmT56E1+N15Ljq28hZRQpFPB5v9Hri8YQzjba+m2KrG3Hi3dyQArVheFI3oOWZPR4vKJVRPG+18Wtc+BudcFwilRVm3Huyxk31gHlHGQkBJFXTKnvOuURD81Cs2eB/OSPA74+FsrBMZTNqQyNTilYrFhm0oqqnDWoB/N///Z3LL7/YArPXm/aAoKYqKqX791uv+W6EgD/f/1euuOIyHnvsITxeT6OGGmmp9NhVR/r5tTTCIx+Y3H+aXq9nbqkCiMgkt5yaC/6XMwMIojy6MMn9pxu1YNZaT/XXoJWlagEmTryHY445kqFDhziyAdksojRqzRPuttY85FhH966xa9YEaLrGn04LcO7BcQ7d3YdStR3TbXH+jbXr1LnvdD/n/ybJb3p7rTVrrbtmo60A5MQTR26l+kkb5mY4ax45olnXrGsah+7utzaGbZzfYa9P13R+01tvM2vW2tI8lbYO5mysWe4CYN4R/7qtrNmgDYmb72rWEmve1Zh3grZ1Axq41m7MUSgis42kaEf01XYBaCklUim0DD8ZmeKZtBczpZWT9hoZFlaSZH3+oQvoBqwgP5/cUJCacNgRnNn5xk6RGwpRUJjfLjwzQI8CQb+upkNPTTdm9+uKTsH2gehWEZpxzTU66pxC11xzAe2aC2jXXHMB7ZprLqBdc80FtGuuuYB2zQW0a665gHbNNRfQrrnmAto111xAu+YC2jXXXEC75poLaNdccwHtmmsuoF1zAe2aay6gXXPNBbRrrrmAds01F9CuuYB2zbVdxf4/YJLxrQ7/k+4AAAAASUVORK5CYII=">
+<meta name="theme-color" content="#2563eb">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Tamil:wght@400;500;600&display=swap" rel="stylesheet">
@@ -368,6 +372,147 @@ table.tbl{width:100%;border-collapse:collapse;min-width:760px}
 .imgbox .info small{color:var(--muted);font-size:11.5px}
 .imgbox .btns{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 
+/* ---------- WhatsApp ---------- */
+.wa-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.wa-top .seg{margin:0}
+.wa-top .seg button{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;font-size:12.5px}
+.wa-top .seg .n{font-size:10.5px;font-weight:800;background:var(--brand);color:#fff;border-radius:20px;padding:0 6px;min-width:18px;text-align:center}
+.wa-top .spacer{flex:1}
+.wa-shell{display:grid;grid-template-columns:minmax(260px,340px) minmax(0,1fr);height:calc(100vh - 210px);height:calc(100dvh - 210px);min-height:480px;overflow:hidden}
+.wa-side{display:flex;flex-direction:column;border-right:1px solid var(--line);min-width:0;min-height:0}
+.wa-side-h{padding:12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.wa-side-h .search{max-width:none;min-width:0}
+.wa-side-h .chips{gap:5px}
+.wa-side-h .chip{height:28px;padding:0 10px;font-size:12px}
+.wa-list{flex:1;overflow-y:auto;overscroll-behavior:contain;min-height:0}
+.wa-item{display:flex;gap:11px;align-items:center;width:100%;padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;transition:background .12s;position:relative}
+.wa-item:hover{background:var(--panel2)}
+.wa-item.on{background:var(--brand-soft)}
+.wa-item .avatar{flex:none;width:40px;height:40px}
+.wa-item .avatar.adm{background:linear-gradient(135deg,#dcfce7,#bbf7d0);color:#15803d}
+.wa-item .mid{min-width:0;flex:1}
+.wa-item .row1{display:flex;align-items:center;gap:6px}
+.wa-item .row1 b{font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.wa-item .row1 time{margin-left:auto;font-size:11px;color:var(--muted);white-space:nowrap;flex:none}
+.wa-item .row2{display:flex;align-items:center;gap:6px;margin-top:2px}
+.wa-item .row2 span.pv{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+.wa-item.unread .row1 b{font-weight:800}
+.wa-item.unread .row2 span.pv{color:var(--text);font-weight:600}
+.wa-unread{flex:none;background:#16a34a;color:#fff;font-size:10.5px;font-weight:800;border-radius:20px;min-width:19px;height:19px;padding:0 5px;display:grid;place-items:center}
+.wa-flag{flex:none;font-size:10px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;border-radius:6px;padding:2px 6px}
+.wa-flag.need{color:#b45309;background:#fef3c7}
+.wa-flag.off{color:var(--muted);background:var(--panel2);border:1px solid var(--line)}
+.wa-flag.stop{color:var(--danger);background:var(--danger-soft)}
+:root[data-theme="dark"] .wa-flag.need{color:#fbbf24;background:#3a2a07}
+.wa-main{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--panel2)}
+.wa-main .empty{margin:auto}
+.wa-ch{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--panel);min-height:62px}
+.wa-ch .back{display:none}
+.wa-ch .who{min-width:0;flex:1}
+.wa-ch .who b{display:block;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wa-ch .who small{display:block;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wa-ch .acts{display:flex;align-items:center;gap:6px;flex:none}
+.wa-botsw{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;padding:4px 8px;border:1px solid var(--line);border-radius:10px;background:var(--panel);white-space:nowrap}
+.wa-botsw input{display:none}
+.wa-botsw .tgl{width:34px;height:20px}
+.wa-botsw .tgl::after{width:14px;height:14px}
+.wa-botsw input:checked+.tgl{background:#16a34a}
+.wa-botsw input:checked+.tgl::after{left:17px}
+.wa-links{display:flex;gap:6px;flex-wrap:wrap;padding:8px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+.wa-links:empty{display:none}
+.wa-links button,.wa-links span{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:7px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.wa-links button:hover{color:var(--brand);border-color:var(--brand)}
+.wa-links svg{width:12px;height:12px}
+.wa-msgs{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:16px 18px;display:flex;flex-direction:column;gap:6px;min-height:0;
+  background-image:radial-gradient(color-mix(in srgb,var(--line) 70%,transparent) 1px,transparent 1px);background-size:18px 18px}
+.wa-day{align-self:center;font-size:11px;font-weight:700;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:3px 10px;margin:8px 0 4px}
+.wa-more{align-self:center;margin-bottom:6px}
+.bub{max-width:min(78%,560px);padding:8px 11px 6px;border-radius:12px;font-size:13.5px;line-height:1.5;box-shadow:0 1px 1px rgba(15,23,42,.06);word-wrap:break-word;overflow-wrap:anywhere;position:relative}
+.bub.in{align-self:flex-start;background:var(--panel);border-top-left-radius:4px}
+.bub.out{align-self:flex-end;background:#d9fdd3;border-top-right-radius:4px;color:#0f172a}
+.bub.out.bot{background:#e8efff}
+.bub.out.system{background:#fff7e6}
+:root[data-theme="dark"] .bub.out{background:#134d37;color:#e7ecf6}
+:root[data-theme="dark"] .bub.out.bot{background:#1d2b55}
+:root[data-theme="dark"] .bub.out.system{background:#3a2a07}
+.bub .who{display:block;font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px;opacity:.65}
+.bub .tx{white-space:pre-wrap}
+.bub .tap{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--brand)}
+.bub .meta{display:flex;align-items:center;justify-content:flex-end;gap:4px;font-size:10.5px;opacity:.6;margin-top:2px;white-space:nowrap}
+.bub .meta svg{width:14px;height:14px}
+.bub .meta .read{color:#0ea5e9;opacity:1}
+.bub .err{font-size:11.5px;color:var(--danger);margin-top:4px;font-weight:600}
+.bub img.media{display:block;max-width:100%;width:260px;max-height:320px;object-fit:cover;border-radius:8px;margin-bottom:4px;background:var(--line);cursor:zoom-in}
+.bub audio,.bub video{display:block;max-width:100%;width:260px;margin-bottom:4px}
+.bub .doc{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.05);margin-bottom:4px;font-weight:600;font-size:12.5px;color:inherit}
+.bub .react{font-size:22px}
+.wa-comp{display:flex;align-items:flex-end;gap:8px;padding:10px 12px;border-top:1px solid var(--line);background:var(--panel)}
+.wa-comp textarea.inp{min-height:40px;max-height:150px;resize:none;padding:9px 12px;line-height:1.45}
+.wa-comp .btn{height:40px;flex:none}
+.wa-closed{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--line);background:var(--warn-soft);color:var(--warn);font-size:12.5px;font-weight:600}
+.wa-closed span{flex:1;min-width:180px}
+.call-grid,.bc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.call{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.call.past{opacity:.75}
+.call-top{display:flex;align-items:flex-start;gap:12px}
+.call-date{flex:none;width:54px;border-radius:12px;overflow:hidden;text-align:center;border:1px solid var(--line);background:var(--panel)}
+.call-date small{display:block;background:var(--brand);color:#fff;font-size:10.5px;font-weight:800;text-transform:uppercase;padding:2px 0}
+.call-date b{display:block;font-size:20px;line-height:1.3}
+.call-date i{display:block;font-style:normal;font-size:10.5px;color:var(--muted);padding-bottom:3px}
+.call-top .info{min-width:0;flex:1}
+.call-top .info b{display:block;font-size:14px}
+.call-top .info small{display:block;color:var(--muted);font-size:12px}
+.call-top .info small svg{width:13px;height:13px;vertical-align:-2px}
+.call-topic{font-size:13px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;white-space:pre-wrap}
+.call-acts{display:flex;gap:6px;flex-wrap:wrap}
+.b-booked{color:var(--brand);background:var(--brand-soft)}
+.b-done{color:var(--ok);background:var(--ok-soft)}
+.b-missed{color:var(--warn);background:var(--warn-soft)}
+.b-cancelled,.b-queued{color:var(--muted);background:var(--panel2);border:1px solid var(--line)}
+.b-sending{color:var(--brand);background:var(--brand-soft)}
+.bc{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.bc h4{font-size:14.5px;display:flex;align-items:center;gap:8px}
+.bc h4 span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.bc .prev{font-size:12.5px;color:var(--muted);white-space:pre-wrap;max-height:84px;overflow:hidden;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.bc .prog{height:8px;border-radius:999px;background:var(--panel2);overflow:hidden;display:flex}
+.bc .prog i{display:block;height:100%}
+.bc .nums{display:flex;gap:14px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.bc .nums b{color:var(--text)}
+.tpl-prev{border-radius:14px;background:#e9f5e1;padding:14px;position:relative}
+:root[data-theme="dark"] .tpl-prev{background:#0f2b1f}
+.tpl-prev .bub{max-width:100%;align-self:auto}
+.tpl-prev .tpl-btns{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.tpl-prev .tpl-btns span{display:block;text-align:center;background:var(--panel);border-radius:8px;padding:6px;font-size:12.5px;font-weight:700;color:#0ea5e9}
+.tpl-params .field{margin-bottom:10px}
+.tpl-params .inrow{display:flex;gap:6px}
+.tpl-params .inrow .btn{flex:none}
+.img-view{position:fixed;inset:0;z-index:130;background:rgba(2,6,23,.88);display:grid;place-items:center;padding:20px;cursor:zoom-out}
+.img-view img{max-width:100%;max-height:100%;border-radius:10px}
+@media (max-width:1180px){.wa-ch .acts .btn .lbl{display:none}.wa-ch .acts .btn{padding:0 10px}}
+@media (max-width:860px){
+  .wa-shell{grid-template-columns:minmax(0,1fr);height:calc(100vh - 180px);height:calc(100dvh - 180px);min-height:420px}
+  .wa-shell .wa-main{display:none}
+  .wa-shell.conv-open .wa-side{display:none}
+  .wa-shell.conv-open .wa-main{display:flex}
+  .wa-side{border-right:0}
+  .wa-ch .back{display:grid}
+  .bub{max-width:88%}
+}
+@media (max-width:720px){
+  .wa-shell{height:calc(100vh - 150px);height:calc(100dvh - 150px);border-radius:12px}
+  .wa-top{flex-wrap:nowrap;gap:8px;margin-bottom:10px}
+  .wa-top .spacer{display:none}
+  .wa-top .seg{flex:1;min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .wa-top .seg button{justify-content:center;padding:7px 4px;min-width:0}
+  .wa-top #waNew{width:40px;padding:0;flex:none}
+  .wa-top #waNew .lbl{display:none}
+  .wa-msgs{padding:12px 10px}
+  .wa-ch{padding:8px 10px;gap:8px}
+  .wa-botsw .lbl{display:none}
+  .call-grid,.bc-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:420px){.wa-ch .acts .hide-xs{display:none}.wa-ch>.avatar{display:none}.wa-top .seg button svg{display:none}}
+
 /* toast */
 .toasts{position:fixed;bottom:20px;right:20px;z-index:120;display:flex;flex-direction:column;gap:8px;max-width:calc(100vw - 40px)}
 .toast{display:flex;align-items:center;gap:10px;background:var(--text);color:var(--panel);padding:12px 16px;border-radius:12px;box-shadow:var(--shadow-lg);font-weight:600;font-size:13px;animation:tin .3s cubic-bezier(.2,.8,.2,1)}
@@ -504,6 +649,12 @@ table.tbl{width:100%;border-collapse:collapse;min-width:760px}
   <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
   <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
   <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36L21 8"/><path d="M21 3v5h-5"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></symbol>
+  <symbol id="i-bot" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4M9 14h.01M15 14h.01M2 13v3M22 13v3"/><circle cx="12" cy="3" r="1"/></symbol>
+  <symbol id="i-checks" viewBox="0 0 24 24"><path d="M18 7 9.5 15.5 6 12"/><path d="m22 7-8.5 8.5-1-1"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></symbol>
+  <symbol id="i-mega" viewBox="0 0 24 24"><path d="m3 11 15-6v14L3 13z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></symbol>
   <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></symbol>
 </svg>
 
@@ -541,6 +692,7 @@ table.tbl{width:100%;border-collapse:collapse;min-width:760px}
       <a href="#/dashboard" data-nav="dashboard"><svg class="i"><use href="#i-grid"/></svg>Dashboard</a>
       <div class="nav-label">Manage</div>
       <a href="#/enquiries" data-nav="enquiries"><svg class="i"><use href="#i-inbox"/></svg>Enquiries<span class="count" id="navNew">0</span></a>
+      <a href="#/whatsapp" data-nav="whatsapp"><svg class="i"><use href="#i-wa"/></svg>WhatsApp<span class="count hidden" id="navWa" style="background:#16a34a">0</span></a>
       <a href="#/projects" data-nav="projects"><svg class="i"><use href="#i-folder"/></svg>Projects</a>
       <a href="#/reviews" data-nav="reviews"><svg class="i"><use href="#i-chat"/></svg>Reviews</a>
       <div class="nav-label">System</div>
@@ -602,8 +754,8 @@ const STATUS = [
 const STATUS_LABEL = Object.fromEntries(STATUS.map(s => [s.code, s.label]));
 const TIMELINE = { '': 'Not given', asap: 'As soon as possible', '1m': 'Within a month', '3m': '1–3 months', explore: 'Just exploring' };
 const METHOD   = { '': 'Not given', whatsapp: 'WhatsApp', call: 'Phone call', email: 'Email' };
-const SOURCE   = { home: 'Home page', contact: 'Contact page' };
-const VIA      = { form: 'Quote form', whatsapp: 'WhatsApp button' };
+const SOURCE   = { home: 'Home page', contact: 'Contact page', bot: 'WhatsApp bot' };
+const VIA      = { form: 'Quote form', whatsapp: 'WhatsApp button', bot: 'WhatsApp bot' };
 const LANG     = { en: 'English', ta: 'Tamil' };
 const CATEGORY = { web: 'Websites', shop: 'E-commerce', app: 'Apps', mkt: 'Marketing' };
 const KIND     = { site: 'Website', app: 'Mobile app' };
@@ -676,6 +828,23 @@ const API = {
     return d.item;
   },
   deleteImage: (path, force = false) => request('DELETE', '/api/images/', { path, force }),
+
+  // ----- WhatsApp (tables from supabase_whatsapp.sql, filled by the WhatsApp bot) -----
+  waChats:        ()            => request('GET', '/api/wa/chats/'),
+  waChat:         (id, q = '')  => request('GET', `/api/wa/chats/${id}/${q}`),
+  waUpdateChat:   (id, patch)   => request('PATCH', `/api/wa/chats/${id}/`, patch).then(d => d.contact),
+  waDeleteChat:   id            => request('DELETE', `/api/wa/chats/${id}/`),
+  waRead:         id            => request('POST', `/api/wa/chats/${id}/read/`, {}),
+  waSend:         (id, text)    => request('POST', `/api/wa/chats/${id}/send/`, { text }),
+  waAskReview:    id            => request('POST', `/api/wa/chats/${id}/review/`, {}),
+  waTemplates:    ()            => request('GET', '/api/wa/templates/').then(d => d.items),
+  waSendTemplate: data          => request('POST', '/api/wa/templates/send/', data),
+  waBookings:     ()            => request('GET', '/api/wa/bookings/').then(d => d.items),
+  waUpdateBooking:(id, patch)   => request('PATCH', `/api/wa/bookings/${id}/`, patch).then(d => d.item),
+  waBroadcasts:   ()            => request('GET', '/api/wa/broadcasts/'),
+  waCreateBroadcast: data       => request('POST', '/api/wa/broadcasts/', data).then(d => d.item),
+  waCancelBroadcast: id         => request('POST', `/api/wa/broadcasts/${id}/cancel/`, {}).then(d => d.item),
+  waMediaUrl:     mediaId       => `/api/wa/media/${encodeURIComponent(mediaId)}/`,
 };
 
 /* any failed action shows its message and unlocks the buttons */
@@ -785,15 +954,20 @@ const state = {
   eq: { status: 'all', q: '', source: 'all', lang: 'all', sort: 'new', page: 1, selected: new Set() },
   pj: { cat: 'all', vis: 'all', q: '' },
   rv: { vis: 'all', stars: 'all', q: '' },
+  wa: { tab: 'chats', chats: [], loaded: false, error: '', errorCode: '', configured: true, admin: '', filter: 'all', q: '',
+        active: null, msgs: [], hasMore: false, links: {}, sending: false,
+        calls: null, callsFilter: 'upcoming', bc: null, audience: 0, optedOut: 0, templates: null },
 };
 const PAGES = {
   dashboard: { title: 'Dashboard', crumb: 'Overview', render: renderDashboard },
   enquiries: { title: 'Enquiries', crumb: 'Manage · contact_enquiries', render: renderEnquiries },
   projects:  { title: 'Projects', crumb: 'Manage · showcase_projects', render: renderProjects },
   reviews:   { title: 'Reviews', crumb: 'Manage · client_reviews', render: renderReviews },
+  whatsapp:  { title: 'WhatsApp', crumb: 'Manage · WhatsApp bot', render: renderWhatsApp },
   settings:  { title: 'Settings', crumb: 'System', render: renderSettings },
 };
 function currentPage() { const p = location.hash.replace(/^#\/?/, '').split('?')[0]; return PAGES[p] ? p : 'dashboard'; }
+function hashParam(k) { return new URLSearchParams(location.hash.split('?')[1] || '').get(k) || ''; }
 function route() {
   const page = currentPage();
   $$('[data-nav]').forEach(a => a.classList.toggle('active', a.dataset.nav === page));
@@ -808,9 +982,11 @@ window.addEventListener('hashchange', route);
 function refreshBadge() {
   const n = state.enquiries.filter(e => e.status === 'new').length;
   $('#navNew').textContent = n; $('#navNew').classList.toggle('hidden', !n);
+  const w = waWaiting().length;
+  $('#navWa').textContent = w; $('#navWa').classList.toggle('hidden', !w);
 }
 async function loadAll() {
-  const [e, p, m, r] = await Promise.allSettled([API.listEnquiries(), API.listProjects(), API.listImages(), API.listReviews()]);
+  const [e, p, m, r, w] = await Promise.allSettled([API.listEnquiries(), API.listProjects(), API.listImages(), API.listReviews(), API.waChats()]);
   if (e.status === 'rejected' || p.status === 'rejected') {
     paintConn('err', 'Database not reachable');
     throw (e.status === 'rejected' ? e.reason : p.reason);
@@ -820,6 +996,7 @@ async function loadAll() {
   state.storageError = m.status === 'rejected' ? m.reason.message : '';
   state.reviews = r.status === 'fulfilled' ? r.value : [];
   state.reviewsError = r.status === 'rejected' ? r.reason.message : '';
+  waTakeChats(w);
   paintConn(state.storageError ? 'warn' : 'ok', state.storageError ? 'Connected · image storage not set up' : 'Connected to Supabase');
   refreshBadge();
 }
@@ -891,6 +1068,8 @@ function renderDashboard() {
             <div><b>${by('source', 'contact')}</b><small>Contact page form</small></div>
             <div><b>${by('submitted_via', 'whatsapp')}</b><small>Sent via WhatsApp</small></div>
             <div><b>${by('language', 'ta')}</b><small>In Tamil</small></div>
+            <div><b>${by('source', 'bot')}</b><small>From the WhatsApp bot</small></div>
+            <div style="cursor:pointer" onclick="location.hash='#/whatsapp'"><b>${waWaiting().length}</b><small>WhatsApp chats waiting</small></div>
           </div></div>
         </div>
       </div>
@@ -934,7 +1113,7 @@ function renderEnquiries() {
     </div>
     <div class="toolbar">
       <div class="search">${icon('search')}<input class="inp" id="eqSearch" placeholder="Search name, phone, business, message…" value="${esc(f.q)}"></div>
-      <select class="inp" id="eqSource" style="width:auto"><option value="all">All sources</option><option value="home">Home page</option><option value="contact">Contact page</option><option value="whatsapp">Sent via WhatsApp</option></select>
+      <select class="inp" id="eqSource" style="width:auto"><option value="all">All sources</option><option value="home">Home page</option><option value="contact">Contact page</option><option value="whatsapp">Sent via WhatsApp</option><option value="bot">WhatsApp bot</option></select>
       <select class="inp" id="eqLang" style="width:auto"><option value="all">All languages</option><option value="en">English</option><option value="ta">Tamil</option></select>
       <select class="inp" id="eqSort" style="width:auto"><option value="new">Newest first</option><option value="old">Oldest first</option><option value="name">Name A–Z</option></select>
       <div class="spacer"></div>
@@ -951,10 +1130,10 @@ function renderEnquiries() {
         <tbody>${pageRows.map(e => `
           <tr data-id="${e.id}" class="${e.status === 'new' ? 'unread' : ''} ${f.selected.has(e.id) ? 'sel' : ''}">
             <td class="c-cb"><input type="checkbox" class="cb" data-sel="${e.id}" ${f.selected.has(e.id) ? 'checked' : ''} aria-label="Select"></td>
-            <td class="nm"><b class="${taCls(e.name)}">${esc(e.name)}</b><small class="${taCls(e.business_name)}">${esc(e.business_name || '—')}</small></td>
+            <td class="nm"><b class="${taCls(e.name)}">${esc(e.name)}</b><small class="${taCls(e.business_name)}">${e.source === 'bot' ? '<span class="badge b-won plain" style="height:18px;font-size:10.5px;margin-right:6px">WhatsApp bot</span>' : ''}${esc(e.business_name || '—')}</small></td>
             <td style="white-space:nowrap">${esc(e.phone)}</td>
             <td><div class="svc ${taCls(e.services.join())}">${esc(e.services.join(', ') || '—')}</div></td>
-            <td class="c-hide" style="white-space:nowrap"><span class="muted" style="font-size:12.5px">${SOURCE[e.source]}${e.submitted_via === 'whatsapp' ? ' · WA' : ''} · ${e.language.toUpperCase()}</span></td>
+            <td class="c-hide" style="white-space:nowrap"><span class="muted" style="font-size:12.5px">${SOURCE[e.source] || e.source}${e.submitted_via === 'whatsapp' ? ' · WA' : ''} · ${e.language.toUpperCase()}</span></td>
             <td class="c-status">${statusBadge(e.status)}</td>
             <td style="white-space:nowrap"><span class="muted" style="font-size:12.5px">${ago(e.created_at)}</span></td>
             <td class="c-acts"><div class="acts">
@@ -1020,7 +1199,7 @@ function openEnquiry(id) {
     <div class="dr-b">
       <div class="quick">
         <a href="tel:${esc(digits(e.phone))}">${icon('phone')}Call</a>
-        <a class="wa" href="${waLink(e.phone)}" target="_blank" rel="noopener">${icon('wa')}WhatsApp</a>
+        ${e.source === 'bot' ? `<a class="wa" href="#/whatsapp?chat=${esc(waNum(e.phone))}" data-close-dr>${icon('chat')}Open chat</a>` : `<a class="wa" href="${waLink(e.phone)}" target="_blank" rel="noopener">${icon('wa')}WhatsApp</a>`}
         ${e.email ? `<a href="mailto:${esc(e.email)}">${icon('mail')}Email</a>` : `<a style="opacity:.45;pointer-events:none">${icon('mail')}No email</a>`}
       </div>
       <div class="sec-t">Status</div>
@@ -1033,7 +1212,7 @@ function openEnquiry(id) {
         <dt>Services</dt><dd class="${taCls(e.services.join())}">${e.services.length ? e.services.map(esc).join(', ') : '—'}</dd>
         <dt>Timeline</dt><dd>${TIMELINE[e.timeline]}</dd>
         <dt>Prefers</dt><dd>${METHOD[e.contact_method]}</dd>
-        <dt>Came from</dt><dd>${SOURCE[e.source]} · ${VIA[e.submitted_via]}</dd>
+        <dt>Came from</dt><dd>${e.source === 'bot' ? `<span class="badge b-won plain">${icon('bot')}Received from the WhatsApp bot</span>` : `${SOURCE[e.source] || e.source} · ${VIA[e.submitted_via] || e.submitted_via}`}</dd>
         <dt>Language</dt><dd>${LANG[e.language]}</dd>
       </dl>
       <div class="sec-t">Message</div>
@@ -1052,6 +1231,7 @@ function openEnquiry(id) {
   paint();
   $$('[data-s]', drawer).forEach(b => b.onclick = () => { status = b.dataset.s; paint(); });
   $('[data-close]', drawer).onclick = closeDrawer;
+  $$('[data-close-dr]', drawer).forEach(a => a.addEventListener('click', closeDrawer));
   $('[data-del]', drawer).onclick = () => deleteEnquiries([e.id]);
   $('[data-edit]', drawer).onclick = () => { closeDrawer(); enquiryForm(e); };
   $('[data-save]', drawer).onclick = async ev => {
@@ -1626,6 +1806,618 @@ function reviewForm(r = null) {
   setTimeout(() => fm.elements.client_name.focus(), 80);
 }
 
+{% verbatim %}
+/* =====================================================================
+   WHATSAPP: chats with the bot, your replies, calls and broadcasts
+   (tables from supabase_whatsapp.sql; the WhatsApp bot fills them)
+   ===================================================================== */
+const WA_LANG = { en: 'English', ta: 'Tamil', tanglish: 'Tanglish', hi: 'Hindi', hinglish: 'Hinglish', ml: 'Malayalam', te: 'Telugu', kn: 'Kannada', bn: 'Bengali', mr: 'Marathi', gu: 'Gujarati', ur: 'Urdu', ar: 'Arabic', fr: 'French' };
+const WA_FLOW = { enquiry: 'Filling a quote request', booking: 'Booking a call', review: 'Writing a review' };
+const BOOKING_STATUS = { booked: 'Booked', done: 'Done', missed: 'Missed', cancelled: 'Cancelled' };
+const BC_STATUS = { queued: 'Waiting to start', sending: 'Sending', done: 'Finished', cancelled: 'Cancelled' };
+const waNum = p => { let d = digits(p); if (d.length === 10) d = '91' + d; return d; };
+const waPhone = d => d && d.length === 12 && d.startsWith('91') ? `+91 ${d.slice(2, 7)} ${d.slice(7)}` : (d ? '+' + d : '');
+const waIsAdmin = c => !!c && !!state.wa.admin && c.wa_id === state.wa.admin;
+const waName = c => waIsAdmin(c) ? 'You (alerts)' : (c.name || c.profile_name || waPhone(c.wa_id));
+const waAvatar = c => waIsAdmin(c) ? icon('bot') : (c.name || c.profile_name) ? esc(initials(c.name || c.profile_name)) : icon('wa');
+const istDate = (d = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(d);
+function waWaiting() { return state.wa.chats.filter(c => !waIsAdmin(c) && (c.needs_reply || c.unread_count > 0)); }
+function waTakeChats(res) {
+  const w = state.wa;
+  w.loaded = true;
+  if (res.status === 'fulfilled') {
+    const d = res.value;
+    w.chats = d.items; w.configured = d.configured; w.admin = d.admin; w.reviewTemplate = d.review_template; w.error = ''; w.errorCode = '';
+  } else {
+    w.error = res.reason.message; w.errorCode = (res.reason.data || {}).code || '';
+  }
+}
+function waTime(iso) { return new Date(iso).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }); }
+function waDay(iso) {
+  const d = istDate(new Date(iso)), today = istDate(), yest = istDate(new Date(Date.now() - 864e5));
+  if (d === today) return 'Today';
+  if (d === yest) return 'Yesterday';
+  return new Date(iso).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+}
+function waAgo(iso) {
+  const d = istDate(new Date(iso));
+  if (d === istDate()) return waTime(iso);
+  if (d === istDate(new Date(Date.now() - 864e5))) return 'Yesterday';
+  if (Date.now() - new Date(iso) < 6 * 864e5) return new Date(iso).toLocaleDateString('en-IN', { weekday: 'short' });
+  return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+}
+function waFormat(text) {
+  let h = esc(text);
+  h = h.replace(/(https?:\/\/[^\s<]+[^\s<.,!?)])/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+  h = h.replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,!?:;]|$)/g, '$1<b>$2</b>');
+  h = h.replace(/(^|[\s(])_([^_\n]+)_(?=[\s).,!?:;]|$)/g, '$1<i>$2</i>');
+  h = h.replace(/(^|[\s(])~([^~\n]+)~(?=[\s).,!?:;]|$)/g, '$1<s>$2</s>');
+  return h;
+}
+function waUpdateRow(contact) {
+  const w = state.wa, i = w.chats.findIndex(c => c.wa_id === contact.wa_id);
+  if (i >= 0) w.chats[i] = { ...w.chats[i], ...contact }; else w.chats.unshift(contact);
+  w.chats.sort((a, b) => new Date(b.last_message_at || 0) - new Date(a.last_message_at || 0));
+  if (w.active && w.active.wa_id === contact.wa_id) Object.assign(w.active, contact);
+  refreshBadge(); renderWaFilters(); renderWaList();
+}
+
+/* ---------- page ---------- */
+function renderWhatsApp() {
+  const w = state.wa;
+  const tab = hashParam('tab'), chat = hashParam('chat');
+  if (['chats', 'calls', 'broadcasts'].includes(tab)) w.tab = tab;
+  if (chat) w.tab = 'chats';
+  if (tab || chat) history.replaceState(null, '', '#/whatsapp');
+  if (w.errorCode === 'no_table') {
+    $('#content').innerHTML = `<div class="view"><div class="card"><div class="empty">${icon('db')}<b>Set up the WhatsApp tables first</b>
+      <span style="display:block;max-width:520px;margin:0 auto">${esc(w.error)}</span><br>
+      <button class="btn primary" id="waRetry">${icon('refresh')}I have run it, check again</button></div></div></div>`;
+    $('#waRetry').onclick = async () => { waTakeChats(await Promise.allSettled([API.waChats()]).then(r => r[0])); renderWhatsApp(); };
+    return;
+  }
+  const waiting = waWaiting().length;
+  $('#content').innerHTML = `<div class="view">
+    <div class="wa-top">
+      <div class="seg" id="waTabs">
+        <button data-tab="chats" class="${w.tab === 'chats' ? 'on' : ''}">${icon('chat')}Chats${waiting ? `<span class="n">${waiting}</span>` : ''}</button>
+        <button data-tab="calls" class="${w.tab === 'calls' ? 'on' : ''}">${icon('cal')}Calls</button>
+        <button data-tab="broadcasts" class="${w.tab === 'broadcasts' ? 'on' : ''}">${icon('mega')}Broadcasts</button>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn" id="waNew" title="Send a template message to any number" aria-label="New message">${icon('plus')}<span class="lbl">New message</span></button>
+    </div>
+    ${!w.configured ? `<div class="notice">${icon('alert')}<span>Replies from the dashboard are off. Add <b>META_ACCESS_TOKEN</b>, <b>PHONE_NUMBER_ID</b> and <b>WABA_ID</b> (the same values as the bot) to this dashboard's environment, then redeploy. Reading chats still works.</span></div>` : ''}
+    ${w.error ? `<div class="notice">${icon('alert')}<span>${esc(w.error)}</span></div>` : ''}
+    <div id="waBody"></div></div>`;
+  $$('#waTabs [data-tab]').forEach(b => b.onclick = () => { w.tab = b.dataset.tab; renderWhatsApp(); });
+  $('#waNew').onclick = () => templateModal({ mode: 'send' });
+  if (w.tab === 'calls') renderWaCalls();
+  else if (w.tab === 'broadcasts') renderWaBroadcasts();
+  else renderWaChats();
+  if (chat) waOpen(chat);
+}
+
+/* ---------- chats ---------- */
+const WA_FILTERS = [
+  ['all', 'All', () => true],
+  ['waiting', 'Needs you', c => c.needs_reply || c.unread_count > 0],
+  ['open', 'Open 24h', c => c.window_open],
+  ['off', 'Bot off', c => !c.bot_enabled],
+  ['stop', 'Sent STOP', c => c.opted_out],
+];
+function waFiltered() {
+  const w = state.wa, q = w.q.trim().toLowerCase(), f = (WA_FILTERS.find(x => x[0] === w.filter) || WA_FILTERS[0])[2];
+  return w.chats.filter(c => f(c) && (!q || [c.name, c.profile_name, c.business_name, c.wa_id, c.last_message_preview].join(' ').toLowerCase().includes(q)
+    || (digits(q) && c.wa_id.includes(digits(q)))));
+}
+function renderWaChats() {
+  const w = state.wa;
+  $('#waBody').innerHTML = `<div class="card wa-shell ${w.active ? 'conv-open' : ''}" id="waShell">
+    <div class="wa-side">
+      <div class="wa-side-h">
+        <div class="search">${icon('search')}<input class="inp" id="waSearch" placeholder="Search name, number, message…" value="${esc(w.q)}"></div>
+        <div class="chips" id="waFilters"></div>
+      </div>
+      <div class="wa-list" id="waList"></div>
+    </div>
+    <div class="wa-main" id="waMain"></div>
+  </div>`;
+  $('#waSearch').oninput = e => { w.q = e.target.value; renderWaList(); };
+  renderWaFilters(); renderWaList(); renderWaConv(true);
+  waFitShell();
+}
+/* the chat box fills the screen exactly, so the reply box is always visible */
+function waFitShell() {
+  const shell = $('#waShell'); if (!shell) return;
+  const gap = innerWidth <= 720 ? 12 : 24;
+  const h = Math.round(innerHeight - shell.getBoundingClientRect().top - window.scrollY * 0 - gap);
+  shell.style.height = Math.max(380, h) + 'px';
+}
+window.addEventListener('resize', () => { clearTimeout(waFitShell._t); waFitShell._t = setTimeout(() => { waFitShell(); const b = $('#waMsgs'); if (b && b.dataset.stick === '1') b.scrollTop = b.scrollHeight; }, 120); });
+function renderWaFilters() {
+  const el = $('#waFilters'), w = state.wa; if (!el) return;
+  el.innerHTML = WA_FILTERS.map(([k, l, f]) => {
+    const n = w.chats.filter(c => !waIsAdmin(c) && f(c)).length;
+    return `<button class="chip ${w.filter === k ? 'on' : ''}" data-wf="${k}">${l} <span class="n">${n}</span></button>`;
+  }).join('');
+  $$('[data-wf]', el).forEach(b => b.onclick = () => { w.filter = b.dataset.wf; renderWaFilters(); renderWaList(); });
+}
+function renderWaList() {
+  const el = $('#waList'), w = state.wa; if (!el) return;
+  const rows = waFiltered();
+  el.innerHTML = rows.length ? rows.map(c => `
+    <button class="wa-item ${w.active && w.active.wa_id === c.wa_id ? 'on' : ''} ${c.unread_count ? 'unread' : ''}" data-chat="${esc(c.wa_id)}">
+      <div class="avatar ${waIsAdmin(c) ? 'adm' : ''}">${waAvatar(c)}</div>
+      <div class="mid">
+        <div class="row1"><b class="${taCls(waName(c))}">${esc(waName(c))}</b><time>${c.last_message_at ? waAgo(c.last_message_at) : ''}</time></div>
+        <div class="row2"><span class="pv ${taCls(c.last_message_preview)}">${esc(c.last_message_preview || waPhone(c.wa_id))}</span>
+          ${c.needs_reply ? '<span class="wa-flag need">Reply</span>' : ''}${!c.bot_enabled ? '<span class="wa-flag off">Bot off</span>' : ''}${c.opted_out ? '<span class="wa-flag stop">Stop</span>' : ''}${c.unread_count ? `<span class="wa-unread">${c.unread_count > 99 ? '99+' : c.unread_count}</span>` : ''}</div>
+      </div>
+    </button>`).join('')
+    : `<div class="empty">${icon('chat')}<b>${w.chats.length ? 'No chats match' : 'No chats yet'}</b>${w.chats.length ? 'Try another filter or search.' : 'Chats appear here as soon as customers message your WhatsApp bot.'}</div>`;
+  $$('[data-chat]', el).forEach(b => b.onclick = () => waOpen(b.dataset.chat));
+}
+async function waOpen(id) {
+  const w = state.wa;
+  w.active = { ...(w.chats.find(x => x.wa_id === id) || { wa_id: id, name: '', profile_name: '', language: 'en', bot_enabled: true, window_open: false }) };
+  w.msgs = []; w.hasMore = false; w.links = {}; w.loadingConv = true;
+  const shell = $('#waShell'); if (shell) shell.classList.add('conv-open');
+  renderWaList(); renderWaConv();
+  let d;
+  try { d = await API.waChat(id); }
+  catch (err) {
+    if (w.active && w.active.wa_id === id) { w.active = null; w.loadingConv = false; if ($('#waShell')) renderWaChats(); }
+    toast(err.status === 404 ? 'This customer has not messaged the WhatsApp bot yet.' : err.message, 'err');
+    return;
+  }
+  if (!w.active || w.active.wa_id !== id) return;
+  w.loadingConv = false;
+  w.active = d.contact; w.msgs = d.messages; w.hasMore = d.has_more; w.links = { enquiries: d.enquiries || [], bookings: d.bookings || [] };
+  renderWaConv(true);
+  if (d.contact.unread_count) API.waRead(id).catch(() => {});
+  w.active.unread_count = 0;
+  const row = w.chats.find(x => x.wa_id === id); if (row) row.unread_count = 0;
+  refreshBadge(); renderWaFilters(); renderWaList();
+}
+function waClose() {
+  state.wa.active = null;
+  const shell = $('#waShell'); if (shell) shell.classList.remove('conv-open');
+  renderWaList(); renderWaConv();
+}
+function renderWaConv(toBottom = false) {
+  const w = state.wa, main = $('#waMain'); if (!main) return;
+  if (!w.active) { main.innerHTML = `<div class="empty">${icon('wa')}<b>Select a chat</b>Choose a conversation to read it and reply.</div>`; return; }
+  main.innerHTML = `<div class="wa-ch" id="waHead"></div><div class="wa-links" id="waLinks"></div><div class="wa-msgs" id="waMsgs"></div><div id="waComp"></div>`;
+  renderWaHead(); renderWaLinks(); renderWaMsgs(toBottom); renderWaComposer();
+}
+function renderWaHead() {
+  const w = state.wa, c = w.active, el = $('#waHead'); if (!el || !c) return;
+  const admin = waIsAdmin(c);
+  const sub = [waPhone(c.wa_id), admin ? '' : (WA_LANG[c.language] || c.language), c.flow ? WA_FLOW[c.flow] : '', c.opted_out ? 'Sent STOP' : ''].filter(Boolean).join(' · ');
+  el.innerHTML = `
+    <button class="icon-btn back" id="waBack" aria-label="Back to chats">${icon('left')}</button>
+    <div class="avatar ${admin ? 'adm' : ''}">${waAvatar(c)}</div>
+    <div class="who"><b class="${taCls(waName(c))}">${esc(waName(c))}</b><small>${esc(sub)}</small></div>
+    <div class="acts">
+      ${admin ? '' : `<label class="wa-botsw" title="When the bot is off, it stays quiet in this chat and only you reply"><input type="checkbox" id="waBot" ${c.bot_enabled ? 'checked' : ''}><span class="tgl"></span><span class="lbl">Bot</span></label>`}
+      ${c.needs_reply ? `<button class="btn sm" id="waDone" title="Mark as handled">${icon('check')}<span class="lbl">Done</span></button>` : ''}
+      ${admin ? '' : `<button class="btn sm hide-xs" id="waReview" title="Ask for a review">${icon('star')}<span class="lbl">Review</span></button>`}
+      ${admin ? '' : `<a class="btn sm icon" href="tel:+${esc(c.wa_id)}" title="Call ${esc(waPhone(c.wa_id))}" aria-label="Call">${icon('phone')}</a>`}
+      <button class="btn sm icon" id="waDel" title="Delete this chat" aria-label="Delete chat">${icon('trash')}</button>
+    </div>`;
+  $('#waBack').onclick = waClose;
+  const bot = $('#waBot');
+  if (bot) bot.onchange = async () => {
+    bot.disabled = true;
+    try {
+      const contact = await API.waUpdateChat(c.wa_id, { bot_enabled: bot.checked });
+      waUpdateRow(contact); renderWaHead();
+      toast(contact.bot_enabled ? 'Bot is on: it answers this customer again' : 'Bot is off for this chat: only you reply');
+    } catch (err) { bot.checked = !bot.checked; bot.disabled = false; throw err; }
+  };
+  if ($('#waDone')) $('#waDone').onclick = async () => { waUpdateRow(await API.waUpdateChat(c.wa_id, { needs_reply: false })); renderWaHead(); toast('Marked as handled'); };
+  if ($('#waReview')) $('#waReview').onclick = () => waAskReview(c);
+  $('#waDel').onclick = async () => {
+    const ok = await confirmBox({ title: 'Delete this chat?', text: `All messages with <b>${esc(waName(c))}</b> will be deleted from the dashboard. Their enquiries, calls and reviews stay. This cannot be undone.` });
+    if (!ok) return;
+    await API.waDeleteChat(c.wa_id);
+    state.wa.chats = state.wa.chats.filter(x => x.wa_id !== c.wa_id);
+    waClose(); refreshBadge(); renderWaFilters(); toast('Chat deleted');
+  };
+}
+function renderWaLinks() {
+  const w = state.wa, el = $('#waLinks'); if (!el) return;
+  const e = (w.links.enquiries || []).map(q => `<button data-eq="${q.id}">${icon('inbox')}Enquiry #${q.id} · ${esc(STATUS_LABEL[q.status] || q.status)}</button>`);
+  const b = (w.links.bookings || []).filter(x => x.status === 'booked').map(x => `<button data-calls>${icon('cal')}Call ${esc(callWhen(x))}</button>`);
+  el.innerHTML = [...e, ...b].join('');
+  $$('[data-eq]', el).forEach(btn => btn.onclick = () => {
+    if (state.enquiries.some(x => x.id === +btn.dataset.eq)) openEnquiry(+btn.dataset.eq);
+    else location.hash = '#/enquiries';
+  });
+  $$('[data-calls]', el).forEach(btn => btn.onclick = () => { w.tab = 'calls'; renderWhatsApp(); });
+}
+function waTick(m) {
+  if (m.status === 'failed') return `<svg class="i" style="color:var(--danger);opacity:1"><use href="#i-alert"/></svg>`;
+  if (m.status === 'read') return `<svg class="i read"><use href="#i-checks"/></svg>`;
+  if (m.status === 'delivered') return `<svg class="i"><use href="#i-checks"/></svg>`;
+  if (m.status === 'sent') return `<svg class="i"><use href="#i-check"/></svg>`;
+  return '';
+}
+function waBubble(m) {
+  const out = m.direction === 'out';
+  if (m.type === 'reaction') return `<div class="bub ${out ? 'out' : 'in'}"><span class="react">${esc(m.body)}</span><div class="meta">${waTime(m.created_at)}</div></div>`;
+  const who = out ? ({ bot: 'Bot', admin: 'You', system: m.type === 'template' ? 'Template' : 'Alert' }[m.sender] || '') : '';
+  const media = m.media_id ? API.waMediaUrl(m.media_id) : '';
+  let inner = '';
+  if (m.type === 'image' && media) inner += `<img class="media" src="${media}" alt="Photo from the customer" loading="lazy" data-zoom>`;
+  else if (m.type === 'audio' && media) inner += `<audio controls preload="none" src="${media}"></audio>`;
+  else if (m.type === 'video' && media) inner += `<video controls preload="none" src="${media}"></video>`;
+  else if (m.type === 'document' && media) inner += `<a class="doc" href="${media}" target="_blank" rel="noopener">${icon('file')}<span>${esc(m.media_filename || 'Document')}</span></a>`;
+  else if (m.type === 'sticker') inner += `<span class="muted">Sticker</span>`;
+  if (!out && (m.type === 'interactive' || m.type === 'button')) inner += `<span class="tap">${icon('check')}Tapped: ${esc(m.body.replace(/^\[|\]$/g, ''))}</span>`;
+  else if (m.body) inner += `<div class="tx ${taCls(m.body)}">${waFormat(m.body)}</div>`;
+  else if (!inner) inner = `<span class="muted">[${esc(m.type)}]</span>`;
+  const err = m.status === 'failed' && m.error ? `<div class="err">Not delivered: ${esc(m.error)}</div>` : '';
+  return `<div class="bub ${out ? 'out ' + esc(m.sender) : 'in'}">${who ? `<span class="who">${who}</span>` : ''}${inner}${err}<div class="meta">${waTime(m.created_at)}${out ? waTick(m) : ''}</div></div>`;
+}
+function renderWaMsgs(toBottom = false) {
+  const w = state.wa, box = $('#waMsgs'); if (!box) return;
+  if (w.loadingConv) { box.innerHTML = '<div class="empty" style="margin:auto">Loading the chat…</div>'; return; }
+  const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 90;
+  const prevTop = box.scrollTop;
+  let html = w.hasMore ? `<button class="btn sm wa-more" id="waOlder">${icon('up')}Load earlier messages</button>` : '';
+  let day = '';
+  for (const m of w.msgs) {
+    const d = waDay(m.created_at);
+    if (d !== day) { html += `<div class="wa-day">${d}</div>`; day = d; }
+    html += waBubble(m);
+  }
+  if (!w.msgs.length) html += '<div class="empty" style="margin:auto">No messages yet.</div>';
+  box.innerHTML = html;
+  const stick = toBottom || nearBottom;
+  box.dataset.stick = stick ? '1' : '0';
+  box.scrollTop = stick ? box.scrollHeight : prevTop;
+  if (stick) {   // again once fonts, emoji and photos have their final size
+    requestAnimationFrame(() => { box.scrollTop = box.scrollHeight; });
+    setTimeout(() => { if (box.dataset.stick === '1') box.scrollTop = box.scrollHeight; }, 250);
+    $$('img.media', box).forEach(img => img.addEventListener('load', () => { if (box.dataset.stick === '1') box.scrollTop = box.scrollHeight; }, { once: true }));
+  }
+  box.onscroll = () => { box.dataset.stick = box.scrollHeight - box.scrollTop - box.clientHeight < 90 ? '1' : '0'; };
+  if ($('#waOlder')) $('#waOlder').onclick = waLoadOlder;
+  $$('[data-zoom]', box).forEach(img => img.onclick = () => {
+    const v = document.createElement('div'); v.className = 'img-view'; v.innerHTML = `<img src="${img.src}" alt="">`;
+    v.onclick = () => v.remove(); document.body.appendChild(v);
+  });
+  $$('img.media', box).forEach(img => img.onerror = () => { img.replaceWith(Object.assign(document.createElement('span'), { className: 'muted', textContent: 'Photo no longer available' })); });
+}
+async function waLoadOlder() {
+  const w = state.wa, c = w.active; if (!c || !w.msgs.length) return;
+  const btn = $('#waOlder'); if (btn) btn.disabled = true;
+  const d = await API.waChat(c.wa_id, `?before=${w.msgs[0].id}`);
+  if (!w.active || w.active.wa_id !== c.wa_id) return;
+  const box = $('#waMsgs'), oldH = box.scrollHeight, oldTop = box.scrollTop;
+  w.msgs = [...d.messages, ...w.msgs]; w.hasMore = d.has_more;
+  renderWaMsgs(false);
+  box.scrollTop = box.scrollHeight - oldH + oldTop;
+}
+function renderWaComposer() {
+  const w = state.wa, c = w.active, el = $('#waComp'); if (!el || !c) return;
+  w.drafts = w.drafts || {};
+  if (waIsAdmin(c)) {
+    el.innerHTML = `<div class="wa-closed" style="background:var(--brand-soft);color:var(--brand)">${icon('bot')}<span>This is your own number. The bot sends your alerts and reminders here.</span></div>`;
+    return;
+  }
+  if (!w.configured) {
+    el.innerHTML = `<div class="wa-closed">${icon('alert')}<span>Replies are off until META_ACCESS_TOKEN and PHONE_NUMBER_ID are added to the dashboard's environment.</span></div>`;
+    return;
+  }
+  if (!c.window_open) {
+    el.innerHTML = `<div class="wa-closed">${icon('clock')}<span>It has been more than 24 hours since ${esc((c.name || c.profile_name || 'the customer').split(' ')[0])} last messaged, so WhatsApp only allows an approved template.</span><button class="btn sm primary" id="waTpl">${icon('send')}Send template</button></div>`;
+    $('#waTpl').onclick = () => templateModal({ mode: 'send', phone: c.wa_id });
+    return;
+  }
+  el.innerHTML = `<div class="wa-comp">
+    <textarea class="inp ${taCls(w.drafts[c.wa_id])}" id="waText" rows="1" maxlength="4096" placeholder="Type a reply…">${esc(w.drafts[c.wa_id] || '')}</textarea>
+    <button class="btn ghost icon" id="waTplBtn" title="Send a template" aria-label="Send a template">${icon('file')}</button>
+    <button class="btn primary" id="waSendBtn">${icon('send')}<span class="hide-xs">Send</span></button></div>`;
+  const ta = $('#waText');
+  const grow = () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight + 2, 150) + 'px'; };
+  grow();
+  ta.oninput = () => { w.drafts[c.wa_id] = ta.value; ta.classList.toggle('ta', isTamil(ta.value)); grow(); };
+  ta.onkeydown = e => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && window.matchMedia('(hover:hover)').matches) { e.preventDefault(); waSendReply(); }
+  };
+  $('#waSendBtn').onclick = waSendReply;
+  $('#waTplBtn').onclick = () => templateModal({ mode: 'send', phone: c.wa_id });
+}
+async function waSendReply() {
+  const w = state.wa, c = w.active, ta = $('#waText');
+  if (!c || !ta || w.sending) return;
+  const text = ta.value.trim();
+  if (!text) return ta.focus();
+  w.sending = true; $('#waSendBtn').disabled = true;
+  try {
+    const d = await API.waSend(c.wa_id, text);
+    if (w.active && w.active.wa_id === c.wa_id) {
+      w.msgs.push(d.message); delete w.drafts[c.wa_id];
+      const t = $('#waText'); if (t) { t.value = ''; t.style.height = 'auto'; }
+      renderWaMsgs(true);
+    }
+    waUpdateRow(d.contact); renderWaHead();
+  } catch (err) {
+    if (err.data && err.data.code === 'window') { c.window_open = false; renderWaComposer(); }
+    toast(err.message, 'err');
+  } finally {
+    w.sending = false;
+    const b = $('#waSendBtn'); if (b) b.disabled = false;
+    const t = $('#waText'); if (t) t.focus();
+  }
+}
+async function waAskReview(c) {
+  const open = c.window_open;
+  const ok = await confirmBox({ title: `Ask ${waName(c)} for a review?`, danger: false, ok: 'Send request',
+    text: open ? 'They get a short thank-you message with a <b>Write a review</b> button. The bot then collects the stars, review and permission, and saves it in Reviews (hidden until you publish it).'
+      : `More than 24 hours have passed, so the approved template <b>${esc(state.wa.reviewTemplate || 'review_request')}</b> is used. The bot then collects the review and saves it in Reviews (hidden until you publish it).` });
+  if (!ok) return;
+  const d = await API.waAskReview(c.wa_id);
+  if (state.wa.active && state.wa.active.wa_id === c.wa_id) { state.wa.msgs.push(d.message); renderWaMsgs(true); }
+  waUpdateRow(d.contact);
+  toast(d.via === 'template' ? 'Review request sent (template)' : 'Review request sent');
+}
+
+/* ---------- polling: new messages every 8 s on this page, the badge every 45 s elsewhere ---------- */
+let waTimer = null, waBusy = false, waLast = 0;
+function waStartPolling() { if (!waTimer) waTimer = setInterval(waPoll, 8000); }
+async function waPoll() {
+  if (document.hidden || waBusy || !state.user) return;
+  const onPage = currentPage() === 'whatsapp' && !$('#app').classList.contains('hidden');
+  if (!onPage && Date.now() - waLast < 45000) return;
+  waLast = Date.now(); waBusy = true;
+  const w = state.wa;
+  try {
+    const d = await API.waChats();
+    w.chats = d.items; w.configured = d.configured; w.admin = d.admin; w.reviewTemplate = d.review_template;
+    if (w.error) { w.error = ''; w.errorCode = ''; if (onPage) return renderWhatsApp(); }
+    refreshBadge();
+    if (!onPage) return;
+    if (w.tab === 'chats') {
+      renderWaFilters(); renderWaList();
+      const waiting = waWaiting().length, tabBtn = $('#waTabs [data-tab="chats"]');
+      if (tabBtn) tabBtn.innerHTML = `${icon('chat')}Chats${waiting ? `<span class="n">${waiting}</span>` : ''}`;
+      const c = w.active;
+      if (c && !w.loadingConv) {
+        const from = w.msgs.length ? w.msgs[Math.max(0, w.msgs.length - 30)].id - 1 : 0;
+        const r = await API.waChat(c.wa_id, `?after=${from}`);
+        if (!w.active || w.active.wa_id !== c.wa_id) return;
+        let changed = false;
+        for (const m of r.messages) {
+          const i = w.msgs.findIndex(x => x.id === m.id);
+          if (i < 0) { w.msgs.push(m); changed = true; }
+          else if (w.msgs[i].status !== m.status || w.msgs[i].body !== m.body) { w.msgs[i] = m; changed = true; }
+        }
+        if (changed) { w.msgs.sort((a, b) => a.id - b.id); renderWaMsgs(false); }
+        const before = JSON.stringify([c.window_open, c.bot_enabled, c.needs_reply, c.flow, c.name, c.language, c.opted_out]);
+        Object.assign(c, r.contact);
+        const after = JSON.stringify([c.window_open, c.bot_enabled, c.needs_reply, c.flow, c.name, c.language, c.opted_out]);
+        if (before !== after) { renderWaHead(); if (!$('#waText') || JSON.parse(before)[0] !== c.window_open) renderWaComposer(); }
+        if (r.contact.unread_count) { API.waRead(c.wa_id).catch(() => {}); c.unread_count = 0; const row = w.chats.find(x => x.wa_id === c.wa_id); if (row) row.unread_count = 0; refreshBadge(); renderWaList(); }
+      }
+    } else if (w.tab === 'broadcasts' && (w.bc || []).some(b => ['queued', 'sending'].includes(b.status))) {
+      await waLoadBroadcasts();
+    }
+  } catch (err) { /* stay quiet: the next poll tries again */ }
+  finally { waBusy = false; }
+}
+
+/* ---------- calls ---------- */
+const callDate = b => new Date(`${b.call_date}T${b.call_time}:00+05:30`);
+function callWhen(b) {
+  const d = callDate(b);
+  return d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'Asia/Kolkata' }) + ', ' +
+         d.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit', timeZone: 'Asia/Kolkata' });
+}
+async function renderWaCalls() {
+  const w = state.wa, body = $('#waBody');
+  if (!w.calls) {
+    body.innerHTML = '<div class="card"><div class="empty">Loading calls…</div></div>';
+    try { w.calls = await API.waBookings(); }
+    catch (err) { if ($('#waBody')) $('#waBody').innerHTML = `<div class="card"><div class="empty">${icon('alert')}<b>Could not load calls</b>${esc(err.message)}</div></div>`; return; }
+    if (currentPage() !== 'whatsapp' || w.tab !== 'calls' || !$('#waBody')) return;
+  }
+  const now = Date.now(), today = istDate();
+  const upcoming = b => b.status === 'booked' && callDate(b) >= now - 30 * 60000;
+  const F = {
+    upcoming: ['Upcoming', w.calls.filter(upcoming).sort((a, b) => callDate(a) - callDate(b))],
+    today: ['Today', w.calls.filter(b => b.call_date === today).sort((a, b) => callDate(a) - callDate(b))],
+    past: ['Past', w.calls.filter(b => !upcoming(b)).sort((a, b) => callDate(b) - callDate(a))],
+    all: ['All', w.calls.slice().sort((a, b) => callDate(b) - callDate(a))],
+  };
+  const rows = F[w.callsFilter][1];
+  $('#waBody').innerHTML = `
+    <div class="toolbar"><div class="chips">${Object.entries(F).map(([k, [l, r]]) => `<button class="chip ${w.callsFilter === k ? 'on' : ''}" data-cf="${k}">${l} <span class="n">${r.length}</span></button>`).join('')}</div>
+      <div class="spacer"></div><button class="btn" id="callsRefresh">${icon('refresh')}Refresh</button></div>
+    ${rows.length ? `<div class="call-grid">${rows.map(b => {
+      const d = callDate(b), past = !upcoming(b);
+      return `<div class="card call ${past ? 'past' : ''}">
+        <div class="call-top">
+          <div class="call-date"><small>${d.toLocaleDateString('en-IN', { month: 'short', timeZone: 'Asia/Kolkata' })}</small><b>${d.toLocaleDateString('en-IN', { day: 'numeric', timeZone: 'Asia/Kolkata' })}</b><i>${d.toLocaleDateString('en-IN', { weekday: 'short', timeZone: 'Asia/Kolkata' })}</i></div>
+          <div class="info"><b class="${taCls(b.name)}">${esc(b.name || 'Customer')}</b><small>${icon('clock')} ${d.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit', timeZone: 'Asia/Kolkata' })} · ${esc(b.phone)}</small>${b.enquiry_id ? `<small>Enquiry #${b.enquiry_id}</small>` : ''}</div>
+          <span class="badge b-${b.status}">${BOOKING_STATUS[b.status]}</span>
+        </div>
+        ${b.topic ? `<div class="call-topic ${taCls(b.topic)}">${esc(b.topic)}</div>` : ''}
+        ${b.notes ? `<div class="call-topic" style="background:var(--warn-soft);border-color:transparent">${icon('edit')} ${esc(b.notes)}</div>` : ''}
+        <div class="call-acts">
+          <a class="btn sm" href="tel:${esc(digits(b.phone))}">${icon('phone')}Call</a>
+          ${b.wa_id ? `<button class="btn sm" data-chatgo="${esc(b.wa_id)}">${icon('chat')}Chat</button>` : ''}
+          <select class="inp" data-bs="${b.id}" style="width:auto;height:32px;font-size:12.5px" aria-label="Status">${Object.entries(BOOKING_STATUS).map(([k, l]) => `<option value="${k}" ${k === b.status ? 'selected' : ''}>${l}</option>`).join('')}</select>
+          <button class="btn sm ghost" data-bn="${b.id}">${icon('edit')}Notes</button>
+        </div></div>`;
+    }).join('')}</div>` : `<div class="card"><div class="empty">${icon('cal')}<b>No calls here</b>Customers book calls from the bot's menu ("Book a call").</div></div>`}`;
+  $$('[data-cf]').forEach(b => b.onclick = () => { w.callsFilter = b.dataset.cf; renderWaCalls(); });
+  $('#callsRefresh').onclick = async () => { w.calls = null; await renderWaCalls(); toast('Calls refreshed'); };
+  $$('[data-chatgo]').forEach(b => b.onclick = () => { w.tab = 'chats'; renderWhatsApp(); waOpen(b.dataset.chatgo); });
+  $$('[data-bs]').forEach(s => s.onchange = async () => {
+    const id = +s.dataset.bs, old = w.calls.find(x => x.id === id).status;
+    s.disabled = true;
+    try { const item = await API.waUpdateBooking(id, { status: s.value }); Object.assign(w.calls.find(x => x.id === id), item); toast(`Call marked as ${BOOKING_STATUS[item.status]}`); renderWaCalls(); }
+    catch (err) { s.value = old; s.disabled = false; throw err; }
+  });
+  $$('[data-bn]').forEach(b => b.onclick = () => callNotes(w.calls.find(x => x.id === +b.dataset.bn)));
+}
+function callNotes(b) {
+  openModal(`
+    <div class="m-h"><h3>Notes · ${esc(b.name || 'Customer')}</h3><div class="spacer"></div><button class="icon-btn" data-x aria-label="Close">${icon('x')}</button></div>
+    <div class="m-b"><div class="field"><label>Private notes (only you see these)</label><textarea class="inp" id="bkNotes" maxlength="5000" placeholder="e.g. Called, wants a quote for an online store">${esc(b.notes)}</textarea></div></div>
+    <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-save>${icon('check')}Save notes</button></div>`);
+  $$('[data-x]', modal).forEach(x => x.onclick = closeModal);
+  $('[data-save]', modal).onclick = async ev => {
+    ev.currentTarget.disabled = true;
+    Object.assign(b, await API.waUpdateBooking(b.id, { notes: $('#bkNotes').value.trim() }));
+    closeModal(); toast('Notes saved'); renderWaCalls();
+  };
+}
+
+/* ---------- broadcasts ---------- */
+async function waLoadBroadcasts() {
+  const d = await API.waBroadcasts(), w = state.wa;
+  w.bc = d.items; w.audience = d.audience; w.optedOut = d.opted_out;
+  if (currentPage() === 'whatsapp' && w.tab === 'broadcasts' && $('#waBody')) paintBroadcasts();
+}
+async function renderWaBroadcasts() {
+  const w = state.wa;
+  if (!w.bc) {
+    $('#waBody').innerHTML = '<div class="card"><div class="empty">Loading broadcasts…</div></div>';
+    try { await waLoadBroadcasts(); }
+    catch (err) { if ($('#waBody')) $('#waBody').innerHTML = `<div class="card"><div class="empty">${icon('alert')}<b>Could not load broadcasts</b>${esc(err.message)}</div></div>`; }
+    return;
+  }
+  paintBroadcasts();
+}
+function paintBroadcasts() {
+  const w = state.wa;
+  $('#waBody').innerHTML = `
+    <div class="notice info">${icon('mega')}<span>A broadcast sends one approved <b>Marketing</b> template to everyone who has messaged the bot and has not sent STOP: <b>${w.audience}</b> customer${w.audience === 1 ? '' : 's'} now${w.optedOut ? ` (${w.optedOut} sent STOP)` : ''}. WhatsApp charges for each message (roughly ₹0.80 each in India). The bot sends about 60 a minute.</span></div>
+    <div class="toolbar"><div class="spacer"></div><button class="btn primary" id="bcNew" ${w.audience ? '' : 'disabled'}>${icon('plus')}New broadcast</button></div>
+    ${w.bc.length ? `<div class="bc-grid">${w.bc.map(b => {
+      const total = Math.max(b.total, 1), done = b.sent + b.failed;
+      return `<div class="card bc">
+        <h4><span>${esc(b.title || b.template_name)}</span><span class="badge b-${b.status}" style="flex:none">${BC_STATUS[b.status]}</span></h4>
+        <div class="muted" style="font-size:12px">Template <b>${esc(b.template_name)}</b> · ${esc(b.template_language)} · ${fmtDate(b.created_at)}</div>
+        ${b.body_preview ? `<div class="prev ${taCls(b.body_preview)}">${esc(b.body_preview)}</div>` : ''}
+        <div class="prog"><i style="width:${b.sent / total * 100}%;background:var(--ok)"></i><i style="width:${b.failed / total * 100}%;background:var(--danger)"></i></div>
+        <div class="nums"><span><b>${b.sent}</b> sent</span><span><b>${b.failed}</b> failed / skipped</span><span><b>${Math.max(b.total - done, 0)}</b> waiting</span><span>of <b>${b.total}</b></span></div>
+        ${['queued', 'sending'].includes(b.status) ? `<div><button class="btn sm danger" data-bcx="${b.id}">${icon('x')}Stop sending</button></div>` : ''}
+      </div>`;
+    }).join('')}</div>` : `<div class="card"><div class="empty">${icon('mega')}<b>No broadcasts yet</b>Create an approved Marketing template in Meta first (e.g. a festival offer), then start a broadcast here.</div></div>`}`;
+  $('#bcNew').onclick = () => templateModal({ mode: 'broadcast' });
+  $$('[data-bcx]').forEach(b => b.onclick = async () => {
+    const ok = await confirmBox({ title: 'Stop this broadcast?', text: 'Messages already sent cannot be taken back. The rest will not be sent.', ok: 'Stop sending' });
+    if (!ok) return;
+    const item = await API.waCancelBroadcast(+b.dataset.bcx);
+    Object.assign(w.bc.find(x => x.id === item.id), item); paintBroadcasts(); toast('Broadcast stopped');
+  });
+}
+
+/* ---------- template picker (new message, 24h closed, broadcast) ---------- */
+async function templateModal(opts) {
+  const w = state.wa, broadcast = opts.mode === 'broadcast';
+  openModal(`
+    <div class="m-h"><h3>${broadcast ? 'New broadcast' : 'Send a template message'}</h3><div class="spacer"></div><button class="icon-btn" data-x aria-label="Close">${icon('x')}</button></div>
+    <div class="m-b" id="tplBody"><div class="empty">Loading your approved templates…</div></div>
+    <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-save disabled>${icon('send')}${broadcast ? 'Start broadcast' : 'Send'}</button></div>`, 'lg');
+  $$('[data-x]', modal).forEach(b => b.onclick = closeModal);
+  let list;
+  try { list = w.templates || (w.templates = await API.waTemplates()); }
+  catch (err) { if ($('#tplBody')) $('#tplBody').innerHTML = `<div class="notice" style="margin:0">${icon('alert')}<span>${esc(err.message)}</span></div>`; return; }
+  if (!$('#tplBody')) return;
+  const usable = list.filter(t => t.supported);
+  if (!usable.length) {
+    $('#tplBody').innerHTML = `<div class="notice" style="margin:0">${icon('alert')}<span>No approved templates yet. Create one in Meta Business Suite > WhatsApp Manager > Message templates, wait for approval (usually a few minutes), then try again.</span></div>`;
+    return;
+  }
+  const pick = broadcast ? (usable.find(t => t.category === 'MARKETING') || usable[0]) : (usable.find(t => t.name === opts.template) || usable.find(t => t.category === 'UTILITY') || usable[0]);
+  let cur = pick, vals = [];
+  const chatName = opts.phone ? waName(w.chats.find(c => c.wa_id === opts.phone) || { wa_id: opts.phone }) : '';
+  $('#tplBody').innerHTML = `<div class="pf">
+    <div>
+      ${broadcast ? fld('title', 'Broadcast name (only you see this)', `<input class="inp" name="title" maxlength="120" placeholder="e.g. Diwali offer 2026">`)
+        : fld('phone', 'WhatsApp number', `<input class="inp" name="phone" maxlength="20" inputmode="tel" value="${esc(opts.phone ? waPhone(opts.phone) : '')}" ${opts.phone ? 'readonly' : ''} placeholder="+91 98765 43210">`, true, 'Enter a WhatsApp number with at least 10 digits.')}
+      <div style="margin-top:14px">${fld('template', 'Template', `<select class="inp" name="template">${usable.map((t, i) => `<option value="${i}" ${t === cur ? 'selected' : ''}>${esc(t.name)} · ${esc(t.language)} · ${esc(t.category.toLowerCase())}</option>`).join('')}</select>`)}</div>
+      <div class="tpl-params" id="tplParams" style="margin-top:14px"></div>
+      <p class="hint">${broadcast ? `Sends to <b>${w.audience}</b> customer${w.audience === 1 ? '' : 's'}. Use <b>{name}</b> in a value to put each customer's first name.` : (chatName ? `To <b>${esc(chatName)}</b>.` : 'The customer can then reply, and the bot answers as usual.')}</p>
+    </div>
+    <div class="preview-col"><div class="sec-t">Preview</div><div class="tpl-prev" id="tplPrev"></div></div>
+  </div>`;
+  const paint = () => {
+    const sample = broadcast ? 'Ravi' : ((chatName || 'there').split(' ')[0]);
+    let body = esc(cur.body);
+    for (let i = 1; i <= cur.params; i++) {
+      const v = (vals[i - 1] || '').replace(/\{name\}/g, sample);
+      body = body.replace(new RegExp(`\\{\\{\\s*${i}\\s*\\}\\}`, 'g'), v ? `<b>${esc(v)}</b>` : `<span style="color:var(--danger)">{{${i}}}</span>`);
+    }
+    $('#tplPrev').innerHTML = `<div class="bub in" style="max-width:100%">
+      ${cur.header === 'IMAGE' ? `<div class="media" style="height:120px;border-radius:8px;background:var(--line);display:grid;place-items:center;color:var(--muted);margin-bottom:6px">${icon('image')}</div>` : ''}
+      ${cur.header === 'TEXT' && cur.header_text ? `<b style="display:block;margin-bottom:4px">${esc(cur.header_text)}</b>` : ''}
+      <div class="tx">${body.replace(/\n/g, '<br>')}</div>
+      ${cur.footer ? `<div class="muted" style="font-size:11.5px;margin-top:4px">${esc(cur.footer)}</div>` : ''}
+      <div class="meta">${waTime(new Date().toISOString())}</div></div>
+      ${cur.buttons.length ? `<div class="tpl-btns">${cur.buttons.map(b => `<span>${esc(b.text)}</span>`).join('')}</div>` : ''}`;
+  };
+  const paramsUI = () => {
+    vals = Array.from({ length: cur.params }, (_, i) => vals[i] || '');
+    $('#tplParams').innerHTML = (cur.params ? cur.params : 0) === 0 && cur.header !== 'IMAGE' ? '<p class="muted" style="font-size:12.5px">This template has no values to fill in.</p>' :
+      Array.from({ length: cur.params }, (_, i) => `<div class="field" data-f="p${i + 1}"><label>Value {{${i + 1}}} <span class="req">*</span></label>
+        <div class="inrow"><input class="inp" data-p="${i}" maxlength="300" value="${esc(vals[i])}" placeholder="${i === 0 ? 'e.g. {name}' : ''}"><button type="button" class="btn sm" data-pn="${i}" title="Use the customer's first name">{name}</button></div>
+        <div class="msg">Fill this in.</div></div>`).join('') +
+      (cur.header === 'IMAGE' ? fld('header_image', 'Header image link (https, JPG or PNG)', `<input class="inp" name="header_image" maxlength="500" placeholder="https://ajtechnologiesltd.com/static/images/offer.jpg">`, true, 'Enter an https:// image link.') : '');
+    $$('[data-p]', modal).forEach(inp => inp.oninput = () => { vals[+inp.dataset.p] = inp.value; inp.closest('.field').classList.remove('has-err'); paint(); });
+    $$('[data-pn]', modal).forEach(b => b.onclick = () => { const inp = $(`[data-p="${b.dataset.pn}"]`, modal); inp.value = (inp.value + ' {name}').trim(); inp.oninput(); inp.focus(); });
+    paint();
+  };
+  $('[name="template"]', modal).onchange = e => {
+    cur = usable[+e.target.value]; vals = []; paramsUI();
+    const btn = $('[data-save]', modal); delete btn.dataset.armed; btn.innerHTML = `${icon('send')}${broadcast ? 'Start broadcast' : 'Send'}`;
+  };
+  paramsUI();
+  const save = $('[data-save]', modal); save.disabled = false;
+  save.onclick = async () => {
+    const f = n => ($(`[name="${n}"]`, modal) || {}).value || '';
+    const errs = {};
+    if (!broadcast && digits(f('phone')).length < 10) errs.phone = 1;
+    vals.forEach((v, i) => { if (!v.trim()) errs['p' + (i + 1)] = 1; });
+    if (cur.header === 'IMAGE' && !/^https:\/\/\S+\.\S+$/.test(f('header_image').trim())) errs.header_image = 1;
+    $$('#tplBody .field').forEach(el => el.classList.toggle('has-err', !!errs[el.dataset.f]));
+    if (Object.keys(errs).length) return toast('Please fill in the highlighted fields', 'err');
+    const data = { template: cur.name, language: cur.language, params: vals.map(v => v.trim()), header_image: f('header_image').trim(), body: cur.body };
+    if (broadcast) {
+      if (!save.dataset.armed) {       // second click confirms (each message is charged by WhatsApp)
+        save.dataset.armed = '1';
+        save.innerHTML = `${icon('check')}Yes, send to ${w.audience} customer${w.audience === 1 ? '' : 's'}`;
+        return toast('Check the preview, then click again to confirm');
+      }
+      save.disabled = true;
+      try {
+        const item = await API.waCreateBroadcast({ ...data, title: f('title').trim() });
+        w.bc = [item, ...(w.bc || [])]; closeModal(); w.tab = 'broadcasts'; renderWhatsApp();
+        toast(`Broadcast started: sending to ${item.total} customer${item.total === 1 ? '' : 's'}`);
+      } finally { save.disabled = false; }
+      return;
+    }
+    save.disabled = true;
+    try {
+      const d = await API.waSendTemplate({ ...data, phone: f('phone') });
+      closeModal(); waUpdateRow(d.contact);
+      if (currentPage() !== 'whatsapp') location.hash = '#/whatsapp';
+      else { if (w.tab !== 'chats') { w.tab = 'chats'; renderWhatsApp(); } }
+      if (w.active && w.active.wa_id === d.contact.wa_id) { w.msgs.push(d.message); renderWaMsgs(true); renderWaComposer(); }
+      else waOpen(d.contact.wa_id);
+      toast('Template sent');
+    } finally { if (save.isConnected) save.disabled = false; }
+  };
+}
+
+{% endverbatim %}
 /* =====================================================================
    SETTINGS
    ===================================================================== */
@@ -1641,6 +2433,9 @@ function renderSettings() {
 
     <div class="card"><div class="card-h"><h3>Database connection</h3><div class="spacer"></div><span class="badge b-soft plain" id="stBadge">Checking…</span></div>
       <div class="card-b" id="stBody"><p class="muted">Checking the connection…</p></div></div>
+
+    <div class="card"><div class="card-h"><h3>WhatsApp bot</h3><div class="spacer"></div><span class="badge b-soft plain" id="waStBadge">Checking…</span></div>
+      <div class="card-b" id="waStBody"><p class="muted">Checking…</p></div></div>
 
     <div class="card"><div class="card-h"><h3>Data & appearance</h3></div><div class="card-b">
       <label class="switch" style="margin-bottom:10px"><div><b>Dark mode</b><small>Remembered on this device</small></div><input type="checkbox" id="setDark" ${document.documentElement.dataset.theme === 'dark' ? 'checked' : ''}><span class="tgl"></span></label>
@@ -1671,6 +2466,15 @@ function renderSettings() {
       <div class="kv"><span>Projects table</span><b>showcase_projects · ${st.counts.projects} rows</b></div>
       <div class="kv"><span>Image storage</span><b>${s.configured ? `${esc(s.bucket)}/${esc(s.folder)} · ${state.media.length} files` : 'Not set up'}</b></div>
       ${state.storageError ? `<div class="notice" style="margin:12px 0 0">${icon('alert')}<span>${esc(state.storageError)}</span></div>` : ''}`;
+    const wa = st.whatsapp || {}, w = state.wa, ready = wa.configured && !w.errorCode;
+    $('#waStBadge').className = 'badge ' + (ready ? 'b-won' : 'b-contacted');
+    $('#waStBadge').textContent = w.errorCode === 'no_table' ? 'Tables missing' : (wa.configured ? 'Connected' : 'Replies off');
+    $('#waStBody').innerHTML = `
+      <div class="kv"><span>Chats</span><b>${w.errorCode === 'no_table' ? 'Run supabase_whatsapp.sql' : w.chats.filter(c => !waIsAdmin(c)).length + ' customers'}</b></div>
+      <div class="kv"><span>Replies from the dashboard</span><b>${wa.configured ? 'On' : 'Off: add META_ACCESS_TOKEN + PHONE_NUMBER_ID'}</b></div>
+      <div class="kv"><span>Templates list</span><b>${wa.templates ? 'On' : 'Off: add WABA_ID'}</b></div>
+      <div class="kv"><span>Review request template</span><b>${esc(wa.review_template || '')}</b></div>
+      <div class="kv"><span>Alerts go to</span><b>${esc(waPhone(wa.admin_number || ''))}</b></div>`;
   }).catch(err => {
     if (!$('#stBody')) return;
     $('#stBadge').className = 'badge b-closed'; $('#stBadge').textContent = 'Not connected';
@@ -1712,7 +2516,7 @@ async function startApp(user) {
   $('#app').classList.remove('hidden');
   paintUser();
   $('#content').innerHTML = '<div class="empty">Loading…</div>';
-  try { await loadAll(); route(); }
+  try { await loadAll(); route(); waStartPolling(); }
   catch (err) {
     if (err.status === 401) return;
     $('#content').innerHTML = `<div class="card"><div class="empty">${icon('db')}<b>Could not load data</b>${esc(err.message)}<br><br><button class="btn primary" id="retryBtn">${icon('refresh')}Try again</button></div></div>`;

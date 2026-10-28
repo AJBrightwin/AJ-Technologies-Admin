@@ -15,8 +15,8 @@ class ContactEnquiry(models.Model):
 
     TIMELINES = ('', 'asap', '1m', '3m', 'explore')
     CONTACT_METHODS = ('', 'whatsapp', 'call', 'email')
-    SOURCES = ('home', 'contact')
-    VIAS = ('form', 'whatsapp')
+    SOURCES = ('home', 'contact', 'bot')      # bot = the WhatsApp bot (supabase_whatsapp.sql)
+    VIAS = ('form', 'whatsapp', 'bot')
     LANGUAGES = ('en', 'ta')
     STATUSES = ('new', 'contacted', 'quoted', 'won', 'closed')
 
@@ -179,3 +179,174 @@ class ClientReview(models.Model):
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
         }
+
+
+
+# ---------------------------------------------------------------------------
+# WhatsApp bot tables (created by supabase_whatsapp.sql in the bot project)
+# ---------------------------------------------------------------------------
+def _iso(value):
+    return value.isoformat() if value else None
+
+
+class WaContact(models.Model):
+    """One WhatsApp customer who has messaged the bot."""
+
+    wa_id = models.CharField(max_length=20, primary_key=True)
+    profile_name = models.CharField(max_length=120, blank=True, default='')
+    name = models.CharField(max_length=120, blank=True, default='')
+    business_name = models.CharField(max_length=160, blank=True, default='')
+    email = models.CharField(max_length=254, blank=True, default='')
+    language = models.CharField(max_length=12, default='en')
+    language_locked = models.BooleanField(default=False)
+    opted_out = models.BooleanField(default=False)
+    opted_out_at = models.DateTimeField(null=True, blank=True)
+    bot_enabled = models.BooleanField(default=True)
+    needs_reply = models.BooleanField(default=False)
+    unread_count = models.IntegerField(default=0)
+    last_inbound_at = models.DateTimeField(null=True, blank=True)
+    last_outbound_at = models.DateTimeField(null=True, blank=True)
+    last_message_at = models.DateTimeField(null=True, blank=True)
+    last_message_preview = models.CharField(max_length=200, blank=True, default='')
+    state = models.JSONField(default=dict, blank=True)
+    nudged_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = 'wa_contacts'
+
+    def window_open(self, now):
+        from datetime import timedelta
+        return bool(self.last_inbound_at) and now - self.last_inbound_at < timedelta(hours=23, minutes=50)
+
+    def to_dict(self, now):
+        return {
+            'wa_id': self.wa_id,
+            'name': self.name,
+            'profile_name': self.profile_name,
+            'business_name': self.business_name,
+            'email': self.email,
+            'language': self.language,
+            'opted_out': self.opted_out,
+            'bot_enabled': self.bot_enabled,
+            'needs_reply': self.needs_reply,
+            'unread_count': self.unread_count,
+            'flow': (self.state or {}).get('flow', ''),
+            'window_open': self.window_open(now),
+            'last_inbound_at': _iso(self.last_inbound_at),
+            'last_message_at': _iso(self.last_message_at),
+            'last_message_preview': self.last_message_preview,
+            'created_at': _iso(self.created_at),
+        }
+
+
+class WaMessage(models.Model):
+    """Every WhatsApp message in and out."""
+
+    id = models.BigAutoField(primary_key=True)
+    wa_id = models.CharField(max_length=20)
+    direction = models.CharField(max_length=3)            # in / out
+    sender = models.CharField(max_length=10)              # customer / bot / admin / system
+    msg_type = models.CharField(max_length=20, default='text')
+    body = models.TextField(blank=True, default='')
+    media_id = models.CharField(max_length=100, blank=True, default='')
+    media_mime = models.CharField(max_length=100, blank=True, default='')
+    media_filename = models.CharField(max_length=200, blank=True, default='')
+    wamid = models.CharField(max_length=200, null=True, blank=True)
+    status = models.CharField(max_length=12, blank=True, default='')
+    error = models.TextField(blank=True, default='')
+    created_at = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'wa_messages'
+
+    def to_dict(self):
+        return {
+            'id': self.pk, 'direction': self.direction, 'sender': self.sender, 'type': self.msg_type,
+            'body': self.body, 'media_id': self.media_id, 'media_mime': self.media_mime,
+            'media_filename': self.media_filename, 'status': self.status, 'error': self.error,
+            'created_at': _iso(self.created_at),
+        }
+
+
+class WaBooking(models.Model):
+    """A call booked through the bot."""
+
+    STATUSES = ('booked', 'done', 'missed', 'cancelled')
+
+    id = models.BigAutoField(primary_key=True)
+    wa_id = models.CharField(max_length=20, null=True, blank=True)
+    name = models.CharField(max_length=120, blank=True, default='')
+    phone = models.CharField(max_length=30, blank=True, default='')
+    topic = models.CharField(max_length=500, blank=True, default='')
+    call_date = models.DateField()
+    call_time = models.TimeField()
+    status = models.CharField(max_length=10, default='booked')
+    enquiry_id = models.BigIntegerField(null=True, blank=True)
+    reminded_at = models.DateTimeField(null=True, blank=True)
+    notes = models.TextField(blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = 'wa_bookings'
+        ordering = ['-call_date', '-call_time']
+
+    def to_dict(self):
+        return {
+            'id': self.pk, 'wa_id': self.wa_id or '', 'name': self.name, 'phone': self.phone, 'topic': self.topic,
+            'call_date': self.call_date.isoformat(), 'call_time': self.call_time.strftime('%H:%M'),
+            'status': self.status, 'enquiry_id': self.enquiry_id, 'notes': self.notes,
+            'created_at': _iso(self.created_at), 'updated_at': _iso(self.updated_at),
+        }
+
+
+class WaBroadcast(models.Model):
+    """An offer broadcast (approved template sent to everyone who has not sent STOP)."""
+
+    id = models.BigAutoField(primary_key=True)
+    title = models.CharField(max_length=120, blank=True, default='')
+    template_name = models.CharField(max_length=512)
+    template_language = models.CharField(max_length=15, default='en')
+    body_preview = models.TextField(blank=True, default='')
+    params = models.JSONField(default=list, blank=True)
+    header_image_url = models.CharField(max_length=500, blank=True, default='')
+    status = models.CharField(max_length=10, default='queued')
+    total = models.IntegerField(default=0)
+    sent = models.IntegerField(default=0)
+    failed = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    finished_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'wa_broadcasts'
+        ordering = ['-created_at']
+
+    def to_dict(self):
+        return {
+            'id': self.pk, 'title': self.title, 'template_name': self.template_name,
+            'template_language': self.template_language, 'body_preview': self.body_preview,
+            'params': list(self.params or []), 'header_image_url': self.header_image_url, 'status': self.status,
+            'total': self.total, 'sent': self.sent, 'failed': self.failed, 'created_at': _iso(self.created_at),
+            'started_at': _iso(self.started_at), 'finished_at': _iso(self.finished_at),
+        }
+
+
+class WaBroadcastRecipient(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    broadcast_id = models.BigIntegerField()
+    wa_id = models.CharField(max_length=20)
+    status = models.CharField(max_length=10, default='queued')
+    error = models.TextField(blank=True, default='')
+    wamid = models.CharField(max_length=200, blank=True, default='')
+    sent_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'wa_broadcast_recipients'

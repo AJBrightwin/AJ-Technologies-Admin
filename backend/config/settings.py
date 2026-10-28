@@ -4,6 +4,7 @@ Django settings for the AJ Technologies admin dashboard.
 Database : the same Supabase PostgreSQL as the website (DATABASE_URL in backend/.env).
            Tables are created by supabase_schema.sql in Supabase, not by Django.
 Images   : Supabase Storage bucket "project-images" (SUPABASE_URL + SUPABASE_SERVICE_KEY).
+WhatsApp : the same Meta token / phone number as the WhatsApp bot (chats, replies, broadcasts).
 Login    : one admin account from .env (ADMIN_EMAIL / ADMIN_PASSWORD).
            Sessions are kept in a signed cookie, so no extra tables are needed.
 """
@@ -86,6 +87,18 @@ SUPABASE_IMAGE_FOLDER = 'projects'
 MAX_IMAGE_MB = 5
 
 
+# ---------- WhatsApp (the same Meta values as the WhatsApp bot) ----------
+META_ACCESS_TOKEN = env('META_ACCESS_TOKEN')                          # permanent System User token: server only
+PHONE_NUMBER_ID = env('PHONE_NUMBER_ID')
+WABA_ID = env('WABA_ID')                                              # WhatsApp Business Account ID (for templates)
+WA_GRAPH_VERSION = env('WA_GRAPH_VERSION', 'v23.0')
+WA_GRAPH_BASE = env('WA_GRAPH_BASE', 'https://graph.facebook.com').rstrip('/')
+ADMIN_WA_NUMBER = ''.join(ch for ch in env('ADMIN_WA_NUMBER', '919092631501') if ch.isdigit())
+ADMIN_TEMPLATE_NAME = env('ADMIN_TEMPLATE_NAME', 'aj_admin_alert')        # your alerts template: hidden from the pickers
+REVIEW_TEMPLATE_NAME = env('REVIEW_TEMPLATE_NAME', 'review_request')
+REVIEW_TEMPLATE_LANG = env('REVIEW_TEMPLATE_LANG', 'en')
+
+
 # ---------- Admin login ----------
 ADMIN_NAME = env('ADMIN_NAME', 'Admin')
 ADMIN_EMAIL = env('ADMIN_EMAIL').lower()
@@ -99,6 +112,14 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_NAME = 'ajadmin_csrftoken'
 SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = not DEBUG                # HTTPS-only cookies when live
 X_FRAME_OPTIONS = 'DENY'
+
+# Live site security (switched on automatically when DEBUG=False)
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')       # Render handles HTTPS
+    SECURE_SSL_REDIRECT = env('SECURE_SSL_REDIRECT', 'true').lower() == 'true'
+    SECURE_HSTS_SECONDS = int(env('SECURE_HSTS_SECONDS', '3600'))
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_REFERRER_POLICY = 'same-origin'
 
 # Used only to count wrong login attempts (kept in memory)
 CACHES = {'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}}
