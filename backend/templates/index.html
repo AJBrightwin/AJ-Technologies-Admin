@@ -502,7 +502,7 @@ table.tbl{width:100%;border-collapse:collapse;min-width:760px}
   .wa-shell{height:calc(100vh - 150px);height:calc(100dvh - 150px);border-radius:12px}
   .wa-top{flex-wrap:nowrap;gap:8px;margin-bottom:10px}
   .wa-top .spacer{display:none}
-  .wa-top .seg{flex:1;min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .wa-top .seg{flex:1;min-width:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));grid-auto-flow:column}
   .wa-top .seg button{justify-content:center;padding:7px 4px;min-width:0}
   .wa-top #waNew{width:40px;padding:0;flex:none}
   .wa-top #waNew .lbl{display:none}
@@ -512,6 +512,74 @@ table.tbl{width:100%;border-collapse:collapse;min-width:760px}
   .call-grid,.bc-grid{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:420px){.wa-ch .acts .hide-xs{display:none}.wa-ch>.avatar{display:none}.wa-top .seg button svg{display:none}}
+
+/* ---------- Clients, knowledge, reports (upgrade v2) ---------- */
+.cl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.cp{padding:16px;display:flex;flex-direction:column;gap:10px}
+.cp.off{opacity:.6}
+.cp-h{display:flex;align-items:flex-start;gap:10px}
+.cp-h .t{min-width:0;flex:1}
+.cp-h .t b{display:block;font-size:15px;line-height:1.3}
+.cp-h .t small{display:block;color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cp .nums{display:flex;flex-wrap:wrap;gap:5px}
+.cp .nums span{font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);display:inline-flex;align-items:center;gap:4px}
+.cp .nums svg{width:12px;height:12px}
+.prog-row{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700}
+.prog-row .bar{flex:1;height:8px;border-radius:999px;background:var(--panel2);overflow:hidden}
+.prog-row .bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--brand),var(--brand2))}
+.cp .note{font-size:13px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;white-space:pre-wrap}
+.cp .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
+.st-requirement,.st-on_hold{color:var(--muted);background:var(--panel2);border:1px solid var(--line)}
+.st-design{color:#7c3aed;background:color-mix(in srgb,#7c3aed 12%,transparent)}
+.st-development{color:var(--brand);background:var(--brand-soft)}
+.st-testing,.st-launch{color:var(--warn);background:var(--warn-soft)}
+.st-live,.st-support{color:var(--ok);background:var(--ok-soft)}
+.rn-list,.tk-list,.kb-list{display:flex;flex-direction:column;gap:10px}
+.rn{display:flex;align-items:center;gap:14px;padding:12px 14px;flex-wrap:wrap}
+.rn .call-date{width:58px}
+.rn .info{min-width:0;flex:1}
+.rn .info b{display:block;font-size:14px}
+.rn .info small{display:block;color:var(--muted);font-size:12px}
+.rn .acts{display:flex;gap:6px;flex-wrap:wrap}
+.days-red{color:var(--danger);background:var(--danger-soft)}
+.days-amber{color:var(--warn);background:var(--warn-soft)}
+.days-ok{color:var(--ok);background:var(--ok-soft)}
+.tk{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.tk-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tk-h b{font-size:14.5px}
+.tk-h .spacer{flex:1}
+.tk .desc{font-size:13.5px;white-space:pre-wrap}
+.tk .meta{font-size:12px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap}
+.tk .upd{font-size:12.5px;background:var(--brand-soft);color:var(--brand);border-radius:10px;padding:7px 10px}
+.b-urgent{color:var(--danger);background:var(--danger-soft)}
+.tks-open{color:var(--brand);background:var(--brand-soft)}
+.tks-in_progress{color:#7c3aed;background:color-mix(in srgb,#7c3aed 12%,transparent)}
+.tks-waiting{color:var(--warn);background:var(--warn-soft)}
+.tks-resolved{color:var(--ok);background:var(--ok-soft)}
+.tks-closed{color:var(--muted);background:var(--panel2);border:1px solid var(--line)}
+.kb{padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.kb.off{opacity:.55}
+.kb .body{min-width:0;flex:1}
+.kb .q{font-weight:700;font-size:14px;margin-bottom:4px}
+.kb .a{font-size:13.5px;color:var(--muted);white-space:pre-wrap}
+.kb .acts{display:flex;gap:4px;flex:none;align-items:center}
+.kb-un{padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.kb-un:last-child{border-bottom:0}
+.kb-un span{flex:1;min-width:200px;font-size:13.5px}
+.kb-un small{color:var(--muted);font-size:11.5px}
+.bub .faq{display:inline-block;margin-top:4px;font-size:11px;font-weight:700;color:var(--brand);opacity:.85}
+.bub .faq:hover{opacity:1;text-decoration:underline}
+.hours{display:flex;align-items:flex-end;gap:3px;height:120px}
+.hours div{flex:1;background:linear-gradient(180deg,var(--brand2),var(--brand));border-radius:4px 4px 1px 1px;min-height:2px;position:relative}
+.hours-l{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:6px}
+input[type=range].inp{padding:0;height:auto;accent-color:var(--brand);border:0;box-shadow:none}
+@media (max-width:720px){
+  .cl-grid{grid-template-columns:minmax(0,1fr)}
+  .rn{gap:10px}
+  .rn .acts{width:100%}
+  .kb{flex-direction:column}
+  .kb .acts{width:100%;justify-content:flex-end}
+}
 
 /* toast */
 .toasts{position:fixed;bottom:20px;right:20px;z-index:120;display:flex;flex-direction:column;gap:8px;max-width:calc(100vw - 40px)}
@@ -655,6 +723,9 @@ table.tbl{width:100%;border-collapse:collapse;min-width:760px}
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
   <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></symbol>
   <symbol id="i-mega" viewBox="0 0 24 24"><path d="m3 11 15-6v14L3 13z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5V21h16"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></symbol>
   <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></symbol>
 </svg>
 
@@ -694,7 +765,9 @@ table.tbl{width:100%;border-collapse:collapse;min-width:760px}
       <a href="#/enquiries" data-nav="enquiries"><svg class="i"><use href="#i-inbox"/></svg>Enquiries<span class="count" id="navNew">0</span></a>
       <a href="#/whatsapp" data-nav="whatsapp"><svg class="i"><use href="#i-wa"/></svg>WhatsApp<span class="count hidden" id="navWa" style="background:#16a34a">0</span></a>
       <a href="#/projects" data-nav="projects"><svg class="i"><use href="#i-folder"/></svg>Projects</a>
+      <a href="#/clients" data-nav="clients"><svg class="i"><use href="#i-users"/></svg>Clients<span class="count hidden" id="navCl" style="background:var(--danger)">0</span></a>
       <a href="#/reviews" data-nav="reviews"><svg class="i"><use href="#i-chat"/></svg>Reviews</a>
+      <a href="#/knowledge" data-nav="knowledge"><svg class="i"><use href="#i-book"/></svg>Bot knowledge<span class="count hidden" id="navKb" style="background:var(--warn)">0</span></a>
       <div class="nav-label">System</div>
       <a href="#/settings" data-nav="settings"><svg class="i"><use href="#i-settings"/></svg>Settings</a>
     </nav>
@@ -845,6 +918,25 @@ const API = {
   waCreateBroadcast: data       => request('POST', '/api/wa/broadcasts/', data).then(d => d.item),
   waCancelBroadcast: id         => request('POST', `/api/wa/broadcasts/${id}/cancel/`, {}).then(d => d.item),
   waMediaUrl:     mediaId       => `/api/wa/media/${encodeURIComponent(mediaId)}/`,
+
+  // ----- Upgrade v2: clients, knowledge, reports -----
+  listClientProjects:  ()          => request('GET', '/api/clients/projects/').then(d => d.items),
+  createClientProject: data        => request('POST', '/api/clients/projects/', data).then(d => d.item),
+  updateClientProject: (id, patch) => request('PATCH', `/api/clients/projects/${id}/`, patch).then(d => d.item),
+  deleteClientProject: id          => request('DELETE', `/api/clients/projects/${id}/`),
+  notifyClientProject: (id, note)  => request('POST', `/api/clients/projects/${id}/notify/`, { note }),
+  listRenewals:        ()          => request('GET', '/api/clients/renewals/').then(d => d.items),
+  createRenewal:       data        => request('POST', '/api/clients/renewals/', data).then(d => d.item),
+  updateRenewal:       (id, patch) => request('PATCH', `/api/clients/renewals/${id}/`, patch).then(d => d.item),
+  deleteRenewal:       id          => request('DELETE', `/api/clients/renewals/${id}/`),
+  listTickets:         ()          => request('GET', '/api/clients/tickets/').then(d => d.items),
+  updateTicket:        (id, patch) => request('PATCH', `/api/clients/tickets/${id}/`, patch),
+  knowledge:           ()          => request('GET', '/api/knowledge/'),
+  createKnowledge:     data        => request('POST', '/api/knowledge/', data).then(d => d.item),
+  updateKnowledge:     (id, patch) => request('PATCH', `/api/knowledge/${id}/`, patch).then(d => d.item),
+  deleteKnowledge:     id          => request('DELETE', `/api/knowledge/${id}/`),
+  ignoreUnanswered:    id          => request('PATCH', `/api/knowledge/unanswered/${id}/`, { status: 'ignored' }),
+  reports:             days        => request('GET', `/api/reports/?days=${days}`),
 };
 
 /* any failed action shows its message and unlocks the buttons */
@@ -956,7 +1048,9 @@ const state = {
   rv: { vis: 'all', stars: 'all', q: '' },
   wa: { tab: 'chats', chats: [], loaded: false, error: '', errorCode: '', configured: true, admin: '', filter: 'all', q: '',
         active: null, msgs: [], hasMore: false, links: {}, sending: false,
-        calls: null, callsFilter: 'upcoming', bc: null, audience: 0, optedOut: 0, templates: null },
+        calls: null, callsFilter: 'upcoming', bc: null, audience: 0, optedOut: 0, templates: null, reportDays: 7 },
+  cl: { tab: 'projects', projects: null, renewals: null, tickets: null, error: '', errorCode: '', q: '', showAll: false, tkFilter: 'active' },
+  kb: { items: null, unanswered: [], error: '', errorCode: '', kind: 'all' },
 };
 const PAGES = {
   dashboard: { title: 'Dashboard', crumb: 'Overview', render: renderDashboard },
@@ -964,6 +1058,8 @@ const PAGES = {
   projects:  { title: 'Projects', crumb: 'Manage · showcase_projects', render: renderProjects },
   reviews:   { title: 'Reviews', crumb: 'Manage · client_reviews', render: renderReviews },
   whatsapp:  { title: 'WhatsApp', crumb: 'Manage · WhatsApp bot', render: renderWhatsApp },
+  clients:   { title: 'Clients', crumb: 'Manage · projects, renewals, support', render: renderClients },
+  knowledge: { title: 'Bot knowledge', crumb: 'Manage · what the WhatsApp bot knows', render: renderKnowledge },
   settings:  { title: 'Settings', crumb: 'System', render: renderSettings },
 };
 function currentPage() { const p = location.hash.replace(/^#\/?/, '').split('?')[0]; return PAGES[p] ? p : 'dashboard'; }
@@ -984,9 +1080,13 @@ function refreshBadge() {
   $('#navNew').textContent = n; $('#navNew').classList.toggle('hidden', !n);
   const w = waWaiting().length;
   $('#navWa').textContent = w; $('#navWa').classList.toggle('hidden', !w);
+  const t = (state.cl.tickets || []).filter(x => !['resolved', 'closed'].includes(x.status)).length;
+  $('#navCl').textContent = t; $('#navCl').classList.toggle('hidden', !t);
+  const u = (state.kb.unanswered || []).length;
+  $('#navKb').textContent = u; $('#navKb').classList.toggle('hidden', !u);
 }
 async function loadAll() {
-  const [e, p, m, r, w] = await Promise.allSettled([API.listEnquiries(), API.listProjects(), API.listImages(), API.listReviews(), API.waChats()]);
+  const [e, p, m, r, w, tk, kb] = await Promise.allSettled([API.listEnquiries(), API.listProjects(), API.listImages(), API.listReviews(), API.waChats(), API.listTickets(), API.knowledge()]);
   if (e.status === 'rejected' || p.status === 'rejected') {
     paintConn('err', 'Database not reachable');
     throw (e.status === 'rejected' ? e.reason : p.reason);
@@ -997,6 +1097,8 @@ async function loadAll() {
   state.reviews = r.status === 'fulfilled' ? r.value : [];
   state.reviewsError = r.status === 'rejected' ? r.reason.message : '';
   waTakeChats(w);
+  if (tk.status === 'fulfilled') state.cl.tickets = tk.value;
+  if (kb.status === 'fulfilled') { state.kb.items = kb.value.items; state.kb.unanswered = kb.value.unanswered; }
   paintConn(state.storageError ? 'warn' : 'ok', state.storageError ? 'Connected · image storage not set up' : 'Connected to Supabase');
   refreshBadge();
 }
@@ -1866,7 +1968,7 @@ function waUpdateRow(contact) {
 function renderWhatsApp() {
   const w = state.wa;
   const tab = hashParam('tab'), chat = hashParam('chat');
-  if (['chats', 'calls', 'broadcasts'].includes(tab)) w.tab = tab;
+  if (['chats', 'calls', 'broadcasts', 'reports'].includes(tab)) w.tab = tab;
   if (chat) w.tab = 'chats';
   if (tab || chat) history.replaceState(null, '', '#/whatsapp');
   if (w.errorCode === 'no_table') {
@@ -1883,6 +1985,7 @@ function renderWhatsApp() {
         <button data-tab="chats" class="${w.tab === 'chats' ? 'on' : ''}">${icon('chat')}Chats${waiting ? `<span class="n">${waiting}</span>` : ''}</button>
         <button data-tab="calls" class="${w.tab === 'calls' ? 'on' : ''}">${icon('cal')}Calls</button>
         <button data-tab="broadcasts" class="${w.tab === 'broadcasts' ? 'on' : ''}">${icon('mega')}Broadcasts</button>
+        <button data-tab="reports" class="${w.tab === 'reports' ? 'on' : ''}">${icon('chart')}Reports</button>
       </div>
       <div class="spacer"></div>
       <button class="btn" id="waNew" title="Send a template message to any number" aria-label="New message">${icon('plus')}<span class="lbl">New message</span></button>
@@ -1894,6 +1997,7 @@ function renderWhatsApp() {
   $('#waNew').onclick = () => templateModal({ mode: 'send' });
   if (w.tab === 'calls') renderWaCalls();
   else if (w.tab === 'broadcasts') renderWaBroadcasts();
+  else if (w.tab === 'reports') renderWaReports();
   else renderWaChats();
   if (chat) waOpen(chat);
 }
@@ -2059,7 +2163,8 @@ function waBubble(m) {
   else if (m.body) inner += `<div class="tx ${taCls(m.body)}">${waFormat(m.body)}</div>`;
   else if (!inner) inner = `<span class="muted">[${esc(m.type)}]</span>`;
   const err = m.status === 'failed' && m.error ? `<div class="err">Not delivered: ${esc(m.error)}</div>` : '';
-  return `<div class="bub ${out ? 'out ' + esc(m.sender) : 'in'}">${who ? `<span class="who">${who}</span>` : ''}${inner}${err}<div class="meta">${waTime(m.created_at)}${out ? waTick(m) : ''}</div></div>`;
+  const faq = out && m.sender === 'admin' && m.type === 'text' && m.body ? `<button class="faq" data-faq="${m.id}" title="Teach the bot this answer">+ Save as FAQ</button>` : '';
+  return `<div class="bub ${out ? 'out ' + esc(m.sender) : 'in'}">${who ? `<span class="who">${who}</span>` : ''}${inner}${err}${faq}<div class="meta">${waTime(m.created_at)}${out ? waTick(m) : ''}</div></div>`;
 }
 function renderWaMsgs(toBottom = false) {
   const w = state.wa, box = $('#waMsgs'); if (!box) return;
@@ -2085,6 +2190,7 @@ function renderWaMsgs(toBottom = false) {
   }
   box.onscroll = () => { box.dataset.stick = box.scrollHeight - box.scrollTop - box.clientHeight < 90 ? '1' : '0'; };
   if ($('#waOlder')) $('#waOlder').onclick = waLoadOlder;
+  $$('[data-faq]', box).forEach(b => b.onclick = () => waSaveFaq(+b.dataset.faq));
   $$('[data-zoom]', box).forEach(img => img.onclick = () => {
     const v = document.createElement('div'); v.className = 'img-view'; v.innerHTML = `<img src="${img.src}" alt="">`;
     v.onclick = () => v.remove(); document.body.appendChild(v);
@@ -2415,6 +2521,437 @@ async function templateModal(opts) {
       toast('Template sent');
     } finally { if (save.isConnected) save.disabled = false; }
   };
+}
+
+/* =====================================================================
+   CLIENTS: projects (status shown ONLY to the linked WhatsApp numbers),
+   renewals and support requests. Tables from supabase_upgrade_v2.sql
+   ===================================================================== */
+const STAGE = { requirement: 'Requirements', design: 'Design', development: 'Development', testing: 'Testing', launch: 'Launch', live: 'Live', support: 'Support & maintenance', on_hold: 'On hold' };
+const RN_ITEM = { domain: 'Domain', hosting: 'Hosting', ssl: 'SSL certificate', amc: 'Maintenance (AMC)', email: 'Business email', app_store: 'App store account', other: 'Other' };
+const TK_STATUS = { open: 'Received', in_progress: 'In progress', waiting: 'Waiting for client', resolved: 'Resolved', closed: 'Closed' };
+const daysLeft = iso => Math.round((new Date(iso + 'T00:00:00+05:30') - new Date(istDate() + 'T00:00:00+05:30')) / 864e5);
+const projName = id => { const p = (state.cl.projects || []).find(x => x.id === id); return p ? p.title : ''; };
+
+async function loadClients(force = false) {
+  const c = state.cl;
+  if (c.projects && !force) return;
+  const [p, r, t] = await Promise.allSettled([API.listClientProjects(), API.listRenewals(), API.listTickets()]);
+  const bad = [p, r, t].find(x => x.status === 'rejected');
+  if (bad) { c.error = bad.reason.message; c.errorCode = (bad.reason.data || {}).code || ''; }
+  else { c.error = ''; c.errorCode = ''; }
+  c.projects = p.status === 'fulfilled' ? p.value : [];
+  c.renewals = r.status === 'fulfilled' ? r.value : [];
+  c.tickets = t.status === 'fulfilled' ? t.value : [];
+  refreshBadge();
+}
+async function renderClients() {
+  const c = state.cl;
+  if (!c.projects) {
+    $('#content').innerHTML = '<div class="empty">Loading…</div>';
+    await loadClients();
+    if (currentPage() !== 'clients') return;
+  }
+  if (c.errorCode === 'no_table') {
+    $('#content').innerHTML = `<div class="view"><div class="card"><div class="empty">${icon('db')}<b>Set up the new tables first</b><span style="display:block;max-width:520px;margin:0 auto">${esc(c.error)}</span><br><button class="btn primary" id="clRetry">${icon('refresh')}I have run it, check again</button></div></div></div>`;
+    $('#clRetry').onclick = async () => { c.projects = null; renderClients(); };
+    return;
+  }
+  const openT = c.tickets.filter(x => !['resolved', 'closed'].includes(x.status)).length;
+  const dueR = c.renewals.filter(x => x.status === 'active' && daysLeft(x.expiry_date) <= 30).length;
+  $('#content').innerHTML = `<div class="view">
+    <div class="wa-top">
+      <div class="seg" id="clTabs">
+        <button data-tab="projects" class="${c.tab === 'projects' ? 'on' : ''}">${icon('folder')}Projects<span class="n" style="background:var(--muted)">${c.projects.length}</span></button>
+        <button data-tab="renewals" class="${c.tab === 'renewals' ? 'on' : ''}">${icon('refresh')}Renewals${dueR ? `<span class="n" style="background:var(--warn)">${dueR}</span>` : ''}</button>
+        <button data-tab="support" class="${c.tab === 'support' ? 'on' : ''}">${icon('alert')}Support${openT ? `<span class="n" style="background:var(--danger)">${openT}</span>` : ''}</button>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn" id="clReload" title="Refresh" aria-label="Refresh">${icon('refresh')}</button>
+    </div>
+    ${c.error ? `<div class="notice">${icon('alert')}<span>${esc(c.error)}</span></div>` : ''}
+    <div id="clBody"></div></div>`;
+  $$('#clTabs [data-tab]').forEach(b => b.onclick = () => { c.tab = b.dataset.tab; renderClients(); });
+  $('#clReload').onclick = async () => { await loadClients(true); renderClients(); toast('Refreshed'); };
+  if (c.tab === 'renewals') paintRenewals(); else if (c.tab === 'support') paintTickets(); else paintClientProjects();
+}
+
+/* ---------- projects ---------- */
+function paintClientProjects() {
+  const c = state.cl, q = c.q.trim().toLowerCase();
+  const rows = c.projects.filter(p => (c.showAll || p.is_active) && (!q || [p.client_name, p.business_name, p.title, p.service, ...p.wa_ids].join(' ').toLowerCase().includes(q)));
+  $('#clBody').innerHTML = `
+    <div class="notice info">${icon('lock')}<span>Each project is shown on WhatsApp <b>only</b> to the numbers you add to it. Clients type <b>status</b> (or tap <b>My project</b>) to see the stage, progress and your latest note. Private notes are never shown.</span></div>
+    <div class="toolbar">
+      <div class="search">${icon('search')}<input class="inp" id="clSearch" placeholder="Search client, business, number…" value="${esc(c.q)}"></div>
+      <label class="switch" style="padding:7px 12px"><div><b style="font-size:12.5px">Show finished / hidden</b></div><input type="checkbox" id="clAll" ${c.showAll ? 'checked' : ''}><span class="tgl"></span></label>
+      <div class="spacer"></div>
+      <button class="btn primary" id="cpAdd">${icon('plus')}Add client project</button>
+    </div>
+    ${rows.length ? `<div class="cl-grid">${rows.map(p => `
+      <div class="card cp ${p.is_active ? '' : 'off'}">
+        <div class="cp-h"><div class="t"><b class="${taCls(p.title)}">${esc(p.title)}</b><small class="${taCls(p.client_name)}">${esc(p.client_name)}${p.business_name ? ' · ' + esc(p.business_name) : ''}</small></div>
+          <span class="badge plain st-${p.stage}">${STAGE[p.stage]}</span></div>
+        <div class="prog-row"><div class="bar"><i style="width:${p.progress}%"></i></div>${p.progress}%</div>
+        <div class="nums">${p.wa_ids.map(n => `<span>${icon('wa')}${esc(waPhone(n))}</span>`).join('')}${p.open_tickets ? `<span style="color:var(--danger)">${icon('alert')}${p.open_tickets} open request${p.open_tickets > 1 ? 's' : ''}</span>` : ''}</div>
+        ${p.client_note ? `<div class="note ${taCls(p.client_note)}">${esc(p.client_note)}</div>` : ''}
+        <div class="acts">
+          <button class="btn sm" data-cpe="${p.id}">${icon('edit')}Edit</button>
+          <button class="btn sm" data-cpn="${p.id}" title="Send the status to the client on WhatsApp">${icon('send')}Update</button>
+          <button class="btn sm" data-cpr="${p.id}" title="Add a domain / hosting / AMC renewal">${icon('plus')}Renewal</button>
+          <button class="btn sm icon ghost" data-cpd="${p.id}" title="Delete" aria-label="Delete" style="margin-left:auto">${icon('trash')}</button>
+        </div>
+      </div>`).join('')}</div>`
+    : `<div class="card"><div class="empty">${icon('users')}<b>${c.projects.length ? 'No projects match' : 'No client projects yet'}</b>${c.projects.length ? 'Try another search.' : 'Add a project for each client, with their WhatsApp number. They can then check its status on WhatsApp.'}</div></div>`}`;
+  const s = $('#clSearch');
+  s.oninput = () => { c.q = s.value; clearTimeout(s._t); s._t = setTimeout(() => { paintClientProjects(); const n = $('#clSearch'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }, 250); };
+  $('#clAll').onchange = e => { c.showAll = e.target.checked; paintClientProjects(); };
+  $('#cpAdd').onclick = () => clientProjectForm();
+  const find = id => c.projects.find(x => x.id === +id);
+  $$('[data-cpe]').forEach(b => b.onclick = () => clientProjectForm(find(b.dataset.cpe)));
+  $$('[data-cpn]').forEach(b => b.onclick = () => sendProjectUpdate(find(b.dataset.cpn)));
+  $$('[data-cpr]').forEach(b => b.onclick = () => renewalForm(null, +b.dataset.cpr));
+  $$('[data-cpd]').forEach(b => b.onclick = async () => {
+    const p = find(b.dataset.cpd);
+    const ok = await confirmBox({ title: 'Delete this client project?', text: `<b>${esc(p.title)}</b> and its renewals will be deleted. Support requests stay. This cannot be undone.` });
+    if (!ok) return;
+    await API.deleteClientProject(p.id);
+    c.projects = c.projects.filter(x => x.id !== p.id); c.renewals = c.renewals.filter(x => x.project_id !== p.id);
+    toast('Project deleted'); renderClients();
+  });
+}
+function clientProjectForm(p = null) {
+  const v = p || { client_name: '', business_name: '', wa_ids: [], title: '', service: '', stage: 'requirement', progress: 0, client_note: '', private_notes: '', live_url: '', start_date: '', is_active: true };
+  openModal(`
+    <div class="m-h"><h3>${p ? 'Edit client project' : 'Add client project'}</h3><div class="spacer"></div><button class="icon-btn" data-x aria-label="Close">${icon('x')}</button></div>
+    <form class="m-b" id="cpForm" novalidate>
+      <div class="grid2">
+        ${fld('client_name', 'Client name', `<input class="inp" name="client_name" maxlength="120" value="${esc(v.client_name)}">`, true, 'Client name is required.')}
+        ${fld('business_name', 'Business name', `<input class="inp" name="business_name" maxlength="160" value="${esc(v.business_name)}">`)}
+      </div>
+      <div style="margin-top:14px">${fld('wa_ids', 'Client WhatsApp numbers (up to 3, separated by commas)', `<input class="inp" name="wa_ids" inputmode="tel" value="${esc(v.wa_ids.map(waPhone).join(', '))}" placeholder="+91 98765 43210, +91 90000 12345">`, true, 'Add at least one valid number (not your own).')}
+        <div class="hint">${icon('lock')} Only these numbers can see this project on WhatsApp.</div></div>
+      <div class="grid2" style="margin-top:14px">
+        ${fld('title', 'Project title', `<input class="inp" name="title" maxlength="160" value="${esc(v.title)}" placeholder="e.g. Online store website">`, true, 'Project title is required.')}
+        ${fld('service', 'Service', `<input class="inp" name="service" maxlength="80" value="${esc(v.service)}" placeholder="e.g. E-commerce">`)}
+        ${fld('stage', 'Stage', sel('stage', STAGE, v.stage))}
+        ${fld('progress', `Progress <b id="cpPct">${v.progress}%</b>`, `<input type="range" class="inp" name="progress" min="0" max="100" step="5" value="${v.progress}">`)}
+        ${fld('live_url', 'Live link', `<input class="inp" name="live_url" maxlength="300" value="${esc(v.live_url)}" placeholder="https://…">`, false, 'Must start with http:// or https://')}
+        ${fld('start_date', 'Start date', `<input class="inp" type="date" name="start_date" value="${esc(v.start_date)}">`)}
+      </div>
+      <div style="margin-top:14px">${fld('client_note', 'Latest update (the client sees this)', `<textarea class="inp" name="client_note" maxlength="2000" placeholder="e.g. Home page design is ready. Please check and approve.">${esc(v.client_note)}</textarea>`)}</div>
+      <div style="margin-top:14px">${fld('private_notes', 'Private notes (only you)', `<textarea class="inp" name="private_notes" style="min-height:70px">${esc(v.private_notes)}</textarea>`)}</div>
+      <label class="switch" style="margin-top:14px"><div><b>Active</b><small>Hidden projects are not shown to the client</small></div><input type="checkbox" name="is_active" ${v.is_active ? 'checked' : ''}><span class="tgl"></span></label>
+      <label class="switch" style="margin-top:10px"><div><b>Tell the client on WhatsApp after saving</b><small>Sends the stage, progress and latest update</small></div><input type="checkbox" id="cpNotify" ${p ? '' : 'checked'}><span class="tgl"></span></label>
+    </form>
+    <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-save>${icon('check')}${p ? 'Save changes' : 'Add project'}</button></div>`);
+  const fm = $('#cpForm');
+  $$('[data-x]', modal).forEach(b => b.onclick = closeModal);
+  fm.elements.progress.oninput = e => { $('#cpPct').textContent = e.target.value + '%'; $('#cpNotify').checked = true; };
+  ['stage', 'client_note'].forEach(n => fm.elements[n].addEventListener('input', () => { $('#cpNotify').checked = true; }));
+  $('[data-save]', modal).onclick = async ev => {
+    const g = n => fm.elements[n].value.trim();
+    const data = { client_name: g('client_name'), business_name: g('business_name'), wa_ids: g('wa_ids'), title: g('title'), service: g('service'),
+      stage: g('stage'), progress: +g('progress'), live_url: g('live_url'), start_date: g('start_date'), client_note: g('client_note'),
+      private_notes: g('private_notes'), is_active: fm.elements.is_active.checked };
+    const errs = {};
+    if (!data.client_name) errs.client_name = 1;
+    if (!data.title) errs.title = 1;
+    const nums = data.wa_ids.split(/[,\n]/).map(digits).filter(Boolean);
+    if (!nums.length || nums.some(n => n.length < 10)) errs.wa_ids = 1;
+    if (data.live_url && !/^https?:\/\/\S+\.\S+$/.test(data.live_url)) errs.live_url = 1;
+    $$('.field', fm).forEach(f => f.classList.toggle('has-err', !!errs[f.dataset.f]));
+    if (Object.keys(errs).length) return toast('Please fix the highlighted fields', 'err');
+    const btn = ev.currentTarget; btn.disabled = true;
+    try {
+      const item = p ? await API.updateClientProject(p.id, data) : await API.createClientProject(data);
+      if (p) Object.assign(p, item); else state.cl.projects.unshift({ ...item, open_tickets: 0 });
+      const tell = $('#cpNotify').checked;
+      closeModal();
+      toast(p ? 'Project saved' : 'Project added');
+      if (tell) await sendProjectUpdate(p || state.cl.projects[0], true);
+      renderClients();
+    } finally { btn.disabled = false; }
+  };
+}
+async function sendProjectUpdate(p, silent = false) {
+  if (!silent) {
+    const ok = await confirmBox({ title: `Send an update to ${p.client_name}?`, danger: false, ok: 'Send update',
+      text: `They get the stage (<b>${STAGE[p.stage]}</b>), progress (<b>${p.progress}%</b>) and your latest update on WhatsApp, at ${p.wa_ids.map(n => esc(waPhone(n))).join(', ')}. If they have not messaged in 24 hours, the approved <b>project_update</b> template is used.` });
+    if (!ok) return;
+  }
+  try {
+    const d = await API.notifyClientProject(p.id, '');
+    Object.assign(p, d.item);
+    toast(d.via.includes('template') ? 'Update sent (template)' : 'Update sent');
+  } catch (err) { toast('Saved, but the WhatsApp update was not sent: ' + err.message, 'err'); }
+}
+
+/* ---------- renewals ---------- */
+function paintRenewals() {
+  const c = state.cl;
+  const rows = c.renewals.slice().sort((a, b) => (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1) || a.expiry_date.localeCompare(b.expiry_date));
+  $('#clBody').innerHTML = `
+    <div class="notice info">${icon('clock')}<span>The bot reminds the client on WhatsApp <b>30, 7 and 1 day</b> before each expiry date (10 AM–7 PM India time), and it is listed in your 9 AM daily summary. After renewing, just change the expiry date: reminders start again for the new date.</span></div>
+    <div class="toolbar"><div class="spacer"></div><button class="btn primary" id="rnAdd" ${c.projects.length ? '' : 'disabled title="Add a client project first"'}>${icon('plus')}Add renewal</button></div>
+    ${rows.length ? `<div class="rn-list">${rows.map(r => {
+      const d = daysLeft(r.expiry_date), dt = new Date(r.expiry_date + 'T00:00:00+05:30');
+      const cls = r.status !== 'active' ? 'b-soft' : d < 0 ? 'days-red' : d <= 7 ? 'days-red' : d <= 30 ? 'days-amber' : 'days-ok';
+      const txt = r.status !== 'active' ? (r.status === 'renewed' ? 'Renewed' : 'Cancelled') : d < 0 ? `Expired ${-d} day${d === -1 ? '' : 's'} ago` : d === 0 ? 'Expires today' : `${d} day${d === 1 ? '' : 's'} left`;
+      return `<div class="card rn">
+        <div class="call-date"><small>${dt.toLocaleDateString('en-IN', { month: 'short', timeZone: 'Asia/Kolkata' })}</small><b>${dt.getDate()}</b><i>${dt.getFullYear()}</i></div>
+        <div class="info"><b>${RN_ITEM[r.item]}${r.label ? ' · ' + esc(r.label) : ''}</b><small>${esc(projName(r.project_id))}${r.amount_text ? ' · ' + esc(r.amount_text) : ''}</small>
+          <small>${r.auto_remind ? 'Auto reminders on' : 'Auto reminders off'}${r.reminded.length ? ' · reminded at ' + r.reminded.map(x => x + 'd').join(', ') : ''}</small></div>
+        <span class="badge plain ${cls}">${txt}</span>
+        <div class="acts"><button class="btn sm" data-rnr="${r.id}">${icon('check')}Renewed</button><button class="btn sm" data-rne="${r.id}">${icon('edit')}Edit</button><button class="btn sm icon ghost" data-rnd="${r.id}" title="Delete" aria-label="Delete">${icon('trash')}</button></div>
+      </div>`;
+    }).join('')}</div>` : `<div class="card"><div class="empty">${icon('refresh')}<b>No renewals yet</b>Add domain, hosting, SSL or AMC expiry dates for your clients.</div></div>`}`;
+  $('#rnAdd').onclick = () => renewalForm();
+  const find = id => c.renewals.find(x => x.id === +id);
+  $$('[data-rne]').forEach(b => b.onclick = () => renewalForm(find(b.dataset.rne)));
+  $$('[data-rnr]').forEach(b => b.onclick = () => renewedForm(find(b.dataset.rnr)));
+  $$('[data-rnd]').forEach(b => b.onclick = async () => {
+    const r = find(b.dataset.rnd);
+    if (!await confirmBox({ title: 'Delete this renewal?', text: `${RN_ITEM[r.item]} ${esc(r.label)} will be removed. No more reminders will be sent for it.` })) return;
+    await API.deleteRenewal(r.id); c.renewals = c.renewals.filter(x => x.id !== r.id); toast('Renewal deleted'); renderClients();
+  });
+}
+function renewalForm(r = null, projectId = null) {
+  const c = state.cl;
+  if (!c.projects.length) return toast('Add a client project first', 'err');
+  const nextYear = () => { const d = new Date(); d.setFullYear(d.getFullYear() + 1); return d.toISOString().slice(0, 10); };
+  const v = r || { project_id: projectId || c.projects[0].id, item: 'domain', label: '', expiry_date: nextYear(), amount_text: '', auto_remind: true, status: 'active' };
+  const projMap = Object.fromEntries(c.projects.map(p => [p.id, `${p.title} · ${p.client_name}`]));
+  openModal(`
+    <div class="m-h"><h3>${r ? 'Edit renewal' : 'Add renewal'}</h3><div class="spacer"></div><button class="icon-btn" data-x aria-label="Close">${icon('x')}</button></div>
+    <form class="m-b" id="rnForm" novalidate>
+      ${fld('project_id', 'Client project', sel('project_id', projMap, String(v.project_id)))}
+      <div class="grid2" style="margin-top:14px">
+        ${fld('item', 'What', sel('item', RN_ITEM, v.item))}
+        ${fld('label', 'Name (e.g. the domain)', `<input class="inp" name="label" maxlength="160" value="${esc(v.label)}" placeholder="sribakery.in">`)}
+        ${fld('expiry_date', 'Expiry date', `<input class="inp" type="date" name="expiry_date" value="${esc(v.expiry_date)}">`, true, 'Choose the expiry date.')}
+        ${fld('amount_text', 'Amount (only you see it)', `<input class="inp" name="amount_text" maxlength="60" value="${esc(v.amount_text)}" placeholder="e.g. ₹1,200 / year">`)}
+      </div>
+      ${r ? `<div style="margin-top:14px">${fld('status', 'Status', sel('status', { active: 'Active', renewed: 'Renewed (no more reminders)', cancelled: 'Cancelled' }, v.status))}</div>` : ''}
+      <label class="switch" style="margin-top:14px"><div><b>Remind the client automatically</b><small>30, 7 and 1 day before, on WhatsApp</small></div><input type="checkbox" name="auto_remind" ${v.auto_remind ? 'checked' : ''}><span class="tgl"></span></label>
+    </form>
+    <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-save>${icon('check')}${r ? 'Save changes' : 'Add renewal'}</button></div>`);
+  const fm = $('#rnForm'); $$('[data-x]', modal).forEach(b => b.onclick = closeModal);
+  $('[data-save]', modal).onclick = async ev => {
+    const g = n => fm.elements[n] ? fm.elements[n].value.trim() : undefined;
+    const data = { project_id: +g('project_id'), item: g('item'), label: g('label'), expiry_date: g('expiry_date'), amount_text: g('amount_text'), auto_remind: fm.elements.auto_remind.checked };
+    if (r) data.status = g('status');
+    const bad = !data.expiry_date;
+    $('.field[data-f="expiry_date"]', fm).classList.toggle('has-err', bad);
+    if (bad) return toast('Choose the expiry date', 'err');
+    ev.currentTarget.disabled = true;
+    const item = r ? await API.updateRenewal(r.id, data) : await API.createRenewal(data);
+    if (r) Object.assign(r, item); else state.cl.renewals.push(item);
+    closeModal(); toast(r ? 'Renewal saved' : 'Renewal added'); state.cl.tab = 'renewals'; renderClients();
+  };
+}
+function renewedForm(r) {
+  const d = new Date(r.expiry_date + 'T00:00:00'); d.setFullYear(d.getFullYear() + 1);
+  openModal(`
+    <div class="m-h"><h3>Renewed: ${esc(RN_ITEM[r.item])} ${esc(r.label)}</h3><div class="spacer"></div><button class="icon-btn" data-x aria-label="Close">${icon('x')}</button></div>
+    <div class="m-b">${fld('expiry_date', 'New expiry date', `<input class="inp" type="date" id="rnNew" value="${d.toISOString().slice(0, 10)}">`)}<p class="hint">Reminders start again for the new date.</p></div>
+    <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-save>${icon('check')}Save new date</button></div>`);
+  $$('[data-x]', modal).forEach(b => b.onclick = closeModal);
+  $('[data-save]', modal).onclick = async ev => {
+    const v = $('#rnNew').value; if (!v) return toast('Choose a date', 'err');
+    ev.currentTarget.disabled = true;
+    Object.assign(r, await API.updateRenewal(r.id, { expiry_date: v, status: 'active' }));
+    closeModal(); toast('Renewal updated'); renderClients();
+  };
+}
+
+/* ---------- support requests ---------- */
+function paintTickets() {
+  const c = state.cl, f = c.tkFilter;
+  const F = { active: x => !['resolved', 'closed'].includes(x.status), resolved: x => ['resolved', 'closed'].includes(x.status), all: () => true };
+  const rows = c.tickets.filter(F[f]).sort((a, b) => (b.priority === 'urgent') - (a.priority === 'urgent') || new Date(b.created_at) - new Date(a.created_at));
+  $('#clBody').innerHTML = `
+    <div class="toolbar"><div class="chips">${[['active', 'Open'], ['resolved', 'Resolved'], ['all', 'All']].map(([k, l]) => `<button class="chip ${f === k ? 'on' : ''}" data-tf="${k}">${l} <span class="n">${c.tickets.filter(F[k]).length}</span></button>`).join('')}</div></div>
+    ${rows.length ? `<div class="tk-list">${rows.map(t => `
+      <div class="card tk">
+        <div class="tk-h"><b>#${t.id}</b>${t.priority === 'urgent' ? '<span class="badge plain b-urgent">🔴 Urgent</span>' : ''}<span class="badge plain tks-${t.status}">${TK_STATUS[t.status]}</span><div class="spacer"></div><span class="muted" style="font-size:12px">${ago(t.created_at)}</span></div>
+        <div class="desc ${taCls(t.description)}">${esc(t.description)}</div>
+        <div class="meta"><span>${icon('users')} ${esc(t.client_name || 'Customer')} · ${esc(waPhone(t.wa_id))}</span>${t.project_id ? `<span>${icon('folder')} ${esc(projName(t.project_id) || 'Project')}</span>` : ''}${t.attachments ? `<span>${icon('file')} ${t.attachments} file(s) in the chat</span>` : ''}</div>
+        ${t.client_update ? `<div class="upd ${taCls(t.client_update)}">Last note to client: ${esc(t.client_update)}</div>` : ''}
+        <div class="call-acts"><button class="btn sm primary" data-tku="${t.id}">${icon('edit')}Update</button><button class="btn sm" data-tkc="${esc(t.wa_id)}">${icon('chat')}Open chat</button></div>
+      </div>`).join('')}</div>` : `<div class="card"><div class="empty">${icon('check')}<b>No support requests here</b>Clients raise them from the bot menu ("Support request") or by describing a problem.</div></div>`}`;
+  $$('[data-tf]').forEach(b => b.onclick = () => { c.tkFilter = b.dataset.tf; paintTickets(); });
+  $$('[data-tku]').forEach(b => b.onclick = () => ticketForm(c.tickets.find(x => x.id === +b.dataset.tku)));
+  $$('[data-tkc]').forEach(b => b.onclick = () => { location.hash = `#/whatsapp?chat=${b.dataset.tkc}`; });
+}
+function ticketForm(t) {
+  openModal(`
+    <div class="m-h"><h3>Support request #${t.id}</h3><div class="spacer"></div><button class="icon-btn" data-x aria-label="Close">${icon('x')}</button></div>
+    <form class="m-b" id="tkForm" novalidate>
+      <div class="msgbox ${taCls(t.description)}">${esc(t.description)}</div>
+      <div class="grid2">
+        ${fld('status', 'Status', sel('status', TK_STATUS, t.status))}
+        ${fld('priority', 'Priority', sel('priority', { normal: 'Normal', urgent: 'Urgent' }, t.priority))}
+      </div>
+      <div style="margin-top:14px">${fld('client_update', 'Message to the client (optional)', `<textarea class="inp" name="client_update" maxlength="1000" placeholder="e.g. Fixed! Your contact form works again.">${esc('')}</textarea>`)}</div>
+      <label class="switch" style="margin-top:10px"><div><b>Tell the client on WhatsApp</b><small>Sends the new status and your message</small></div><input type="checkbox" name="notify" checked><span class="tgl"></span></label>
+      <div style="margin-top:14px">${fld('private_notes', 'Private notes (only you)', `<textarea class="inp" name="private_notes" style="min-height:70px">${esc(t.private_notes)}</textarea>`)}</div>
+    </form>
+    <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-save>${icon('check')}Save</button></div>`);
+  const fm = $('#tkForm'); $$('[data-x]', modal).forEach(b => b.onclick = closeModal);
+  $('[data-save]', modal).onclick = async ev => {
+    const g = n => fm.elements[n].value.trim();
+    ev.currentTarget.disabled = true;
+    const data = { status: g('status'), priority: g('priority'), private_notes: g('private_notes'), notify: fm.elements.notify.checked };
+    if (g('client_update')) data.client_update = g('client_update');
+    try {
+      const d = await API.updateTicket(t.id, data);
+      Object.assign(t, d.item); closeModal();
+      toast(d.via ? (d.via === 'template' ? 'Saved and the client was told (template)' : 'Saved and the client was told') : 'Saved');
+      refreshBadge(); renderClients();
+    } catch (err) {
+      if (err.data && err.data.code === 'whatsapp') { toast('Saved, but the WhatsApp message failed: ' + err.message, 'err'); closeModal(); await loadClients(true); renderClients(); }
+      else throw err;
+    }
+  };
+}
+
+/* =====================================================================
+   BOT KNOWLEDGE: FAQs, info and offers the bot uses (within 1 minute)
+   ===================================================================== */
+const KB_KIND = { faq: 'FAQ', info: 'Fact', offer: 'Offer' };
+async function renderKnowledge() {
+  const k = state.kb;
+  if (!k.items || k.stale) {
+    $('#content').innerHTML = '<div class="empty">Loading…</div>';
+    try { const d = await API.knowledge(); k.items = d.items; k.unanswered = d.unanswered; k.error = ''; k.errorCode = ''; k.stale = false; }
+    catch (err) { k.items = []; k.error = err.message; k.errorCode = (err.data || {}).code || ''; }
+    refreshBadge();
+    if (currentPage() !== 'knowledge') return;
+  }
+  if (k.errorCode === 'no_table') {
+    $('#content').innerHTML = `<div class="view"><div class="card"><div class="empty">${icon('db')}<b>Set up the new tables first</b><span style="display:block;max-width:520px;margin:0 auto">${esc(k.error)}</span><br><button class="btn primary" id="kbRetry">${icon('refresh')}Check again</button></div></div></div>`;
+    $('#kbRetry').onclick = () => { k.stale = true; renderKnowledge(); };
+    return;
+  }
+  const rows = k.items.filter(x => k.kind === 'all' || x.kind === k.kind);
+  $('#content').innerHTML = `<div class="view">
+    <div class="notice info">${icon('bot')}<span>The WhatsApp bot uses everything here to answer customers (changes apply within a minute, no redeploy). Write answers the way you want the bot to say them. It still never gives prices, and only talks about AJ Technologies and your services.</span></div>
+    ${k.error ? `<div class="notice">${icon('alert')}<span>${esc(k.error)}</span></div>` : ''}
+    ${k.unanswered.length ? `<div class="card" style="margin-bottom:16px"><div class="card-h"><h3>❓ Questions the bot couldn't answer</h3><div class="spacer"></div><span class="badge plain days-amber">${k.unanswered.length}</span></div>
+      ${k.unanswered.map(u => `<div class="kb-un"><span class="${taCls(u.question)}">${esc(u.question)}<br><small>${ago(u.created_at)}${u.wa_id ? ' · ' + esc(waPhone(u.wa_id)) : ''}</small></span><button class="btn sm primary" data-kua="${u.id}">${icon('edit')}Answer</button><button class="btn sm ghost" data-kui="${u.id}">Ignore</button></div>`).join('')}</div>` : ''}
+    <div class="toolbar"><div class="chips">${[['all', 'All'], ...Object.entries(KB_KIND)].map(([key, l]) => `<button class="chip ${k.kind === key ? 'on' : ''}" data-kk="${key}">${l}${key === 'all' ? '' : 's'} <span class="n">${key === 'all' ? k.items.length : k.items.filter(x => x.kind === key).length}</span></button>`).join('')}</div>
+      <div class="spacer"></div><button class="btn primary" id="kbAdd">${icon('plus')}Add</button></div>
+    ${rows.length ? `<div class="kb-list">${rows.map(x => `
+      <div class="card kb ${x.is_active ? '' : 'off'}">
+        <span class="badge plain ${x.kind === 'offer' ? 'days-amber' : x.kind === 'info' ? 'b-soft' : 'tks-open'}" style="flex:none">${KB_KIND[x.kind]}</span>
+        <div class="body">${x.question ? `<div class="q ${taCls(x.question)}">${esc(x.question)}</div>` : ''}<div class="a ${taCls(x.answer)}">${esc(x.answer)}</div></div>
+        <div class="acts">
+          <label class="switch" style="padding:4px 8px;border:0;background:none" title="${x.is_active ? 'The bot uses this' : 'Switched off'}"><input type="checkbox" data-kon="${x.id}" ${x.is_active ? 'checked' : ''}><span class="tgl"></span></label>
+          <button class="btn sm icon ghost" data-ke="${x.id}" title="Edit" aria-label="Edit">${icon('edit')}</button>
+          <button class="btn sm icon ghost" data-kd="${x.id}" title="Delete" aria-label="Delete">${icon('trash')}</button>
+        </div>
+      </div>`).join('')}</div>` : `<div class="card"><div class="empty">${icon('book')}<b>Nothing here yet</b>Add FAQs like "Do you work on Sundays?", facts like "We are located near VOC Port", or current offers.</div></div>`}
+  </div>`;
+  $$('[data-kk]').forEach(b => b.onclick = () => { k.kind = b.dataset.kk; renderKnowledge(); });
+  $('#kbAdd').onclick = () => knowledgeForm();
+  const find = id => k.items.find(x => x.id === +id);
+  $$('[data-ke]').forEach(b => b.onclick = () => knowledgeForm(find(b.dataset.ke)));
+  $$('[data-kon]').forEach(c => c.onchange = async () => { c.disabled = true; try { Object.assign(find(c.dataset.kon), await API.updateKnowledge(+c.dataset.kon, { is_active: c.checked })); toast(c.checked ? 'The bot uses this now' : 'Switched off'); renderKnowledge(); } catch (e) { c.checked = !c.checked; c.disabled = false; throw e; } });
+  $$('[data-kd]').forEach(b => b.onclick = async () => {
+    if (!await confirmBox({ title: 'Delete this?', text: 'The bot will stop using it within a minute.' })) return;
+    await API.deleteKnowledge(+b.dataset.kd); k.items = k.items.filter(x => x.id !== +b.dataset.kd); toast('Deleted'); renderKnowledge();
+  });
+  $$('[data-kua]').forEach(b => b.onclick = () => { const u = k.unanswered.find(x => x.id === +b.dataset.kua); knowledgeForm(null, { question: u.question, unanswered_id: u.id }); });
+  $$('[data-kui]').forEach(b => b.onclick = async () => { await API.ignoreUnanswered(+b.dataset.kui); k.unanswered = k.unanswered.filter(x => x.id !== +b.dataset.kui); refreshBadge(); renderKnowledge(); });
+}
+function knowledgeForm(x = null, pre = {}) {
+  const v = x || { kind: 'faq', question: pre.question || '', answer: pre.answer || '', is_active: true };
+  openModal(`
+    <div class="m-h"><h3>${x ? 'Edit' : 'Add to bot knowledge'}</h3><div class="spacer"></div><button class="icon-btn" data-x aria-label="Close">${icon('x')}</button></div>
+    <form class="m-b" id="kbForm" novalidate>
+      ${fld('kind', 'Type', sel('kind', { faq: 'FAQ (question and answer)', info: 'Fact about AJ Technologies', offer: 'Current offer' }, v.kind))}
+      <div style="margin-top:14px">${fld('question', '<span id="kbQl">Question</span>', `<input class="inp ${taCls(v.question)}" name="question" maxlength="300" value="${esc(v.question)}" placeholder="e.g. Do you work on Sundays?">`, false, 'Add the question for an FAQ.')}</div>
+      <div style="margin-top:14px">${fld('answer', 'Answer / details', `<textarea class="inp ${taCls(v.answer)}" name="answer" maxlength="3000" style="min-height:120px" placeholder="Write it the way the bot should say it.">${esc(v.answer)}</textarea>`, true, 'The answer is required.')}</div>
+      <p class="hint">The bot answers in the customer's own language, so you can write in English or Tamil.</p>
+      <label class="switch" style="margin-top:12px"><div><b>The bot uses this</b><small>Switch off to keep it without using it</small></div><input type="checkbox" name="is_active" ${v.is_active ? 'checked' : ''}><span class="tgl"></span></label>
+    </form>
+    <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-save>${icon('check')}${x ? 'Save' : 'Add'}</button></div>`);
+  const fm = $('#kbForm'); $$('[data-x]', modal).forEach(b => b.onclick = closeModal);
+  const ql = () => { $('#kbQl').textContent = { faq: 'Question', info: 'Title (optional)', offer: 'Offer name' }[fm.elements.kind.value]; };
+  fm.elements.kind.onchange = ql; ql();
+  $('[data-save]', modal).onclick = async ev => {
+    const g = n => fm.elements[n].value.trim();
+    const data = { kind: g('kind'), question: g('question'), answer: g('answer'), is_active: fm.elements.is_active.checked };
+    const errs = { answer: !data.answer, question: data.kind === 'faq' && !data.question };
+    $$('.field', fm).forEach(f => f.classList.toggle('has-err', !!errs[f.dataset.f]));
+    if (errs.answer || errs.question) return toast('Please fix the highlighted fields', 'err');
+    ev.currentTarget.disabled = true;
+    const k = state.kb;
+    if (x) Object.assign(x, await API.updateKnowledge(x.id, data));
+    else {
+      const item = await API.createKnowledge({ ...data, unanswered_id: pre.unanswered_id || undefined });
+      if (k.items) k.items.push(item);
+      if (pre.unanswered_id) k.unanswered = k.unanswered.filter(u => u.id !== pre.unanswered_id);
+    }
+    closeModal(); refreshBadge(); toast('Saved: the bot will use it within a minute');
+    if (currentPage() === 'knowledge') renderKnowledge();
+  };
+}
+/* "Save as FAQ" under your own replies in a chat */
+function waSaveFaq(msgId) {
+  const w = state.wa, i = w.msgs.findIndex(m => m.id === msgId);
+  if (i < 0) return;
+  let q = '';
+  for (let j = i - 1; j >= 0; j--) { const m = w.msgs[j]; if (m.direction === 'in' && m.body && m.type !== 'interactive') { q = m.body.replace(/^🎙️ /, ''); break; } }
+  knowledgeForm(null, { question: q.slice(0, 300), answer: w.msgs[i].body });
+}
+
+/* =====================================================================
+   REPORTS (WhatsApp page, India time)
+   ===================================================================== */
+async function renderWaReports() {
+  const w = state.wa, box = $('#waBody');
+  box.innerHTML = '<div class="card"><div class="empty">Loading the report…</div></div>';
+  let r;
+  try { r = await API.reports(w.reportDays); }
+  catch (err) { if ($('#waBody')) $('#waBody').innerHTML = `<div class="card"><div class="empty">${icon('alert')}<b>Could not load the report</b>${esc(err.message)}</div></div>`; return; }
+  if (!$('#waBody') || w.tab !== 'reports') return;
+  const L = r.leads, C = r.chats || {}, T = r.tickets || {};
+  const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '–';
+  const maxDay = Math.max(1, ...r.per_day.map(x => x.n));
+  const days = [...Array(Math.min(r.days, 31))].map((_, i) => { const d = new Date(Date.now() - (Math.min(r.days, 31) - 1 - i) * 864e5); return istDate(d); });
+  const perDay = days.map(d => (r.per_day.find(x => x.date === d) || { n: 0 }).n);
+  const maxH = Math.max(1, ...r.hours);
+  const maxS = Math.max(1, ...r.services.map(s => s.n));
+  const botShare = (C.bot_replies || 0) + (C.your_replies || 0);
+  $('#waBody').innerHTML = `
+    <div class="toolbar"><div class="chips">${[[7, 'Last 7 days'], [30, 'Last 30 days'], [90, 'Last 90 days']].map(([d, l]) => `<button class="chip ${w.reportDays === d ? 'on' : ''}" data-rd="${d}">${l}</button>`).join('')}</div>
+      <div class="spacer"></div><span class="muted" style="font-size:12px">India time · a weekly report also comes to your WhatsApp every Monday at 9 AM</span></div>
+    <div class="kpis">
+      ${kpi('inbox', 'var(--brand)', 'var(--brand-soft)', L.total, 'Enquiries', `🤖 ${L.bot} · 🌐 ${L.home + L.contact}`, 'var(--muted)')}
+      ${kpi('phone', 'var(--s-contacted)', 'var(--warn-soft)', pct(L.contacted, L.total), 'Contacted', `${L.contacted} of ${L.total}`, 'var(--muted)')}
+      ${kpi('trophy', 'var(--ok)', 'var(--ok-soft)', L.won, 'Won', L.won + L.closed ? pct(L.won, L.won + L.closed) + ' win rate' : '', 'var(--ok)')}
+      ${kpi('chat', 'var(--brand2)', 'color-mix(in srgb,var(--brand2) 12%,transparent)', C.new_chats || 0, 'New WhatsApp chats', `${C.messages_in || 0} messages in`, 'var(--muted)')}
+    </div>
+    <div class="dash-grid">
+      <div class="card"><div class="card-h"><h3>Enquiries per day</h3></div><div class="card-b"><div class="bars">${perDay.map((v, i) => `<div class="col"><div class="bar" style="height:${Math.max(3, v / Math.max(1, ...perDay) * 100)}%"><span>${v || ''}</span></div><small>${perDay.length > 10 ? (i % Math.ceil(perDay.length / 7) ? '' : days[i].slice(8)) : new Date(days[i] + 'T12:00:00+05:30').toLocaleDateString('en-IN', { weekday: 'short' })}</small></div>`).join('')}</div></div></div>
+      <div class="card"><div class="card-h"><h3>Where they came from</h3></div><div class="card-b"><div class="mini-stats">
+        <div><b>${L.bot}</b><small>WhatsApp bot</small></div><div><b>${L.home}</b><small>Home page form</small></div>
+        <div><b>${L.contact}</b><small>Contact page form</small></div><div><b>${L.wa_button}</b><small>WhatsApp button</small></div></div></div></div>
+    </div>
+    <div class="dash-grid">
+      <div class="card"><div class="card-h"><h3>When customers message (India time)</h3></div><div class="card-b">
+        <div class="hours">${r.hours.map((v, h) => `<div title="${h}:00 – ${v} messages" style="height:${Math.max(2, v / maxH * 100)}%"></div>`).join('')}</div>
+        <div class="hours-l"><span>12 AM</span><span>6 AM</span><span>12 PM</span><span>6 PM</span><span>11 PM</span></div></div></div>
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        <div class="card"><div class="card-h"><h3>Most requested services</h3></div><div class="card-b">${r.services.map(s => `<div class="hbar"><div class="t"><span class="${taCls(s.name)}">${esc(s.name)}</span><b>${s.n}</b></div><div class="track"><div class="fill" style="width:${s.n / maxS * 100}%"></div></div></div>`).join('') || '<p class="muted">No data yet.</p>'}</div></div>
+        <div class="card"><div class="card-h"><h3>WhatsApp work</h3></div><div class="card-b"><div class="mini-stats">
+          <div><b>${pct(C.bot_replies || 0, botShare)}</b><small>Replies sent by the bot</small></div><div><b>${C.your_replies || 0}</b><small>Replies sent by you</small></div>
+          <div><b>${C.calls || 0}</b><small>Calls booked (${C.calls_done || 0} done)</small></div><div><b>${T.new || 0}</b><small>Support requests (${T.resolved || 0} resolved)</small></div></div></div></div>
+      </div>
+    </div>`;
+  $$('[data-rd]').forEach(b => b.onclick = () => { w.reportDays = +b.dataset.rd; renderWaReports(); });
 }
 
 {% endverbatim %}

@@ -350,3 +350,151 @@ class WaBroadcastRecipient(models.Model):
     class Meta:
         managed = False
         db_table = 'wa_broadcast_recipients'
+
+
+# ---------------------------------------------------------------------------
+# Upgrade v2 tables (created by supabase_upgrade_v2.sql in the bot project)
+# ---------------------------------------------------------------------------
+from django.contrib.postgres.fields import ArrayField  # noqa: E402
+
+
+class ClientProject(models.Model):
+    """A client's project. Its status is shown ONLY to the WhatsApp numbers in wa_ids."""
+
+    STAGES = ('requirement', 'design', 'development', 'testing', 'launch', 'live', 'support', 'on_hold')
+
+    id = models.BigAutoField(primary_key=True)
+    client_name = models.CharField(max_length=120)
+    business_name = models.CharField(max_length=160, blank=True, default='')
+    wa_ids = ArrayField(models.CharField(max_length=20), size=3)
+    title = models.CharField(max_length=160)
+    service = models.CharField(max_length=80, blank=True, default='')
+    stage = models.CharField(max_length=12, default='requirement')
+    progress = models.SmallIntegerField(default=0)
+    client_note = models.TextField(blank=True, default='')
+    private_notes = models.TextField(blank=True, default='')
+    live_url = models.CharField(max_length=300, blank=True, default='')
+    start_date = models.DateField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = 'client_projects'
+        ordering = ['-updated_at']
+
+    def to_dict(self):
+        return {
+            'id': self.pk, 'client_name': self.client_name, 'business_name': self.business_name,
+            'wa_ids': list(self.wa_ids or []), 'title': self.title, 'service': self.service, 'stage': self.stage,
+            'progress': self.progress, 'client_note': self.client_note, 'private_notes': self.private_notes,
+            'live_url': self.live_url, 'start_date': self.start_date.isoformat() if self.start_date else '',
+            'is_active': self.is_active, 'created_at': _iso(self.created_at), 'updated_at': _iso(self.updated_at),
+        }
+
+
+class ClientRenewal(models.Model):
+    ITEMS = ('domain', 'hosting', 'ssl', 'amc', 'email', 'app_store', 'other')
+    STATUSES = ('active', 'renewed', 'cancelled')
+
+    id = models.BigAutoField(primary_key=True)
+    project_id = models.BigIntegerField()
+    item = models.CharField(max_length=10, default='domain')
+    label = models.CharField(max_length=160, blank=True, default='')
+    expiry_date = models.DateField()
+    amount_text = models.CharField(max_length=60, blank=True, default='')
+    auto_remind = models.BooleanField(default=True)
+    status = models.CharField(max_length=10, default='active')
+    reminded_30_at = models.DateTimeField(null=True, blank=True)
+    reminded_7_at = models.DateTimeField(null=True, blank=True)
+    reminded_1_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = 'client_renewals'
+        ordering = ['expiry_date']
+
+    def to_dict(self):
+        return {
+            'id': self.pk, 'project_id': self.project_id, 'item': self.item, 'label': self.label,
+            'expiry_date': self.expiry_date.isoformat(), 'amount_text': self.amount_text,
+            'auto_remind': self.auto_remind, 'status': self.status,
+            'reminded': [d for d, v in (('30', self.reminded_30_at), ('7', self.reminded_7_at), ('1', self.reminded_1_at)) if v],
+            'created_at': _iso(self.created_at), 'updated_at': _iso(self.updated_at),
+        }
+
+
+class SupportTicket(models.Model):
+    STATUSES = ('open', 'in_progress', 'waiting', 'resolved', 'closed')
+    PRIORITIES = ('normal', 'urgent')
+
+    id = models.BigAutoField(primary_key=True)
+    wa_id = models.CharField(max_length=20)
+    project_id = models.BigIntegerField(null=True, blank=True)
+    client_name = models.CharField(max_length=120, blank=True, default='')
+    description = models.TextField()
+    attachments = models.SmallIntegerField(default=0)
+    priority = models.CharField(max_length=8, default='normal')
+    status = models.CharField(max_length=12, default='open')
+    client_update = models.TextField(blank=True, default='')
+    private_notes = models.TextField(blank=True, default='')
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = 'support_tickets'
+        ordering = ['-created_at']
+
+    def to_dict(self):
+        return {
+            'id': self.pk, 'wa_id': self.wa_id, 'project_id': self.project_id, 'client_name': self.client_name,
+            'description': self.description, 'attachments': self.attachments, 'priority': self.priority,
+            'status': self.status, 'client_update': self.client_update, 'private_notes': self.private_notes,
+            'resolved_at': _iso(self.resolved_at), 'created_at': _iso(self.created_at), 'updated_at': _iso(self.updated_at),
+        }
+
+
+class BotKnowledge(models.Model):
+    KINDS = ('faq', 'info', 'offer')
+
+    id = models.BigAutoField(primary_key=True)
+    kind = models.CharField(max_length=8, default='faq')
+    question = models.CharField(max_length=300, blank=True, default='')
+    answer = models.TextField()
+    is_active = models.BooleanField(default=True)
+    sort_order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = 'bot_knowledge'
+        ordering = ['sort_order', 'id']
+
+    def to_dict(self):
+        return {'id': self.pk, 'kind': self.kind, 'question': self.question, 'answer': self.answer,
+                'is_active': self.is_active, 'sort_order': self.sort_order,
+                'created_at': _iso(self.created_at), 'updated_at': _iso(self.updated_at)}
+
+
+class BotUnanswered(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    wa_id = models.CharField(max_length=20, blank=True, default='')
+    question = models.TextField()
+    status = models.CharField(max_length=10, default='pending')
+    knowledge_id = models.BigIntegerField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        managed = False
+        db_table = 'bot_unanswered'
+        ordering = ['-created_at']
+
+    def to_dict(self):
+        return {'id': self.pk, 'wa_id': self.wa_id, 'question': self.question, 'status': self.status,
+                'created_at': _iso(self.created_at)}

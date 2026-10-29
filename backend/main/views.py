@@ -48,6 +48,19 @@ API (all JSON; everything except login needs the admin to be signed in)
     GET    /api/wa/broadcasts/                  offer broadcasts
     POST   /api/wa/broadcasts/                  queue a broadcast (the bot sends it)
     POST   /api/wa/broadcasts/<id>/cancel/      stop a broadcast
+
+    Upgrade v2 (tables from supabase_upgrade_v2.sql)
+    GET/POST          /api/clients/projects/              client projects
+    PATCH/DELETE      /api/clients/projects/<id>/
+    POST              /api/clients/projects/<id>/notify/  send the project update to the client
+    GET/POST          /api/clients/renewals/              domain / hosting / AMC renewals
+    PATCH/DELETE      /api/clients/renewals/<id>/
+    GET               /api/clients/tickets/               support requests
+    PATCH             /api/clients/tickets/<id>/          {status, client_update, private_notes, notify}
+    GET/POST          /api/knowledge/                     bot FAQs (+ unanswered questions)
+    PATCH/DELETE      /api/knowledge/<id>/
+    PATCH             /api/knowledge/unanswered/<id>/     {status: ignored}
+    GET               /api/reports/?days=7                numbers for the Reports tab
 """
 import hmac
 import json
@@ -71,8 +84,8 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from . import storage, whatsapp
-from .models import (ClientReview, ContactEnquiry, ShowcaseProject, WaBooking, WaBroadcast, WaBroadcastRecipient,
-                     WaContact, WaMessage)
+from .models import (BotKnowledge, BotUnanswered, ClientProject, ClientRenewal, ClientReview, ContactEnquiry,
+                     ShowcaseProject, SupportTicket, WaBooking, WaBroadcast, WaBroadcastRecipient, WaContact, WaMessage)
 
 log = logging.getLogger(__name__)
 
@@ -672,7 +685,7 @@ def _chat(wa_id):
         raise ApiError('This chat no longer exists. Refresh the page.', 404)
 
 
-def _record_out(contact, sender, msg_type, body, wamid):
+def _record_out(contact, sender, msg_type, body, wamid, clear=True):
     now = timezone.now()
     fields = dict(wa_id=contact.wa_id, direction='out', sender=sender, msg_type=msg_type, body=body,
                   status='sent', created_at=now)
@@ -681,9 +694,10 @@ def _record_out(contact, sender, msg_type, body, wamid):
             msg = WaMessage.objects.create(wamid=wamid, **fields)
     except IntegrityError:                      # already saved (the message was sent, so never fail here)
         msg = WaMessage.objects.create(wamid=None, **fields)
+    extra = {'needs_reply': False, 'unread_count': 0} if clear else {}
     WaContact.objects.filter(pk=contact.wa_id).update(
         last_outbound_at=now, last_message_at=now, last_message_preview=' '.join(body.split())[:200],
-        needs_reply=False, unread_count=0, updated_at=now)
+        updated_at=now, **extra)
     contact.refresh_from_db()
     return msg
 
@@ -952,3 +966,378 @@ def wa_broadcast_cancel(request, pk):
             WaBroadcastRecipient.objects.filter(broadcast_id=pk, status='queued').update(status='skipped', error='Cancelled')
         item.refresh_from_db()
     return ok(item=item.to_dict())
+
+
+
+# ---------------------------------------------------------------------------
+# Upgrade v2: client projects, renewals, support requests (strictly per WhatsApp number)
+# ---------------------------------------------------------------------------
+NO_V2_TABLES = ('The new tables do not exist yet. In Supabase, open SQL Editor and run supabase_upgrade_v2.sql '
+                '(from the WhatsApp bot project), then refresh this page.')
+V2_TABLES = ('client_projects', 'client_renewals', 'support_tickets', 'bot_knowledge', 'bot_unanswered')
+
+
+def _v2_guard(view):
+    @wraps(view)
+    def inner(request, *args, **kwargs):
+        try:
+            return view(request, *args, **kwargs)
+        except ProgrammingError as e:
+            if any(t in str(e) for t in V2_TABLES):
+                raise ApiError(NO_V2_TABLES, 503, code='no_table')
+            raise
+    return inner
+
+
+def _numbers(v, rule):
+    items = v if isinstance(v, list) else re.split(r'[,\n]', str(v or ''))
+    out = []
+    for item in items:
+        if not str(item).strip():
+            continue
+        d = re.sub(r'\D', '', str(item))
+        if len(d) == 10:
+            d = '91' + d
+        if len(d) == 11 and d.startswith('0'):
+            d = '91' + d[1:]
+        if not 10 <= len(d) <= 15:
+            raise ValueError(f'{item} is not a valid WhatsApp number')
+        if d == settings.ADMIN_WA_NUMBER:
+            raise ValueError('that is your own alerts number')
+        if d not in out:
+            out.append(d)
+    if not out:
+        raise ValueError('add at least one WhatsApp number')
+    if len(out) > 3:
+        raise ValueError('max 3 numbers')
+    return out
+
+
+def _percent(v, rule):
+    try:
+        n = int(v)
+    except (TypeError, ValueError):
+        raise ValueError('0 to 100')
+    if not 0 <= n <= 100:
+        raise ValueError('0 to 100')
+    return n
+
+
+def _any_date(v, rule):
+    s = str(v or '').strip()
+    if not s:
+        if rule.get('required'):
+            raise ValueError('required')
+        return None
+    try:
+        return datetime.strptime(s, '%Y-%m-%d').date()
+    except ValueError:
+        raise ValueError('must be a date like 2026-10-28')
+
+
+def _project_id(v, rule):
+    try:
+        pk = int(v)
+    except (TypeError, ValueError):
+        raise ValueError('choose a project')
+    if not ClientProject.objects.filter(pk=pk).exists():
+        raise ValueError('project not found')
+    return pk
+
+
+CLIENT_PROJECT_FIELDS = {
+    'client_name':   (_text,    {'max': 120, 'required': True}),
+    'business_name': (_text,    {'max': 160}),
+    'wa_ids':        (_numbers, {}),
+    'title':         (_text,    {'max': 160, 'required': True}),
+    'service':       (_text,    {'max': 80}),
+    'stage':         (_choice,  {'choices': ClientProject.STAGES}),
+    'progress':      (_percent, {}),
+    'client_note':   (_text,    {'max': 2000}),
+    'private_notes': (_text,    {'max': 5000}),
+    'live_url':      (_url,     {'max': 300}),
+    'start_date':    (_any_date, {}),
+    'is_active':     (_bool,    {}),
+}
+CLIENT_PROJECT_FIELDS['wa_ids'][1]['required'] = True
+
+RENEWAL_FIELDS = {
+    'project_id':  (_project_id, {'required': True}),
+    'item':        (_choice,     {'choices': ClientRenewal.ITEMS}),
+    'label':       (_text,       {'max': 160}),
+    'expiry_date': (_any_date,   {'required': True}),
+    'amount_text': (_text,       {'max': 60}),
+    'auto_remind': (_bool,       {}),
+    'status':      (_choice,     {'choices': ClientRenewal.STATUSES}),
+}
+
+TICKET_FIELDS = {
+    'status':        (_choice, {'choices': SupportTicket.STATUSES}),
+    'priority':      (_choice, {'choices': SupportTicket.PRIORITIES}),
+    'client_update': (_text,   {'max': 1000}),
+    'private_notes': (_text,   {'max': 5000}),
+}
+
+KNOWLEDGE_FIELDS = {
+    'kind':       (_choice, {'choices': BotKnowledge.KINDS}),
+    'question':   (_text,   {'max': 300}),
+    'answer':     (_text,   {'max': 3000, 'required': True}),
+    'is_active':  (_bool,   {}),
+    'sort_order': (_int,    {}),
+}
+
+# Messages to clients while their 24-hour window is open (otherwise the approved templates are used)
+STAGE_LABEL = {
+    'en': {'requirement': 'Requirements', 'design': 'Design', 'development': 'Development', 'testing': 'Testing',
+           'launch': 'Launch', 'live': 'Live ✅', 'support': 'Support & maintenance', 'on_hold': 'On hold'},
+    'ta': {'requirement': 'தேவைகள்', 'design': 'வடிவமைப்பு', 'development': 'உருவாக்கம்', 'testing': 'சோதனை',
+           'launch': 'வெளியீடு', 'live': 'நேரலையில் ✅', 'support': 'ஆதரவு & பராமரிப்பு', 'on_hold': 'நிறுத்தி வைக்கப்பட்டது'},
+}
+TICKET_LABEL = {
+    'en': {'open': 'Received', 'in_progress': 'In progress', 'waiting': 'Waiting for your reply',
+           'resolved': 'Resolved ✅', 'closed': 'Closed'},
+    'ta': {'open': 'பெறப்பட்டது', 'in_progress': 'நடைபெறுகிறது', 'waiting': 'உங்கள் பதிலுக்காகக் காத்திருக்கிறது',
+           'resolved': 'தீர்க்கப்பட்டது ✅', 'closed': 'மூடப்பட்டது'},
+}
+MSG = {
+    'project': {'en': '📊 Update on your project *{title}*: *{stage}* ({progress}%)\n{note}',
+                'ta': '📊 உங்கள் திட்டம் *{title}* பற்றிய தகவல்: *{stage}* ({progress}%)\n{note}',
+                'tanglish': '📊 Unga project *{title}* update: *{stage}* ({progress}%)\n{note}'},
+    'ticket': {'en': '🛠️ Update on your support request *#{id}*: *{status}*\n{note}',
+               'ta': '🛠️ உங்கள் உதவி கோரிக்கை *#{id}* பற்றிய தகவல்: *{status}*\n{note}',
+               'tanglish': '🛠️ Unga support request *#{id}* update: *{status}*\n{note}'},
+    'b_status': {'en': '📊 My project', 'ta': '📊 என் திட்டம்', 'tanglish': '📊 En project'},
+    'b_requests': {'en': '📋 My requests', 'ta': '📋 என் கோரிக்கைகள்', 'tanglish': '📋 En requests'},
+    'b_menu': {'en': '🏠 Menu', 'ta': '🏠 மெனு', 'tanglish': '🏠 Menu'},
+}
+
+
+def _lang3(contact):
+    return contact.language if contact.language in ('en', 'ta', 'tanglish') else 'en'
+
+
+def _notify(wa_id, text, buttons, template, params, payloads, preview):
+    """Send to one client: free message (with buttons) inside 24 hours, otherwise the approved template."""
+    contact, _ = WaContact.objects.get_or_create(pk=wa_id)
+    if contact.window_open(timezone.now()):
+        wamid = whatsapp.send(wa_id, whatsapp.buttons_payload(text, buttons))
+        _record_out(contact, 'admin', 'interactive', text, wamid, clear=False)
+        return 'message'
+    wamid = whatsapp.send(wa_id, whatsapp.template_payload(template, settings.TPL_LANG, params, '', payloads))
+    _record_out(contact, 'admin', 'template', preview, wamid, clear=False)
+    return 'template'
+
+
+def _first(name):
+    return (name or '').strip().split(' ')[0] or 'there'
+
+
+def notify_project(p, note=''):
+    note = (note or p.client_note or '').strip()
+    results = []
+    for wa_id in p.wa_ids:
+        contact, _ = WaContact.objects.get_or_create(pk=wa_id)
+        L = _lang3(contact)
+        stage = STAGE_LABEL.get(L, STAGE_LABEL['en'])[p.stage]
+        text = MSG['project'][L].format(title=p.title, stage=stage, progress=p.progress, note=note).strip()
+        line = f"{STAGE_LABEL['en'][p.stage]} ({p.progress}%). {note}".strip()
+        results.append(_notify(wa_id, text, [('m:project', MSG['b_status'][L]), ('m:menu', MSG['b_menu'][L])],
+                               settings.TPL_PROJECT_UPDATE, [_first(contact.name or p.client_name), p.title, line],
+                               ['m:project'], f'[Template {settings.TPL_PROJECT_UPDATE}] {p.title}: {line}'))
+    return results
+
+
+def notify_ticket(tk, note=''):
+    contact, _ = WaContact.objects.get_or_create(pk=tk.wa_id)
+    L = _lang3(contact)
+    status = TICKET_LABEL.get(L, TICKET_LABEL['en'])[tk.status]
+    text = MSG['ticket'][L].format(id=tk.pk, status=status, note=note or '').strip()
+    line = f"{TICKET_LABEL['en'][tk.status]}. {note}".strip()
+    return _notify(tk.wa_id, text, [('sp:list', MSG['b_requests'][L]), ('m:menu', MSG['b_menu'][L])],
+                   settings.TPL_TICKET_UPDATE, [_first(contact.name or tk.client_name), f'#{tk.pk}', line],
+                   ['sp:list'], f'[Template {settings.TPL_TICKET_UPDATE}] Request #{tk.pk}: {line}')
+
+
+@api(['GET', 'POST'])
+@_v2_guard
+def client_projects(request):
+    if request.method == 'GET':
+        items = [p.to_dict() for p in ClientProject.objects.all()]
+        open_counts = {}
+        for row in SupportTicket.objects.exclude(status__in=('resolved', 'closed')).values('project_id'):
+            open_counts[row['project_id']] = open_counts.get(row['project_id'], 0) + 1
+        for item in items:
+            item['open_tickets'] = open_counts.get(item['id'], 0)
+        return ok(items=items)
+    values = _clean(CLIENT_PROJECT_FIELDS, _json_body(request), partial=False)
+    item = ClientProject.objects.create(**values)
+    return ok(201, item=item.to_dict())
+
+
+@api(['PATCH', 'DELETE'])
+@_v2_guard
+def client_project(request, pk):
+    item = _get(ClientProject, pk)
+    if request.method == 'DELETE':
+        item.delete()
+        return ok()
+    values = _clean(CLIENT_PROJECT_FIELDS, _json_body(request), partial=True)
+    if values:
+        _save(item, values)
+    return ok(item=item.to_dict())
+
+
+@api(['POST'])
+@_v2_guard
+def client_project_notify(request, pk):
+    item = _get(ClientProject, pk)
+    note = str(_json_body(request).get('note') or '').strip()[:1000]
+    if note and note != item.client_note:
+        _save(item, {'client_note': note})
+    via = notify_project(item, note)
+    return ok(item=item.to_dict(), via=via)
+
+
+@api(['GET', 'POST'])
+@_v2_guard
+def client_renewals(request):
+    if request.method == 'GET':
+        return ok(items=[r.to_dict() for r in ClientRenewal.objects.all()])
+    values = _clean(RENEWAL_FIELDS, _json_body(request), partial=False)
+    item = ClientRenewal.objects.create(**values)
+    return ok(201, item=item.to_dict())
+
+
+@api(['PATCH', 'DELETE'])
+@_v2_guard
+def client_renewal(request, pk):
+    item = _get(ClientRenewal, pk)
+    if request.method == 'DELETE':
+        item.delete()
+        return ok()
+    values = _clean(RENEWAL_FIELDS, _json_body(request), partial=True)
+    if 'expiry_date' in values and values['expiry_date'] != item.expiry_date:
+        # a new expiry date (e.g. after renewing): reminders start again for the new date
+        values.update(reminded_30_at=None, reminded_7_at=None, reminded_1_at=None)
+        values.setdefault('status', 'active')
+    if values:
+        _save(item, values)
+    return ok(item=item.to_dict())
+
+
+@api(['GET'])
+@_v2_guard
+def client_tickets(request):
+    return ok(items=[t.to_dict() for t in SupportTicket.objects.all()[:500]])
+
+
+@api(['PATCH'])
+@_v2_guard
+def client_ticket(request, pk):
+    item = _get(SupportTicket, pk)
+    data = _json_body(request)
+    values = _clean(TICKET_FIELDS, data, partial=True)
+    if 'status' in values:
+        values['resolved_at'] = (item.resolved_at or timezone.now()) if values['status'] in ('resolved', 'closed') else None
+    if values:
+        _save(item, values)
+    via = ''
+    if data.get('notify') is True:
+        via = notify_ticket(item, values.get('client_update', '') or '')
+    return ok(item=item.to_dict(), via=via)
+
+
+# ---------------------------------------------------------------------------
+# Upgrade v2: bot knowledge (FAQs) + questions the bot could not answer
+# ---------------------------------------------------------------------------
+@api(['GET', 'POST'])
+@_v2_guard
+def knowledge(request):
+    if request.method == 'GET':
+        return ok(items=[k.to_dict() for k in BotKnowledge.objects.all()],
+                  unanswered=[u.to_dict() for u in BotUnanswered.objects.filter(status='pending')[:100]])
+    data = _json_body(request)
+    values = _clean(KNOWLEDGE_FIELDS, data, partial=False)
+    if values.get('kind', 'faq') == 'faq' and not values.get('question'):
+        raise ApiError('Please fix the highlighted fields.', 400, errors={'question': 'required for an FAQ'})
+    item = BotKnowledge.objects.create(**values)
+    uid = data.get('unanswered_id')
+    if isinstance(uid, int):
+        BotUnanswered.objects.filter(pk=uid).update(status='answered', knowledge_id=item.pk)
+    return ok(201, item=item.to_dict())
+
+
+@api(['PATCH', 'DELETE'])
+@_v2_guard
+def knowledge_item(request, pk):
+    item = _get(BotKnowledge, pk)
+    if request.method == 'DELETE':
+        item.delete()
+        return ok()
+    values = _clean(KNOWLEDGE_FIELDS, _json_body(request), partial=True)
+    if values:
+        _save(item, values)
+    return ok(item=item.to_dict())
+
+
+@api(['PATCH'])
+@_v2_guard
+def unanswered_item(request, pk):
+    status_value = _json_body(request).get('status')
+    if status_value not in ('pending', 'ignored', 'answered'):
+        raise ApiError('Invalid status.')
+    BotUnanswered.objects.filter(pk=pk).update(status=status_value)
+    return ok()
+
+
+# ---------------------------------------------------------------------------
+# Upgrade v2: reports (India time)
+# ---------------------------------------------------------------------------
+@api(['GET'])
+@_wa_guard
+def reports(request):
+    try:
+        days = max(1, min(int(request.GET.get('days', 7)), 365))
+    except ValueError:
+        days = 7
+    ist_day = "(created_at AT TIME ZONE 'Asia/Kolkata')::date"
+    since = f"{ist_day} > (now() AT TIME ZONE 'Asia/Kolkata')::date - %s"
+    admin = settings.ADMIN_WA_NUMBER
+    out = {'days': days}
+    with connection.cursor() as cur:
+        cur.execute(f"""SELECT count(*), count(*) FILTER (WHERE source = 'bot'), count(*) FILTER (WHERE source = 'home'),
+                               count(*) FILTER (WHERE source = 'contact'), count(*) FILTER (WHERE submitted_via = 'whatsapp'),
+                               count(*) FILTER (WHERE status <> 'new'), count(*) FILTER (WHERE status = 'won'),
+                               count(*) FILTER (WHERE status = 'closed')
+                        FROM contact_enquiries WHERE {since}""", [days])
+        r = cur.fetchone()
+        out['leads'] = dict(zip(['total', 'bot', 'home', 'contact', 'wa_button', 'contacted', 'won', 'closed'], r))
+        cur.execute(f"""SELECT {ist_day} AS d, count(*) FROM contact_enquiries WHERE {since} GROUP BY 1 ORDER BY 1""", [days])
+        out['per_day'] = [{'date': d.isoformat(), 'n': n} for d, n in cur.fetchall()]
+        cur.execute(f"""SELECT s, count(*) FROM contact_enquiries, jsonb_array_elements_text(services) s
+                        WHERE {since} GROUP BY s ORDER BY 2 DESC LIMIT 8""", [days])
+        out['services'] = [{'name': s, 'n': n} for s, n in cur.fetchall()]
+        try:
+            cur.execute(f"""SELECT extract(hour FROM created_at AT TIME ZONE 'Asia/Kolkata')::int, count(*)
+                            FROM wa_messages WHERE direction = 'in' AND wa_id <> %s AND {since} GROUP BY 1""", [admin, days])
+            hours = dict(cur.fetchall())
+            out['hours'] = [hours.get(h, 0) for h in range(24)]
+            cur.execute(f"""SELECT (SELECT count(*) FROM wa_contacts WHERE wa_id <> %s AND {since}),
+                                   (SELECT count(*) FROM wa_messages WHERE direction = 'in' AND wa_id <> %s AND {since}),
+                                   (SELECT count(*) FROM wa_messages WHERE direction = 'out' AND sender = 'bot' AND {since}),
+                                   (SELECT count(*) FROM wa_messages WHERE direction = 'out' AND sender = 'admin' AND {since}),
+                                   (SELECT count(*) FROM wa_bookings WHERE {since}),
+                                   (SELECT count(*) FROM wa_bookings WHERE {since} AND status = 'done')""",
+                        [admin, days, admin, days, days, days, days, days])
+            out['chats'] = dict(zip(['new_chats', 'messages_in', 'bot_replies', 'your_replies', 'calls', 'calls_done'],
+                                    cur.fetchone()))
+        except ProgrammingError:
+            connection.rollback() if not connection.get_autocommit() else None
+            out['hours'], out['chats'] = [0] * 24, {}
+        try:
+            cur.execute(f"""SELECT count(*), count(*) FILTER (WHERE status IN ('resolved', 'closed'))
+                            FROM support_tickets WHERE {since}""", [days])
+            out['tickets'] = dict(zip(['new', 'resolved'], cur.fetchone()))
+        except ProgrammingError:
+            out['tickets'] = {'new': 0, 'resolved': 0}
+    return ok(**out)

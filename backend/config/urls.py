@@ -46,4 +46,17 @@ urlpatterns = [
     path('api/wa/bookings/<int:pk>/', views.wa_booking, name='api_wa_booking'),
     path('api/wa/broadcasts/', views.wa_broadcasts, name='api_wa_broadcasts'),
     path('api/wa/broadcasts/<int:pk>/cancel/', views.wa_broadcast_cancel, name='api_wa_broadcast_cancel'),
+
+    # Upgrade v2: clients, knowledge, reports (tables from supabase_upgrade_v2.sql)
+    path('api/clients/projects/', views.client_projects, name='api_client_projects'),
+    path('api/clients/projects/<int:pk>/', views.client_project, name='api_client_project'),
+    path('api/clients/projects/<int:pk>/notify/', views.client_project_notify, name='api_client_project_notify'),
+    path('api/clients/renewals/', views.client_renewals, name='api_client_renewals'),
+    path('api/clients/renewals/<int:pk>/', views.client_renewal, name='api_client_renewal'),
+    path('api/clients/tickets/', views.client_tickets, name='api_client_tickets'),
+    path('api/clients/tickets/<int:pk>/', views.client_ticket, name='api_client_ticket'),
+    path('api/knowledge/', views.knowledge, name='api_knowledge'),
+    path('api/knowledge/<int:pk>/', views.knowledge_item, name='api_knowledge_item'),
+    path('api/knowledge/unanswered/<int:pk>/', views.unanswered_item, name='api_unanswered_item'),
+    path('api/reports/', views.reports, name='api_reports'),
 ]

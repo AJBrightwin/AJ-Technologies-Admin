@@ -33,6 +33,7 @@ CSRF_TRUSTED_ORIGINS = [o.strip() for o in env('CSRF_TRUSTED_ORIGINS').split(','
 # ---------- Apps (no default Django admin, no auth/session tables) ----------
 INSTALLED_APPS = [
     'django.contrib.staticfiles',
+    'django.contrib.postgres',      # for the list of client WhatsApp numbers (no tables, no migrations)
     'main',
 ]
 
@@ -97,6 +98,9 @@ ADMIN_WA_NUMBER = ''.join(ch for ch in env('ADMIN_WA_NUMBER', '919092631501') if
 ADMIN_TEMPLATE_NAME = env('ADMIN_TEMPLATE_NAME', 'aj_admin_alert')        # your alerts template: hidden from the pickers
 REVIEW_TEMPLATE_NAME = env('REVIEW_TEMPLATE_NAME', 'review_request')
 REVIEW_TEMPLATE_LANG = env('REVIEW_TEMPLATE_LANG', 'en')
+TPL_PROJECT_UPDATE = env('TPL_PROJECT_UPDATE', 'project_update')        # same template names as the bot
+TPL_TICKET_UPDATE = env('TPL_TICKET_UPDATE', 'ticket_update')
+TPL_LANG = env('TPL_LANG', 'en')
 
 
 # ---------- Admin login ----------
