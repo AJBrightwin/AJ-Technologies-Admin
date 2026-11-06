@@ -1,265 +1,780 @@
 """
-Upgrade v4 pages:
+Upgrade v4 API for the dashboard (tables from supabase_upgrade_v4.sql).
 
-    /areas-we-serve/                         every service x place page, grouped by region
-    /<service>-in-<place>/                   e.g. /website-development-in-thoothukudi/ (80 pages for Google)
-    /blog/  and  /blog/<slug>/               posts written in the dashboard
-    /portfolio/<slug>/                       case study of a portfolio project (switched on in the dashboard)
-    /sitemap.xml                             built automatically (pages, places, posts, case studies)
+    Billing (quotations + invoices)
+    GET/POST          /api/billing/docs/                     list / create            ?type=quote|invoice
+    GET/PATCH/DELETE  /api/billing/docs/<id>/
+    GET               /api/billing/docs/<id>/pdf/            the PDF (?download=1 to save it)
+    POST              /api/billing/docs/<id>/send/           send the PDF to the client on WhatsApp
+    POST              /api/billing/docs/<id>/convert/        quotation -> invoice
+    POST              /api/billing/docs/<id>/link/           Razorpay payment link {amount}
+    POST              /api/billing/docs/<id>/payments/       record a payment {amount, method, paid_on, reference, notes}
+    GET               /api/billing/payments/                 all payments
+    DELETE            /api/billing/payments/<id>/
+    GET/PATCH         /api/billing/settings/                 billing details (name, address, UPI, bank, terms ...)
 
-Every database read is wrapped, so a page never breaks if the database is briefly unreachable or
-supabase_upgrade_v4.sql has not been run yet (blog / case studies are then simply empty).
+    Money
+    GET               /api/money/?from=YYYY-MM-DD&to=YYYY-MM-DD   income, expenses, profit, outstanding, charts
+    GET/POST          /api/money/expenses/
+    PATCH/DELETE      /api/money/expenses/<id>/
+
+    Your subscriptions (the WhatsApp bot reminds you every day at 12 PM before a renewal)
+    GET/POST          /api/subscriptions/
+    PATCH/DELETE      /api/subscriptions/<id>/
+    POST              /api/subscriptions/<id>/renewed/       move to the next date
+
+    Blog
+    GET/POST          /api/blog/
+    PATCH/DELETE      /api/blog/<id>/
+
+    Extras on existing screens (they never break the old screens if the v4 SQL was not run yet)
+    GET               /api/v4/extras/                        lead scores, case studies, review requests
+    PATCH             /api/projects/<id>/case/               case study fields of a portfolio project
+    POST              /api/clients/projects/<id>/review/     {ask_review} or {ask_now: true}
 """
-import json
 import logging
-from datetime import date
+import re
+from datetime import date, timedelta
+from decimal import Decimal
+from functools import wraps
 
-from django.db import connection
-from django.http import Http404, HttpResponse
-from django.shortcuts import render
+from django.conf import settings
+from django.db import IntegrityError, ProgrammingError, connection, transaction
+from django.http import HttpResponse
 from django.utils import timezone
 
-from . import markdown_lite, seo_data
-from .models import BlogPost, ClientReview, ShowcaseProject, storage_url
+from . import billing, whatsapp
+from .billing import D
+from .models import (BillingDocument, BillingPayment, BlogPost, BusinessExpense, BusinessSettings, ClientProject,
+                     ContactEnquiry, MySubscription, ShowcaseProject, WaContact)
+from .views import (ApiError, _any_date, _bool, _choice, _clean, _email, _get, _json_body, _record_out, _save, _text,
+                    _url, api, ok)
 
 log = logging.getLogger(__name__)
-SITE = seo_data.SITE
-ORG = {'@type': 'Organization', 'name': 'AJ Technologies', 'url': SITE + '/',
-       'logo': SITE + '/static/images/logo-icon.png', 'telephone': '+91-90926-31501',
-       'email': 'ajtechnologieslimited@gmail.com',
-       'address': {'@type': 'PostalAddress', 'addressLocality': 'Thoothukudi', 'addressRegion': 'Tamil Nadu',
-                   'addressCountry': 'IN'},
-       'sameAs': ['https://www.instagram.com/aj_technologies_ltd_/', 'https://www.youtube.com/@AJ_Technologies']}
+
+NO_V4 = ('The new tables do not exist yet. In Supabase, open SQL Editor, run supabase_upgrade_v4.sql, '
+         'then refresh this page.')
+V4_TABLES = ('business_settings', 'billing_documents', 'billing_payments', 'business_expenses', 'blog_posts',
+             'cost_inr', 'lead_score', 'lead_temp', 'case_study', 'went_live_at', 'ask_review', 'my_subscriptions')
 
 
-def _crumbs(*items):
-    return {'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
-        {'@type': 'ListItem', 'position': i, 'name': name, 'item': SITE + url} for i, (name, url) in enumerate(items, 1)]}
+def v4_guard(view):
+    @wraps(view)
+    def inner(request, *args, **kwargs):
+        try:
+            return view(request, *args, **kwargs)
+        except ProgrammingError as e:
+            if any(t in str(e) for t in V4_TABLES):
+                raise ApiError(NO_V4, 503, code='no_table')
+            raise
+        except billing.BillingError as e:
+            raise ApiError(str(e), 400, code='billing')
+    return inner
 
 
-# ===========================================================================
-# R. Service x place pages
-# ===========================================================================
-def _faqs(s, c):
-    city, city_in, svc, svc_ta = c['en'], c['ta_in'], s['en'].lower(), s['ta']
-    here = c['region'] == 'home'
-    return [
-        {'q_en': f'How much does {svc} cost in {city}?',
-         'q_ta': f'{city_in} {svc_ta} எவ்வளவு செலவாகும்?',
-         'a_en': 'Every project is different, so we never use a fixed price list. Tell us what you need on WhatsApp and we send '
-                 'a clear, written quotation within 24 hours, free and with no obligation.',
-         'a_ta': 'ஒவ்வொரு திட்டமும் வேறுபட்டது, அதனால் நிலையான விலைப் பட்டியல் இல்லை. உங்கள் தேவையை WhatsApp-ல் சொல்லுங்கள்; '
-                 '24 மணி நேரத்தில் தெளிவான எழுத்துப்பூர்வ மதிப்பீட்டை இலவசமாக அனுப்புவோம்.'},
-        {'q_en': f'Do you work with businesses in {city}?' if c['region'] not in ('state', 'india') else f'Do you work with businesses all over {city}?',
-         'q_ta': f'{city_in} உள்ள வணிகங்களுக்கும் வேலை செய்கிறீர்களா?',
-         'a_en': ('Yes. We are based in Thoothukudi district, so we can meet you in person when needed, and we stay in touch on '
-                  'WhatsApp and phone every step of the way.') if here else
-                 ('Yes. We work with clients across Tamil Nadu and India online: WhatsApp, phone and video calls, with a shared '
-                  'progress update at every stage. You never need to travel.'),
-         'a_ta': ('ஆம். நாங்கள் தூத்துக்குடி மாவட்டத்தில் இருப்பதால் தேவைப்பட்டால் நேரில் சந்திக்கலாம்; ஒவ்வொரு படியிலும் '
-                  'WhatsApp, போன் மூலம் தொடர்பில் இருப்போம்.') if here else
-                 ('ஆம். தமிழ்நாடு மற்றும் இந்தியா முழுவதும் உள்ள வாடிக்கையாளர்களுடன் WhatsApp, போன், வீடியோ அழைப்பு மூலம் ஆன்லைனில் '
-                  'வேலை செய்கிறோம். ஒவ்வொரு கட்டத்திலும் முன்னேற்றத்தைப் பகிர்வோம்; நீங்கள் பயணிக்க வேண்டியதில்லை.')},
-        {'q_en': f'How long does {svc} take?', 'q_ta': f'{svc_ta} எவ்வளவு நாட்கள் ஆகும்?',
-         'a_en': 'Most business websites go live in 1 to 3 weeks; online stores and apps take longer depending on the features. '
-                 'You get the exact timeline with your quotation, and live progress updates on WhatsApp.',
-         'a_ta': 'பெரும்பாலான வணிக இணையதளங்கள் 1 முதல் 3 வாரங்களில் தயாராகும்; ஆன்லைன் ஸ்டோர், ஆப்ஸ் அம்சங்களைப் பொறுத்து '
-                 'சற்று அதிக நாட்கள் ஆகும். சரியான கால அட்டவணை மதிப்பீட்டுடன் வரும்; முன்னேற்றம் WhatsApp-ல் தெரியும்.'},
-        {'q_en': 'Can I talk to you in Tamil?', 'q_ta': 'தமிழில் பேசலாமா?',
-         'a_en': 'Of course. Our team speaks Tamil and English, and our WhatsApp assistant understands Tamil, Tanglish and voice notes.',
-         'a_ta': 'நிச்சயமாக. எங்கள் குழு தமிழ் மற்றும் ஆங்கிலம் பேசும்; எங்கள் WhatsApp உதவியாளர் தமிழ், Tanglish, வாய்ஸ் நோட் '
-                 'அனைத்தையும் புரிந்துகொள்ளும்.'},
-        {'q_en': 'What happens after the project goes live?', 'q_ta': 'திட்டம் நேரலைக்கு வந்த பிறகு என்ன?',
-         'a_en': 'You get free support for 30 days, then optional maintenance (AMC). We remind you before your domain, hosting '
-                 'or SSL renews, so your business never goes offline.',
-         'a_ta': '30 நாட்கள் இலவச ஆதரவு, அதன் பிறகு விருப்பமான பராமரிப்பு (AMC). டொமைன், ஹோஸ்டிங், SSL புதுப்பிக்க வேண்டிய '
-                 'முன்பே நினைவூட்டுவோம்; உங்கள் வணிகம் ஒருபோதும் ஆஃப்லைன் ஆகாது.'},
-    ]
-
-
-def seo_page(request, page):
-    if page not in seo_data.PAGES:
-        raise Http404
-    s, c = seo_data.PAGES[page]
-    url = f'/{page}/'
-    region_name = dict((k, (en, ta)) for k, en, ta in seo_data.REGIONS)[c['region']]
-    nearby = [x for x in seo_data.CITIES if x['region'] == c['region'] and x['slug'] != c['slug']][:10]
-    faqs = _faqs(s, c)
-    title = f"{s['en']} in {c['en']}" + (f" ({c['alt']})" if c['alt'] else '') + ' | AJ Technologies'
-    desc = (f"{s['en']} in {c['en']} by AJ Technologies: {s['intro_en']}. Tamil & English support, free quote in 24 hours "
-            f"on WhatsApp.")[:300]
-    json_ld = [
-        {'@context': 'https://schema.org', '@type': 'Service', 'name': f"{s['en']} in {c['en']}", 'serviceType': s['en'],
-         'provider': ORG, 'url': SITE + url, 'description': desc,
-         'areaServed': {'@type': 'Country' if c['region'] == 'india' else 'State' if c['region'] == 'state' else 'City',
-                        'name': c['en']}},
-        {'@context': 'https://schema.org', '@type': 'FAQPage', 'mainEntity': [
-            {'@type': 'Question', 'name': f['q_en'], 'acceptedAnswer': {'@type': 'Answer', 'text': f['a_en']}} for f in faqs]},
-        _crumbs(('Home', '/'), ('Areas we serve', '/areas-we-serve/'), (f"{s['en']} in {c['en']}", url)),
-    ]
-    return render(request, 'seo_page.html', {
-        'seo_title': title, 'seo_description': desc, 'canonical': SITE + url, 'json_ld': json_ld,
-        's': s, 'c': c, 'faqs': faqs, 'region_name': region_name, 'nearby': nearby, 'services': seo_data.SERVICES,
-        'other_services': [x for x in seo_data.SERVICES if x['slug'] != s['slug']], 'local': c['region'] == 'home',
-        'active_nav': 'services',
-        'wa_msg_en': f"Hi AJ Technologies, I'm in {c['en']} and I'd like {s['wa_en']} for my business.",
-        'wa_msg_ta': f"Hi AJ Technologies, என் ஊர்: {c['ta']}. என் வணிகத்திற்கு {s['wa_ta']} வேண்டும்.",
-    })
-
-
-def areas(request):
-    groups = []
-    for key, en, ta in seo_data.REGIONS:
-        cities = [c for c in seo_data.CITIES if c['region'] == key]
-        groups.append({'key': key, 'en': en, 'ta': ta, 'cities': cities})
-    return render(request, 'areas.html', {
-        'seo_title': 'Areas We Serve: Website, App & Marketing Services in Tamil Nadu | AJ Technologies',
-        'seo_description': 'AJ Technologies builds websites, online stores, mobile apps and digital marketing for businesses in '
-                           'Thoothukudi, Tirunelveli, Madurai, Chennai, Coimbatore and across Tamil Nadu and India.',
-        'canonical': SITE + '/areas-we-serve/', 'groups': groups, 'services': seo_data.SERVICES,
-        'json_ld': [_crumbs(('Home', '/'), ('Areas we serve', '/areas-we-serve/'))],
-    })
-
-
-# ===========================================================================
-# S. Blog
-# ===========================================================================
-def _posts(limit=None):
+# ---------------------------------------------------------------------------
+# Validators
+# ---------------------------------------------------------------------------
+def _money(v, rule):
     try:
-        qs = BlogPost.objects.filter(is_published=True)
-        return list(qs[:limit] if limit else qs)
+        d = Decimal(str(v if v not in (None, '') else 0))
     except Exception:
-        log.exception('Could not load blog posts')
-        return []
+        raise ValueError('must be an amount like 15000')
+    if d < 0 or d > Decimal('100000000'):
+        raise ValueError('must be 0 or more')
+    if rule.get('positive') and d <= 0:
+        raise ValueError('must be more than 0')
+    return D(d)
 
 
+def _wa(v, rule):
+    d = re.sub(r'\D', '', str(v or ''))
+    if not d:
+        return ''
+    if len(d) == 10:
+        d = '91' + d
+    if len(d) == 11 and d.startswith('0'):
+        d = '91' + d[1:]
+    if not 10 <= len(d) <= 15:
+        raise ValueError('enter a valid WhatsApp number with country code')
+    return d
+
+
+def _small(v, rule):
+    try:
+        n = int(v)
+    except (TypeError, ValueError):
+        raise ValueError('must be a whole number')
+    if not rule['min'] <= n <= rule['max']:
+        raise ValueError(f'{rule["min"]} to {rule["max"]}')
+    return n
+
+
+def _opt_id(v, rule):
+    if v in (None, '', 0):
+        return None
+    try:
+        return int(v)
+    except (TypeError, ValueError):
+        raise ValueError('invalid')
+
+
+def _items(v, rule):
+    return billing.clean_items(v)
+
+
+def _slug(v, rule):
+    s = re.sub(r'[^a-z0-9]+', '-', str(v or '').lower()).strip('-')[:120]
+    if rule.get('required') and not s:
+        raise ValueError('required')
+    return s
+
+
+def _tags(v, rule):
+    items = v if isinstance(v, list) else str(v or '').split(',')
+    out = []
+    for x in items:
+        x = ' '.join(str(x).split())[:40]
+        if x and x not in out:
+            out.append(x)
+    return out[:8]
+
+
+DOC_FIELDS = {
+    'client_name':    (_text,   {'max': 120, 'required': True}),
+    'business_name':  (_text,   {'max': 160}),
+    'client_wa_id':   (_wa,     {}),
+    'client_email':   (_email,  {'max': 254}),
+    'client_address': (_text,   {'max': 1000}),
+    'title':          (_text,   {'max': 200}),
+    'issue_date':     (_any_date, {}),
+    'due_date':       (_any_date, {}),
+    'items':          (_items,  {'required': True}),
+    'discount':       (_money,  {}),
+    'notes':          (_text,   {'max': 3000}),
+    'terms':          (_text,   {'max': 3000}),
+    'private_notes':  (_text,   {'max': 3000}),
+    'enquiry_id':     (_opt_id, {}),
+    'project_id':     (_opt_id, {}),
+    'status':         (_choice, {'choices': BillingDocument.STATUSES}),
+}
+
+SETTINGS_FIELDS = {
+    'business_name':     (_text, {'max': 160, 'required': True}),
+    'tagline':           (_text, {'max': 160}),
+    'address':           (_text, {'max': 600}),
+    'phone':             (_text, {'max': 40}),
+    'email':             (_email, {'max': 254}),
+    'website':           (_url, {'max': 200}),
+    'upi_id':            (_text, {'max': 100}),
+    'bank_details':      (_text, {'max': 600}),
+    'quote_prefix':      (_text, {'max': 12, 'required': True}),
+    'invoice_prefix':    (_text, {'max': 12, 'required': True}),
+    'quote_valid_days':  (_small, {'min': 1, 'max': 365}),
+    'invoice_due_days':  (_small, {'min': 0, 'max': 365}),
+    'quote_terms':       (_text, {'max': 3000}),
+    'invoice_terms':     (_text, {'max': 3000}),
+    'footer_note':       (_text, {'max': 300}),
+    'google_review_url': (_url, {'max': 500}),
+    'review_after_days': (_small, {'min': 0, 'max': 60}),
+}
+
+PAYMENT_FIELDS = {
+    'amount':    (_money, {'positive': True, 'required': True}),
+    'method':    (_choice, {'choices': BillingPayment.METHODS}),
+    'paid_on':   (_any_date, {}),
+    'reference': (_text, {'max': 120}),
+    'notes':     (_text, {'max': 1000}),
+}
+
+EXPENSE_FIELDS = {
+    'spent_on':    (_any_date, {'required': True}),
+    'category':    (_choice, {'choices': BusinessExpense.CATEGORIES}),
+    'description': (_text, {'max': 300}),
+    'amount':      (_money, {'positive': True, 'required': True}),
+    'project_id':  (_opt_id, {}),
+}
+
+SUB_FIELDS = {
+    'name':         (_text, {'max': 120, 'required': True}),
+    'renews_on':    (_any_date, {}),
+    'cycle':        (_choice, {'choices': MySubscription.CYCLES}),
+    'auto_renew':   (_bool, {}),
+    'check_kind':   (_choice, {'choices': MySubscription.CHECKS}),
+    'check_target': (_text, {'max': 300}),
+    'amount_text':  (_text, {'max': 60}),
+    'cost_inr':     (_money, {}),
+    'notes':        (_text, {'max': 2000}),
+    'is_active':    (_bool, {}),
+}
+
+BLOG_FIELDS = {
+    'slug':             (_slug, {'required': True}),
+    'title_en':         (_text, {'max': 200, 'required': True}),
+    'title_ta':         (_text, {'max': 300}),
+    'excerpt_en':       (_text, {'max': 400}),
+    'excerpt_ta':       (_text, {'max': 600}),
+    'body_en':          (_text, {'max': 60000}),
+    'body_ta':          (_text, {'max': 80000}),
+    'cover_image_path': (_text, {'max': 500}),
+    'tags':             (_tags, {}),
+    'is_published':     (_bool, {}),
+}
+
+CASE_FIELDS = {
+    'slug':          (_slug, {}),
+    'case_study':    (_bool, {}),
+    'challenge_en':  (_text, {'max': 4000}), 'challenge_ta': (_text, {'max': 6000}),
+    'solution_en':   (_text, {'max': 4000}), 'solution_ta':  (_text, {'max': 6000}),
+    'results_en':    (_text, {'max': 4000}), 'results_ta':   (_text, {'max': 6000}),
+    'tech_used':     (_tags, {}),
+    'duration_text': (_text, {'max': 60}),
+}
+
+
+# ===========================================================================
+# Billing
+# ===========================================================================
+def _recalc(doc):
+    """amount_paid + status from the payments."""
+    paid = sum((p.amount for p in BillingPayment.objects.filter(document_id=doc.pk)), Decimal(0))
+    doc.amount_paid = D(paid)
+    if doc.doc_type == 'invoice' and doc.status != 'cancelled':
+        if paid >= doc.total and doc.total > 0:
+            doc.status = 'paid'
+            doc.paid_at = doc.paid_at or timezone.now()
+        elif paid > 0:
+            doc.status, doc.paid_at = 'partly_paid', None
+        elif doc.status in ('paid', 'partly_paid'):
+            doc.status, doc.paid_at = ('sent' if doc.sent_at else 'draft'), None
+    doc.save(update_fields=['amount_paid', 'status', 'paid_at', 'updated_at'])
+    return doc
+
+
+def _defaults(doc_type, s):
+    today = billing.ist_today()
+    days = s.quote_valid_days if doc_type == 'quote' else s.invoice_due_days
+    return today, today + timedelta(days=days)
+
+
+@api(['GET', 'POST'])
+@v4_guard
+def billing_docs(request):
+    if request.method == 'GET':
+        qs = BillingDocument.objects.all()
+        kind = request.GET.get('type')
+        if kind in BillingDocument.TYPES:
+            qs = qs.filter(doc_type=kind)
+        return ok(items=[d.to_dict() for d in qs[:1000]], razorpay=billing.razorpay_ready(),
+                  whatsapp=whatsapp.is_configured())
+    data = _json_body(request)
+    doc_type = data.get('doc_type')
+    if doc_type not in BillingDocument.TYPES:
+        raise ApiError('Choose quotation or invoice.')
+    values = _clean(DOC_FIELDS, data, partial=False)
+    values.pop('status', None)
+    s = BusinessSettings.load()
+    issue, due = _defaults(doc_type, s)
+    values.setdefault('issue_date', None)
+    values['issue_date'] = values['issue_date'] or issue
+    if 'due_date' not in data:
+        values['due_date'] = due
+    try:
+        values['total'] = billing.compute_total(values['items'], values.get('discount', 0))
+    except ValueError as e:
+        raise ApiError('Please fix the highlighted fields.', 400, errors={'discount': str(e)})
+    if not values.get('terms'):
+        values['terms'] = s.quote_terms if doc_type == 'quote' else s.invoice_terms
+    for attempt in range(5):
+        try:
+            with transaction.atomic():
+                doc = BillingDocument.objects.create(doc_type=doc_type, number=billing.next_number(doc_type, s),
+                                                     status='draft', **values)
+            break
+        except IntegrityError:
+            if attempt == 4:
+                raise ApiError('Could not create a new number. Please try again.')
+    log.info('%s %s created', doc_type, doc.number)
+    return ok(201, item=doc.to_dict())
+
+
+@api(['GET', 'PATCH', 'DELETE'])
+@v4_guard
+def billing_doc(request, pk):
+    doc = _get(BillingDocument, pk)
+    if request.method == 'GET':
+        return ok(item=doc.to_dict(), payments=[p.to_dict() for p in BillingPayment.objects.filter(document_id=pk)])
+    if request.method == 'DELETE':
+        if BillingPayment.objects.filter(document_id=pk).exists():
+            raise ApiError('This invoice has payments. Delete the payments first, or mark it Cancelled instead.')
+        doc.delete()
+        return ok()
+    data = _json_body(request)
+    values = _clean(DOC_FIELDS, data, partial=True)
+    if 'items' in values or 'discount' in values:
+        items = values.get('items', doc.items)
+        try:
+            values['total'] = billing.compute_total(items, values.get('discount', doc.discount))
+        except ValueError as e:
+            raise ApiError('Please fix the highlighted fields.', 400, errors={'discount': str(e)})
+        if values['total'] < doc.amount_paid:
+            raise ApiError(f'The new total is less than what was already paid ({billing.money(doc.amount_paid)}).')
+    st = values.get('status')
+    if st:
+        if doc.doc_type == 'quote' and st in ('partly_paid', 'paid'):
+            raise ApiError('A quotation cannot be paid. Convert it to an invoice first.')
+        if doc.doc_type == 'invoice' and st in ('accepted', 'rejected', 'expired'):
+            raise ApiError('That status is only for quotations.')
+        if st == 'accepted' and not doc.accepted_at:
+            values['accepted_at'] = timezone.now()
+        if st == 'sent' and not doc.sent_at:
+            values['sent_at'] = timezone.now()
+    if values:
+        _save(doc, values)
+    if 'total' in values and doc.doc_type == 'invoice':
+        _recalc(doc)
+    return ok(item=doc.to_dict())
+
+
+@api(['GET'])
+@v4_guard
+def billing_pdf(request, pk):
+    doc = _get(BillingDocument, pk)
+    data = billing.pdf(doc, BusinessSettings.load())
+    res = HttpResponse(data, content_type='application/pdf')
+    how = 'attachment' if request.GET.get('download') else 'inline'
+    res['Content-Disposition'] = f'{how}; filename="{billing.filename(doc)}"'
+    return res
+
+
+@api(['POST'])
+@v4_guard
+def billing_send(request, pk):
+    doc = _get(BillingDocument, pk)
+    if not doc.client_wa_id:
+        raise ApiError('Add the client\'s WhatsApp number first (Edit).', 400, errors={'client_wa_id': 'required'})
+    if doc.status == 'cancelled':
+        raise ApiError('This document is cancelled.')
+    s = BusinessSettings.load()
+    if doc.doc_type == 'invoice' and not doc.razorpay_link_url and billing.razorpay_ready() and doc.balance > 0 \
+            and _json_body(request).get('with_link', True):
+        billing.create_payment_link(doc)
+    if doc.status == 'draft':
+        doc.status = 'sent'                     # the PDF the client gets has no DRAFT mark (saved below)
+    data = billing.pdf(doc, s)
+    name = billing.filename(doc)
+    media_id = whatsapp.upload_media(data, 'application/pdf', name)
+    contact, _ = WaContact.objects.get_or_create(pk=doc.client_wa_id, defaults={'name': doc.client_name[:120]})
+    text = billing.caption(doc, s)
+    if contact.window_open(timezone.now()):
+        wamid = whatsapp.send(doc.client_wa_id, whatsapp.document_payload(media_id, name, text))
+        _record_out(contact, 'admin', 'document', f'📎 {name}\n{text}', wamid, clear=False)
+        via = 'message'
+        if doc.doc_type == 'quote':
+            body = 'Would you like to go ahead with this quotation?'
+            wamid = whatsapp.send(doc.client_wa_id, whatsapp.buttons_payload(
+                body, [(f'qt:accept:{doc.pk}', '✅ Accept quote'), (f'qt:ask:{doc.pk}', '💬 Ask a question')]))
+            _record_out(contact, 'admin', 'interactive', body, wamid, clear=False)
+    else:
+        first = (doc.client_name or '').split(' ')[0] or 'there'
+        kind = 'quotation' if doc.doc_type == 'quote' else 'invoice'
+        amount = billing.money(doc.total if doc.doc_type == 'quote' else doc.balance)
+        params = [first, kind, doc.number, amount, billing.template_line(doc, s)]
+        wamid = whatsapp.send(doc.client_wa_id, whatsapp.document_template_payload(
+            settings.TPL_BILLING_DOCUMENT, settings.TPL_LANG, media_id, name, params))
+        _record_out(contact, 'admin', 'template',
+                    f'[Template {settings.TPL_BILLING_DOCUMENT}] 📎 {name} · {kind} {doc.number} · {amount}', wamid, clear=False)
+        via = 'template'
+    _save(doc, {'sent_at': timezone.now(), 'status': doc.status})
+    if doc.doc_type == 'quote' and doc.enquiry_id:
+        ContactEnquiry.objects.filter(pk=doc.enquiry_id, status__in=('new', 'contacted')).update(status='quoted')
+    return ok(item=doc.to_dict(), via=via)
+
+
+@api(['POST'])
+@v4_guard
+def billing_convert(request, pk):
+    quote = _get(BillingDocument, pk)
+    if quote.doc_type != 'quote':
+        raise ApiError('Only a quotation can be converted.')
+    data = _json_body(request)
+    s = BusinessSettings.load()
+    items = quote.items
+    pct = data.get('advance_percent')
+    if pct not in (None, '', 100):
+        try:
+            pct = Decimal(str(pct))
+            assert 0 < pct < 100
+        except Exception:
+            raise ApiError('Advance must be between 1 and 99 %.')
+        amount = D(quote.total * pct / 100)
+        items = [{'description': f'Advance payment ({pct.normalize():f}%) for {quote.title or quote.number}',
+                  'details': f'As per quotation {quote.number} (total {billing.money(quote.total)})',
+                  'qty': 1, 'rate': float(amount)}]
+        total, discount = amount, Decimal(0)
+    else:
+        total, discount = quote.total, quote.discount
+    issue, due = _defaults('invoice', s)
+    for attempt in range(5):
+        try:
+            with transaction.atomic():
+                inv = BillingDocument.objects.create(
+                    doc_type='invoice', number=billing.next_number('invoice', s), enquiry_id=quote.enquiry_id,
+                    project_id=quote.project_id, converted_from=quote.pk, client_name=quote.client_name,
+                    business_name=quote.business_name, client_wa_id=quote.client_wa_id, client_email=quote.client_email,
+                    client_address=quote.client_address, title=quote.title, issue_date=issue, due_date=due, items=items,
+                    discount=discount, total=total, status='draft', notes=quote.notes, terms=s.invoice_terms)
+            break
+        except IntegrityError:
+            if attempt == 4:
+                raise ApiError('Could not create a new number. Please try again.')
+    if quote.status in ('draft', 'sent'):
+        _save(quote, {'status': 'accepted', 'accepted_at': quote.accepted_at or timezone.now()})
+    if quote.enquiry_id:
+        ContactEnquiry.objects.filter(pk=quote.enquiry_id).exclude(status='won').update(status='won')
+    return ok(201, item=inv.to_dict(), quote=quote.to_dict())
+
+
+@api(['POST'])
+@v4_guard
+def billing_link(request, pk):
+    doc = _get(BillingDocument, pk)
+    if doc.doc_type != 'invoice':
+        raise ApiError('Payment links are for invoices. Convert the quotation to an invoice first.')
+    if doc.status in ('paid', 'cancelled'):
+        raise ApiError('This invoice is already ' + doc.status + '.')
+    amount = _json_body(request).get('amount')
+    billing.create_payment_link(doc, amount)
+    return ok(item=doc.to_dict())
+
+
+@api(['POST'])
+@v4_guard
+def billing_add_payment(request, pk):
+    doc = _get(BillingDocument, pk)
+    if doc.doc_type != 'invoice':
+        raise ApiError('Record payments on an invoice (convert the quotation first).')
+    values = _clean(PAYMENT_FIELDS, _json_body(request), partial=False)
+    values['paid_on'] = values.get('paid_on') or billing.ist_today()
+    if values['amount'] > doc.balance:
+        raise ApiError(f'More than the balance ({billing.money(doc.balance)}).', 400, errors={'amount': 'too much'})
+    BillingPayment.objects.create(document_id=doc.pk, client_name=doc.client_name, **values)
+    _recalc(doc)
+    return ok(201, item=doc.to_dict(), payments=[p.to_dict() for p in BillingPayment.objects.filter(document_id=pk)])
+
+
+@api(['GET'])
+@v4_guard
+def billing_payments(request):
+    docs = {d['id']: d for d in BillingDocument.objects.values('id', 'number', 'title')}
+    items = []
+    for p in BillingPayment.objects.all()[:1000]:
+        d = p.to_dict()
+        doc = docs.get(p.document_id)
+        d['number'], d['title'] = (doc['number'], doc['title']) if doc else ('', '')
+        items.append(d)
+    return ok(items=items)
+
+
+@api(['DELETE'])
+@v4_guard
+def billing_payment(request, pk):
+    p = _get(BillingPayment, pk)
+    doc_id = p.document_id
+    p.delete()
+    doc = BillingDocument.objects.filter(pk=doc_id).first()
+    if doc:
+        _recalc(doc)
+    return ok(item=doc.to_dict() if doc else None)
+
+
+@api(['GET', 'PATCH'])
+@v4_guard
+def billing_settings(request):
+    s = BusinessSettings.load()
+    if request.method == 'PATCH':
+        values = _clean(SETTINGS_FIELDS, _json_body(request), partial=True)
+        for k in ('quote_prefix', 'invoice_prefix'):
+            if k in values:
+                values[k] = re.sub(r'[^A-Za-z0-9]', '', values[k]).upper()[:10]
+                if not values[k]:
+                    raise ApiError('Please fix the highlighted fields.', 400, errors={k: 'letters / numbers only'})
+        if values:
+            _save(s, values)
+    return ok(item=s.to_dict(), razorpay=billing.razorpay_ready(),
+              webhook_url='https://bot.ajtechnologiesltd.com/razorpay/webhook')
+
+
+# ===========================================================================
+# Money: income & profit
+# ===========================================================================
+def _period(request):
+    today = billing.ist_today()
+    try:
+        start = date.fromisoformat(request.GET.get('from') or '')
+    except ValueError:
+        start = today.replace(day=1)
+    try:
+        end = date.fromisoformat(request.GET.get('to') or '')
+    except ValueError:
+        end = today
+    if start > end:
+        start, end = end, start
+    return start, end
+
+
+@api(['GET'])
+@v4_guard
+def money(request):
+    start, end = _period(request)
+    out = {'from': start.isoformat(), 'to': end.isoformat()}
+    with connection.cursor() as cur:
+        cur.execute('SELECT COALESCE(sum(amount), 0), count(*) FROM billing_payments WHERE paid_on BETWEEN %s AND %s',
+                    [start, end])
+        income, n_pay = cur.fetchone()
+        cur.execute('SELECT COALESCE(sum(amount), 0) FROM business_expenses WHERE spent_on BETWEEN %s AND %s', [start, end])
+        spent = cur.fetchone()[0]
+        cur.execute("""SELECT COALESCE(sum(total - amount_paid), 0), count(*),
+                              COALESCE(sum(total - amount_paid) FILTER (WHERE due_date < (now() AT TIME ZONE 'Asia/Kolkata')::date), 0),
+                              count(*) FILTER (WHERE due_date < (now() AT TIME ZONE 'Asia/Kolkata')::date)
+                       FROM billing_documents WHERE doc_type = 'invoice' AND status IN ('sent', 'partly_paid')""")
+        outstanding, n_out, overdue, n_overdue = cur.fetchone()
+        cur.execute("""SELECT COALESCE(sum(total), 0), count(*) FROM billing_documents
+                       WHERE doc_type = 'quote' AND status = 'sent'""")
+        quoted, n_quoted = cur.fetchone()
+        cur.execute("""SELECT count(*) FILTER (WHERE status IN ('accepted', 'paid', 'partly_paid')), count(*)
+                       FROM billing_documents WHERE doc_type = 'quote' AND issue_date BETWEEN %s AND %s
+                         AND status NOT IN ('draft', 'cancelled')""", [start, end])
+        q_won, q_all = cur.fetchone()
+        cur.execute("""SELECT COALESCE(sum(CASE cycle WHEN 'monthly' THEN cost_inr WHEN 'yearly' THEN cost_inr / 12 ELSE 0 END), 0)
+                       FROM my_subscriptions WHERE is_active""")
+        subs_month = cur.fetchone()[0]
+        # last 12 months (India time)
+        cur.execute("""WITH m AS (SELECT generate_series(date_trunc('month', (now() AT TIME ZONE 'Asia/Kolkata')::date) - interval '11 months',
+                                                         date_trunc('month', (now() AT TIME ZONE 'Asia/Kolkata')::date), interval '1 month')::date AS m)
+                       SELECT m.m,
+                              (SELECT COALESCE(sum(amount), 0) FROM billing_payments WHERE date_trunc('month', paid_on) = m.m),
+                              (SELECT COALESCE(sum(amount), 0) FROM business_expenses WHERE date_trunc('month', spent_on) = m.m)
+                       FROM m ORDER BY m.m""")
+        months = [{'month': m.isoformat()[:7], 'income': float(i), 'expenses': float(e)} for m, i, e in cur.fetchall()]
+        cur.execute("""SELECT method, sum(amount) FROM billing_payments WHERE paid_on BETWEEN %s AND %s
+                       GROUP BY method ORDER BY 2 DESC""", [start, end])
+        by_method = [{'name': m, 'amount': float(a)} for m, a in cur.fetchall()]
+        cur.execute("""SELECT category, sum(amount) FROM business_expenses WHERE spent_on BETWEEN %s AND %s
+                       GROUP BY category ORDER BY 2 DESC""", [start, end])
+        by_category = [{'name': c, 'amount': float(a)} for c, a in cur.fetchall()]
+        cur.execute("""SELECT COALESCE(NULLIF(client_name, ''), 'Unknown'), sum(amount) FROM billing_payments
+                       WHERE paid_on BETWEEN %s AND %s GROUP BY 1 ORDER BY 2 DESC LIMIT 6""", [start, end])
+        top = [{'name': c, 'amount': float(a)} for c, a in cur.fetchall()]
+        cur.execute("""SELECT id, number, client_name, title, total - amount_paid, due_date, client_wa_id
+                       FROM billing_documents WHERE doc_type = 'invoice' AND status IN ('sent', 'partly_paid')
+                       ORDER BY due_date NULLS LAST LIMIT 20""")
+        unpaid = [{'id': r[0], 'number': r[1], 'client_name': r[2], 'title': r[3], 'balance': float(r[4]),
+                   'due_date': r[5].isoformat() if r[5] else '', 'client_wa_id': r[6]} for r in cur.fetchall()]
+    out.update(income=float(income), payments=n_pay, expenses=float(spent), profit=float(income - spent),
+               margin=round(float((income - spent) / income * 100)) if income else None,
+               outstanding=float(outstanding), outstanding_count=n_out, overdue=float(overdue), overdue_count=n_overdue,
+               quoted=float(quoted), quoted_count=n_quoted, quote_win=round(q_won / q_all * 100) if q_all else None,
+               subs_month=float(subs_month), months=months, by_method=by_method, by_category=by_category,
+               top_clients=top, unpaid=unpaid)
+    return ok(**out)
+
+
+@api(['GET', 'POST'])
+@v4_guard
+def expenses(request):
+    if request.method == 'GET':
+        start, end = _period(request) if request.GET.get('from') else (date(2000, 1, 1), date(2100, 1, 1))
+        return ok(items=[e.to_dict() for e in BusinessExpense.objects.filter(spent_on__range=(start, end))[:2000]])
+    values = _clean(EXPENSE_FIELDS, _json_body(request), partial=False)
+    item = BusinessExpense.objects.create(**values)
+    return ok(201, item=item.to_dict())
+
+
+@api(['PATCH', 'DELETE'])
+@v4_guard
+def expense(request, pk):
+    item = _get(BusinessExpense, pk)
+    if request.method == 'DELETE':
+        item.delete()
+        return ok()
+    values = _clean(EXPENSE_FIELDS, _json_body(request), partial=True)
+    if values:
+        for k, v in values.items():
+            setattr(item, k, v)
+        item.save(update_fields=list(values))
+    return ok(item=item.to_dict())
+
+
+# ===========================================================================
+# Your subscriptions
+# ===========================================================================
+def _next_date(d, cycle):
+    if not d or cycle == 'none':
+        return d
+    months = 1 if cycle == 'monthly' else 12
+    y, m = divmod(d.month - 1 + months, 12)
+    y, m = d.year + y, m + 1
+    import calendar
+    return date(y, m, min(d.day, calendar.monthrange(y, m)[1]))
+
+
+@api(['GET', 'POST'])
+@v4_guard
+def subscriptions(request):
+    if request.method == 'GET':
+        return ok(items=[s.to_dict() for s in MySubscription.objects.all()],
+                  alert_at='12:00 PM', alert_days=7)
+    values = _clean(SUB_FIELDS, _json_body(request), partial=False)
+    item = MySubscription.objects.create(**values)
+    return ok(201, item=item.to_dict())
+
+
+@api(['PATCH', 'DELETE'])
+@v4_guard
+def subscription(request, pk):
+    item = _get(MySubscription, pk)
+    if request.method == 'DELETE':
+        item.delete()
+        return ok()
+    values = _clean(SUB_FIELDS, _json_body(request), partial=True)
+    if values:
+        _save(item, values)
+    return ok(item=item.to_dict())
+
+
+@api(['POST'])
+@v4_guard
+def subscription_renewed(request, pk):
+    item = _get(MySubscription, pk)
+    nxt = _json_body(request).get('next_date')
+    if nxt:
+        try:
+            new = date.fromisoformat(nxt)
+        except ValueError:
+            raise ApiError('Use a date like 2027-01-15.')
+    else:
+        if not item.renews_on or item.cycle == 'none':
+            raise ApiError('Set the next renewal date for this one.')
+        new = item.renews_on
+        today = billing.ist_today()
+        while new <= today or new == item.renews_on:
+            new = _next_date(new, item.cycle)
+    _save(item, {'renews_on': new, 'last_problem': ''})
+    return ok(item=item.to_dict())
+
+
+# ===========================================================================
+# Blog
+# ===========================================================================
+@api(['GET', 'POST'])
+@v4_guard
 def blog(request):
-    posts = _posts()
-    tag = request.GET.get('tag', '').strip()
-    if tag:
-        posts = [p for p in posts if tag in (p.tags or [])]
-    tags = sorted({t for p in _posts() for t in (p.tags or [])})
-    return render(request, 'blog.html', {
-        'seo_title': 'Blog: Websites, Online Stores & Digital Marketing Tips | AJ Technologies',
-        'seo_description': 'Simple, practical tips in English and Tamil to grow your business online: websites, online stores, '
-                           'Google Maps, SEO and WhatsApp marketing.',
-        'canonical': SITE + '/blog/', 'posts': posts, 'tags': tags, 'tag': tag, 'noindex': bool(tag),
-        'json_ld': [_crumbs(('Home', '/'), ('Blog', '/blog/'))],
-    })
-
-
-def blog_post(request, slug):
+    if request.method == 'GET':
+        return ok(items=[b.to_dict() for b in BlogPost.objects.all()], site=settings.SITE_URL)
+    values = _clean(BLOG_FIELDS, _json_body(request), partial=False)
+    if values.get('is_published'):
+        values['published_at'] = timezone.now()
     try:
-        post = BlogPost.objects.filter(is_published=True, slug=slug).first()
-    except Exception:
-        log.exception('Could not load the blog post')
-        post = None
-    if not post:
-        raise Http404
-    more = [p for p in _posts(6) if p.pk != post.pk][:3]
-    url = f'/blog/{post.slug}/'
-    desc = post.excerpt_en or markdown_lite.plain(post.body_en, 160)
-    when = post.published_at or post.created_at
-    json_ld = [
-        {'@context': 'https://schema.org', '@type': 'BlogPosting', 'headline': post.title_en[:110], 'description': desc,
-         'datePublished': when.isoformat(), 'dateModified': post.updated_at.isoformat(), 'inLanguage': ['en', 'ta'],
-         'mainEntityOfPage': SITE + url, 'author': ORG, 'publisher': ORG,
-         **({'image': post.cover_url} if post.cover_url else {})},
-        _crumbs(('Home', '/'), ('Blog', '/blog/'), (post.title_en, url)),
-    ]
-    return render(request, 'blog_post.html', {
-        'seo_title': f'{post.title_en} | AJ Technologies', 'seo_description': desc, 'canonical': SITE + url,
-        'og_type': 'article', 'og_image': post.cover_url, 'json_ld': json_ld, 'post': post, 'more': more,
-        'body_en': markdown_lite.render(post.body_en), 'body_ta': markdown_lite.render(post.body_ta) if post.body_ta.strip() else '',
-        'wa_msg_en': f'Hi AJ Technologies, I read your post "{post.title_en[:80]}" and I have a question.',
-        'wa_msg_ta': f'Hi AJ Technologies, உங்கள் "{(post.title_ta or post.title_en)[:80]}" பதிவைப் படித்தேன். ஒரு கேள்வி உள்ளது.',
-    })
+        with transaction.atomic():
+            item = BlogPost.objects.create(**values)
+    except IntegrityError:
+        raise ApiError('Please fix the highlighted fields.', 400, errors={'slug': 'another post uses this link'})
+    return ok(201, item=item.to_dict())
+
+
+@api(['PATCH', 'DELETE'])
+@v4_guard
+def blog_post(request, pk):
+    item = _get(BlogPost, pk)
+    if request.method == 'DELETE':
+        item.delete()
+        return ok()
+    values = _clean(BLOG_FIELDS, _json_body(request), partial=True)
+    if values.get('is_published') and not item.published_at:
+        values['published_at'] = timezone.now()
+    try:
+        with transaction.atomic():
+            if values:
+                _save(item, values)
+    except IntegrityError:
+        raise ApiError('Please fix the highlighted fields.', 400, errors={'slug': 'another post uses this link'})
+    return ok(item=item.to_dict())
 
 
 # ===========================================================================
-# T. Case studies
+# Extras on the old screens (raw SQL, so the old screens keep working before the v4 SQL is run)
 # ===========================================================================
-CASE_COLS = ('slug', 'challenge_en', 'challenge_ta', 'solution_en', 'solution_ta', 'results_en', 'results_ta',
-             'tech_used', 'duration_text')
-
-
-def case_links():
-    """{project id: '/portfolio/<slug>/'} for projects with a case study (empty before the v4 SQL is run)."""
+@api(['GET'])
+def extras(request):
+    out = {'ready': True, 'leads': {}, 'cases': {}, 'reviews': {}}
     try:
         with connection.cursor() as cur:
-            cur.execute("""SELECT id, slug FROM showcase_projects
-                           WHERE case_study AND is_published AND NOT is_sample AND slug <> ''""")
-            return {pk: f'/portfolio/{slug}/' for pk, slug in cur.fetchall()}
-    except Exception:
-        return {}
-
-
-def case_study(request, slug):
-    try:
-        with connection.cursor() as cur:
-            cur.execute(f"""SELECT id, {', '.join(CASE_COLS)} FROM showcase_projects
-                            WHERE slug = %s AND case_study AND is_published AND NOT is_sample""", [slug])
+            cur.execute("""SELECT id, lead_score, lead_temp, lead_reason FROM contact_enquiries
+                           WHERE lead_temp <> '' ORDER BY id DESC LIMIT 3000""")
+            out['leads'] = {r[0]: {'score': r[1], 'temp': r[2], 'reason': r[3]} for r in cur.fetchall()}
+            cur.execute("""SELECT id, slug, case_study, challenge_en, challenge_ta, solution_en, solution_ta, results_en,
+                                  results_ta, tech_used, duration_text FROM showcase_projects""")
+            cols = ['slug', 'case_study', 'challenge_en', 'challenge_ta', 'solution_en', 'solution_ta', 'results_en',
+                    'results_ta', 'tech_used', 'duration_text']
+            out['cases'] = {r[0]: dict(zip(cols, r[1:])) for r in cur.fetchall()}
+            cur.execute("""SELECT id, went_live_at, review_requested_at, review_rating, ask_review FROM client_projects""")
+            out['reviews'] = {r[0]: {'went_live_at': r[1].isoformat() if r[1] else None,
+                                     'review_requested_at': r[2].isoformat() if r[2] else None,
+                                     'review_rating': r[3], 'ask_review': r[4]} for r in cur.fetchall()}
+            cur.execute('SELECT review_after_days, google_review_url FROM business_settings WHERE id = 1')
             row = cur.fetchone()
-    except Exception:
-        row = None
-    if not row:
-        raise Http404
-    case = dict(zip(CASE_COLS, row[1:]))
-    if isinstance(case['tech_used'], str):
-        case['tech_used'] = json.loads(case['tech_used'] or '[]')
-    p = ShowcaseProject.objects.get(pk=row[0])
-    try:
-        review = ClientReview.objects.filter(is_published=True, project_id=p.pk).first()
-    except Exception:
-        review = None
-    blocks = [(k, case[f'{k}_en'], case[f'{k}_ta'] or case[f'{k}_en']) for k in ('challenge', 'solution', 'results')
-              if case[f'{k}_en'] or case[f'{k}_ta']]
-    url = f'/portfolio/{slug}/'
-    desc = (case['challenge_en'] or p.built_en or p.business_type_en)[:155]
-    others = [x for x in ShowcaseProject.objects.filter(is_published=True, is_sample=False).exclude(pk=p.pk)[:3]]
-    links = case_links()
-    json_ld = [
-        {'@context': 'https://schema.org', '@type': 'CreativeWork', 'name': f'{p.title_en}: case study', 'about': p.business_type_en,
-         'description': desc, 'url': SITE + url, 'creator': ORG, **({'image': p.image_url} if p.image_url else {})},
-        _crumbs(('Home', '/'), ('Portfolio', '/portfolio/'), (p.title_en, url)),
-    ]
-    return render(request, 'case_study.html', {
-        'seo_title': f'{p.title_en}: Case Study | AJ Technologies', 'seo_description': desc, 'canonical': SITE + url,
-        'og_image': p.image_url, 'json_ld': json_ld, 'p': p, 'case': case, 'blocks': blocks, 'review': review,
-        'others': [(o, links.get(o.pk)) for o in others], 'active_nav': 'portfolio',
-        'wa_msg_en': f"Hi AJ Technologies, I saw your {p.title_en} project. I'd like something similar for my business.",
-        'wa_msg_ta': f"Hi AJ Technologies, உங்கள் {p.title_ta or p.title_en} வேலையைப் பார்த்தேன். என் வணிகத்திற்கும் இதுபோல வேண்டும்.",
-    })
+            out['review_after_days'], out['google_review_url'] = (row[0], row[1]) if row else (3, '')
+    except ProgrammingError:
+        out['ready'] = False
+    for v in out['cases'].values():
+        if isinstance(v.get('tech_used'), str):
+            import json
+            v['tech_used'] = json.loads(v['tech_used'] or '[]')
+    return ok(**out)
 
 
-# ===========================================================================
-# Sitemap (always https://ajtechnologiesltd.com, whatever address Render uses)
-# ===========================================================================
-STATIC_PAGES = [('/', 'weekly', '1.0'), ('/services/', 'monthly', '0.9'), ('/portfolio/', 'weekly', '0.8'),
-                ('/contact/', 'yearly', '0.8'), ('/about/', 'yearly', '0.7'), ('/blog/', 'weekly', '0.7'),
-                ('/areas-we-serve/', 'monthly', '0.7'), ('/privacy-policy/', 'yearly', '0.3'),
-                ('/terms-and-conditions/', 'yearly', '0.3'), ('/service-delivery-policy/', 'yearly', '0.3')]
-CONTENT_DATE = date(2026, 11, 5)          # change when you edit the static pages
-
-
-def sitemap(request):
-    rows = [(SITE + path, CONTENT_DATE, freq, prio) for path, freq, prio in STATIC_PAGES]
-    for slug, s, c in seo_data.all_pages():
-        prio = '0.7' if c['region'] == 'home' else '0.6' if c['region'] == 'tn' else '0.5'
-        rows.append((f'{SITE}/{slug}/', CONTENT_DATE, 'monthly', prio))
-    for p in _posts():
-        rows.append((f'{SITE}/blog/{p.slug}/', timezone.localtime(p.updated_at).date(), 'monthly', '0.6'))
-    try:
+@api(['PATCH'])
+@v4_guard
+def project_case(request, pk):
+    _get(ShowcaseProject, pk)
+    values = _clean(CASE_FIELDS, _json_body(request), partial=True)
+    if values.get('case_study') and not values.get('slug'):
         with connection.cursor() as cur:
-            cur.execute("""SELECT slug, updated_at FROM showcase_projects
-                           WHERE case_study AND is_published AND NOT is_sample AND slug <> ''""")
-            for slug, updated in cur.fetchall():
-                rows.append((f'{SITE}/portfolio/{slug}/', timezone.localtime(updated).date(), 'monthly', '0.6'))
-    except Exception:
-        pass
-    xml = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
-    for loc, mod, freq, prio in rows:
-        xml.append(f'  <url><loc>{loc}</loc><lastmod>{mod.isoformat()}</lastmod>'
-                   f'<changefreq>{freq}</changefreq><priority>{prio}</priority></url>')
-    xml.append('</urlset>')
-    return HttpResponse('\n'.join(xml) + '\n', content_type='application/xml; charset=utf-8')
+            cur.execute('SELECT slug, title_en FROM showcase_projects WHERE id = %s', [pk])
+            slug, title = cur.fetchone()
+        if not slug:
+            values['slug'] = _slug(title, {})
+    if not values:
+        return ok()
+    import json
+    sets, params = [], []
+    for k, v in values.items():
+        sets.append(f'{k} = %s')
+        params.append(json.dumps(v) if k == 'tech_used' else v)
+    try:
+        with transaction.atomic(), connection.cursor() as cur:
+            cur.execute(f"UPDATE showcase_projects SET {', '.join(sets)} WHERE id = %s", params + [pk])
+    except IntegrityError:
+        raise ApiError('Please fix the highlighted fields.', 400, errors={'slug': 'another project uses this link'})
+    return ok(values={k: v for k, v in values.items()})
+
+
+@api(['POST'])
+@v4_guard
+def client_project_review(request, pk):
+    p = _get(ClientProject, pk)
+    data = _json_body(request)
+    with connection.cursor() as cur:
+        if data.get('ask_now') is True:
+            if p.stage not in ('live', 'support'):
+                raise ApiError('Set the project stage to Live first.')
+            cur.execute("""UPDATE client_projects SET ask_review = true, review_requested_at = NULL,
+                               went_live_at = now() - make_interval(days => COALESCE(
+                                   (SELECT review_after_days FROM business_settings WHERE id = 1), 3) + 1)
+                           WHERE id = %s""", [pk])
+        elif isinstance(data.get('ask_review'), bool):
+            cur.execute('UPDATE client_projects SET ask_review = %s WHERE id = %s', [data['ask_review'], pk])
+        else:
+            raise ApiError('Nothing to change.')
+    return ok()
