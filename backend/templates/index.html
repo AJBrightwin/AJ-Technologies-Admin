@@ -3103,7 +3103,7 @@ function modalHead(title) { return `<div class="m-h"><h3>${title}</h3><div class
 function bindClose() { $$('[data-x]', modal).forEach(b => b.onclick = closeModal); }
 function markErrors(form, errs) {
   $$('.field', form).forEach(f => f.classList.toggle('has-err', !!errs[f.dataset.f]));
-  return Object.keys(errs).length === 0;
+  return !Object.values(errs).some(Boolean);   // only fields marked true are errors
 }
 
 /* =====================================================================
@@ -3444,7 +3444,7 @@ function linkForm(d) {
     try {
       Object.assign(d, await API.billLink(d.id, amt));
       closeModal(); toast('Payment link created. Send the invoice to share it.'); renderBilling(); openDoc(d.id);
-    } finally { ev.currentTarget.disabled = false; }
+    } finally { if (ev.target.closest('button')) ev.target.closest('button').disabled = false; }
   };
 }
 async function paintPayments() {
@@ -3599,7 +3599,7 @@ function expenseForm(e = null) {
     if (!markErrors(fm, { amount: !(data.amount > 0), spent_on: !data.spent_on })) return;
     ev.currentTarget.disabled = true;
     try { e ? await API.expenseUpdate(e.id, data) : await API.expenseCreate(data); closeModal(); toast('Expense saved'); renderMoney(); }
-    finally { ev.currentTarget.disabled = false; }
+    finally { if (ev.target.closest('button')) ev.target.closest('button').disabled = false; }
   };
 }
 
@@ -3682,7 +3682,7 @@ function subForm(s = null) {
       const item = s ? await API.subUpdate(s.id, data) : await API.subCreate(data);
       if (s) Object.assign(s, item); else state.subs.items.push(item);
       closeModal(); toast('Saved'); renderSubs();
-    } finally { ev.currentTarget.disabled = false; }
+    } finally { if (ev.target.closest('button')) ev.target.closest('button').disabled = false; }
   };
 }
 
@@ -3759,7 +3759,7 @@ function blogForm(p = null) {
       const item = p ? await API.blogUpdate(p.id, data) : await API.blogCreate(data);
       if (p) Object.assign(p, item); else state.blog.items.unshift(item);
       closeModal(); toast(item.is_published ? 'Post saved and live' : 'Draft saved'); renderBlog();
-    } finally { ev.currentTarget.disabled = false; }
+    } finally { if (ev.target.closest('button')) ev.target.closest('button').disabled = false; }
   };
 }
 
@@ -3802,7 +3802,7 @@ function caseForm(p) {
       const r = await API.projectCase(p.id, data);
       state.v4.extras.cases[p.id] = { ...v, ...data, ...(r.values || {}) };
       closeModal(); toast(data.case_study ? 'Case study is live' : 'Case study saved (hidden)'); renderProjects();
-    } finally { ev.currentTarget.disabled = false; }
+    } finally { if (ev.target.closest('button')) ev.target.closest('button').disabled = false; }
   };
 }
 async function askGoogleReview(p) {
