@@ -3,7 +3,7 @@ URL configuration for the AJ Technologies admin dashboard.
 """
 from django.urls import path
 
-from main import views
+from main import views, views_v4
 
 urlpatterns = [
     # The dashboard page
@@ -59,4 +59,27 @@ urlpatterns = [
     path('api/knowledge/<int:pk>/', views.knowledge_item, name='api_knowledge_item'),
     path('api/knowledge/unanswered/<int:pk>/', views.unanswered_item, name='api_unanswered_item'),
     path('api/reports/', views.reports, name='api_reports'),
+
+    # Upgrade v4: billing, money, subscriptions, blog (tables from supabase_upgrade_v4.sql)
+    path('api/billing/docs/', views_v4.billing_docs, name='api_billing_docs'),
+    path('api/billing/docs/<int:pk>/', views_v4.billing_doc, name='api_billing_doc'),
+    path('api/billing/docs/<int:pk>/pdf/', views_v4.billing_pdf, name='api_billing_pdf'),
+    path('api/billing/docs/<int:pk>/send/', views_v4.billing_send, name='api_billing_send'),
+    path('api/billing/docs/<int:pk>/convert/', views_v4.billing_convert, name='api_billing_convert'),
+    path('api/billing/docs/<int:pk>/link/', views_v4.billing_link, name='api_billing_link'),
+    path('api/billing/docs/<int:pk>/payments/', views_v4.billing_add_payment, name='api_billing_add_payment'),
+    path('api/billing/payments/', views_v4.billing_payments, name='api_billing_payments'),
+    path('api/billing/payments/<int:pk>/', views_v4.billing_payment, name='api_billing_payment'),
+    path('api/billing/settings/', views_v4.billing_settings, name='api_billing_settings'),
+    path('api/money/', views_v4.money, name='api_money'),
+    path('api/money/expenses/', views_v4.expenses, name='api_expenses'),
+    path('api/money/expenses/<int:pk>/', views_v4.expense, name='api_expense'),
+    path('api/subscriptions/', views_v4.subscriptions, name='api_subscriptions'),
+    path('api/subscriptions/<int:pk>/', views_v4.subscription, name='api_subscription'),
+    path('api/subscriptions/<int:pk>/renewed/', views_v4.subscription_renewed, name='api_subscription_renewed'),
+    path('api/blog/', views_v4.blog, name='api_blog'),
+    path('api/blog/<int:pk>/', views_v4.blog_post, name='api_blog_post'),
+    path('api/v4/extras/', views_v4.extras, name='api_v4_extras'),
+    path('api/projects/<int:pk>/case/', views_v4.project_case, name='api_project_case'),
+    path('api/clients/projects/<int:pk>/review/', views_v4.client_project_review, name='api_client_project_review'),
 ]

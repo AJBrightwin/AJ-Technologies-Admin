@@ -102,6 +102,14 @@ TPL_PROJECT_UPDATE = env('TPL_PROJECT_UPDATE', 'project_update')        # same t
 TPL_TICKET_UPDATE = env('TPL_TICKET_UPDATE', 'ticket_update')
 TPL_LANG = env('TPL_LANG', 'en')
 
+TPL_BILLING_DOCUMENT = env('TPL_BILLING_DOCUMENT', 'billing_document')  # quotation / invoice PDF (document header)
+
+# ---------- Razorpay (upgrade v4: payment links on invoices) ----------
+# Razorpay Dashboard > Account & Settings > API Keys. Server only: never put these in the page or on GitHub.
+RAZORPAY_KEY_ID = env('RAZORPAY_KEY_ID')
+RAZORPAY_KEY_SECRET = env('RAZORPAY_KEY_SECRET')
+RAZORPAY_API_BASE = env('RAZORPAY_API_BASE', 'https://api.razorpay.com').rstrip('/')
+SITE_URL = env('SITE_URL', 'https://ajtechnologiesltd.com').rstrip('/')
 
 # ---------- Admin login ----------
 ADMIN_NAME = env('ADMIN_NAME', 'Admin')

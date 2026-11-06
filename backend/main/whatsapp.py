@@ -158,3 +158,43 @@ def fetch_media(media_id):
         raise WhatsAppError('This file is too large to show here.')
     content, ctype = _request('GET', info['url'], timeout=60, raw=True)
     return content, info.get('mime_type') or ctype or 'application/octet-stream'
+
+# ---------------------------------------------------------------------------
+# Upgrade v4: send a PDF (quotation / invoice)
+# ---------------------------------------------------------------------------
+def upload_media(data, mime, filename):
+    """Upload a file to WhatsApp and return its media id (valid for 30 days)."""
+    if not is_configured():
+        raise WhatsAppError('WhatsApp is not set up here. Add META_ACCESS_TOKEN and PHONE_NUMBER_ID to the environment.')
+    import secrets as _secrets
+    boundary = '----aj' + _secrets.token_hex(12)
+    parts = []
+    for name, value in (('messaging_product', 'whatsapp'), ('type', mime)):
+        parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="{name}"\r\n\r\n{value}\r\n'.encode())
+    parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="file"; filename="{filename}"\r\n'
+                 f'Content-Type: {mime}\r\n\r\n'.encode() + data + b'\r\n')
+    parts.append(f'--{boundary}--\r\n'.encode())
+    req = urllib.request.Request(_url(f'{settings.PHONE_NUMBER_ID}/media'), data=b''.join(parts), method='POST',
+                                 headers={'Authorization': f'Bearer {settings.META_ACCESS_TOKEN}',
+                                          'Content-Type': f'multipart/form-data; boundary={boundary}'})
+    try:
+        with urllib.request.urlopen(req, timeout=60) as res:
+            media_id = json.loads(res.read() or b'{}').get('id')
+    except urllib.error.HTTPError as e:
+        raise WhatsAppError(_meta_error(e.read().decode('utf-8', 'replace'), e.code))
+    except (urllib.error.URLError, TimeoutError) as e:
+        raise WhatsAppError(f'Could not reach WhatsApp ({getattr(e, "reason", e)}). Check your internet and try again.')
+    if not media_id:
+        raise WhatsAppError('WhatsApp did not accept the file. Please try again.')
+    return media_id
+
+
+def document_payload(media_id, filename, caption=''):
+    return {'type': 'document', 'document': {'id': media_id, 'filename': filename, 'caption': caption[:1024]}}
+
+
+def document_template_payload(name, language, media_id, filename, params=()):
+    components = [{'type': 'header', 'parameters': [{'type': 'document', 'document': {'id': media_id, 'filename': filename}}]}]
+    if params:
+        components.append({'type': 'body', 'parameters': [{'type': 'text', 'text': template_param(p)} for p in params]})
+    return {'type': 'template', 'template': {'name': name, 'language': {'code': language}, 'components': components}}

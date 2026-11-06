@@ -581,6 +581,50 @@ input[type=range].inp{padding:0;height:auto;accent-color:var(--brand);border:0;b
   .kb .acts{width:100%;justify-content:flex-end}
 }
 
+/* ---------- Upgrade v4: billing, money, blog ---------- */
+.items-ed{display:flex;flex-direction:column;gap:8px}
+.it-row{display:grid;grid-template-columns:minmax(0,1fr) 74px 110px 100px 34px;gap:8px;align-items:start;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}
+.it-d{display:flex;flex-direction:column;gap:6px;min-width:0}
+.it-row .it-sub{height:34px;font-size:12.5px}
+.it-row .it-a{align-self:center;text-align:right;font-size:13.5px;white-space:nowrap}
+.tot-box{margin:14px 0 0 auto;max-width:320px;display:flex;flex-direction:column;gap:8px;font-size:13.5px}
+.tot-box>div{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tot-box span{color:var(--muted)}
+.tot-box .big{border-top:1px solid var(--line);padding-top:8px;font-size:16px}
+.tot-box .big span{color:var(--text);font-weight:700}
+.doc-sum{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-radius:14px;background:var(--brand-soft);margin-bottom:14px}
+.doc-sum small{display:block;color:var(--muted);font-size:12px;font-weight:600}
+.doc-sum b{font-size:24px;letter-spacing:-.02em}
+.btn-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.pay-list{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-direction:column}
+.pay-list li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}
+.pay-list li:last-child{border-bottom:0}
+.pay-list li>div{min-width:0}
+.pay-list small{display:block;color:var(--muted);font-size:12px}
+.radio-card{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;cursor:pointer;background:var(--panel2)}
+.radio-card input{margin-top:3px;accent-color:var(--brand)}
+.radio-card b{display:block;font-size:14px}
+.radio-card small{color:var(--muted);font-size:12.5px}
+.bars2{display:flex;align-items:flex-end;gap:6px;height:190px}
+.bars2 .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;min-width:0}
+.bars2 .pair{display:flex;align-items:flex-end;gap:2px;height:100%;width:100%;justify-content:center}
+.bars2 .b{flex:1;max-width:14px;border-radius:5px 5px 2px 2px;min-height:2px}
+.bars2 .b.in{background:var(--ok)}
+.bars2 .b.out{background:var(--danger);opacity:.75}
+.bars2 small{font-size:10.5px;color:var(--muted)}
+.legend-i{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);margin-left:10px}
+.legend-i i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.inp.mono-ish{font-size:13.5px;line-height:1.6}
+.hide-lg{display:none}
+@media (max-width:720px){
+  .it-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 34px;grid-template-areas:"d d d" "q r x" "a a a"}
+  .it-row .it-d{grid-area:d}.it-row .it-q{grid-area:q}.it-row .it-r{grid-area:r}.it-row .it-a{grid-area:a}.it-row [data-rm]{grid-area:x}
+  .tot-box{max-width:none}
+  .hide-lg{display:block}
+  .bars2{gap:3px}
+  .bars2 small{font-size:9px}
+}
+
 /* toast */
 .toasts{position:fixed;bottom:20px;right:20px;z-index:120;display:flex;flex-direction:column;gap:8px;max-width:calc(100vw - 40px)}
 .toast{display:flex;align-items:center;gap:10px;background:var(--text);color:var(--panel);padding:12px 16px;border-radius:12px;box-shadow:var(--shadow-lg);font-weight:600;font-size:13px;animation:tin .3s cubic-bezier(.2,.8,.2,1)}
@@ -726,6 +770,8 @@ input[type=range].inp{padding:0;height:auto;accent-color:var(--brand);border:0;b
   <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
   <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5V21h16"/></symbol>
   <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></symbol>
+  <symbol id="i-rupee" viewBox="0 0 24 24"><path d="M6 3h12M6 8h12M6 13l8.5 8M6 13h3a5 5 0 0 0 0-10"/></symbol>
+  <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M4 2v20l2.5-1.5L9 22l2.5-1.5L14 22l2.5-1.5L19 22l1-.6V2l-1 .6L16.5 1 14 2.5 11.5 1 9 2.5 6.5 1z" transform="translate(0 .5) scale(1 .96)"/><path d="M8 7h8M8 11h8M8 15h5"/></symbol>
   <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></symbol>
 </svg>
 
@@ -768,6 +814,12 @@ input[type=range].inp{padding:0;height:auto;accent-color:var(--brand);border:0;b
       <a href="#/clients" data-nav="clients"><svg class="i"><use href="#i-users"/></svg>Clients<span class="count hidden" id="navCl" style="background:var(--danger)">0</span></a>
       <a href="#/reviews" data-nav="reviews"><svg class="i"><use href="#i-chat"/></svg>Reviews</a>
       <a href="#/knowledge" data-nav="knowledge"><svg class="i"><use href="#i-book"/></svg>Bot knowledge<span class="count hidden" id="navKb" style="background:var(--warn)">0</span></a>
+      <div class="nav-label">Money</div>
+      <a href="#/billing" data-nav="billing"><svg class="i"><use href="#i-receipt"/></svg>Billing<span class="count hidden" id="navBill" style="background:var(--warn)">0</span></a>
+      <a href="#/money" data-nav="money"><svg class="i"><use href="#i-rupee"/></svg>Income &amp; profit</a>
+      <a href="#/subs" data-nav="subs"><svg class="i"><use href="#i-refresh"/></svg>Subscriptions</a>
+      <div class="nav-label">Website</div>
+      <a href="#/blog" data-nav="blog"><svg class="i"><use href="#i-edit"/></svg>Blog</a>
       <div class="nav-label">System</div>
       <a href="#/settings" data-nav="settings"><svg class="i"><use href="#i-settings"/></svg>Settings</a>
     </nav>
@@ -1082,11 +1134,13 @@ function refreshBadge() {
   $('#navWa').textContent = w; $('#navWa').classList.toggle('hidden', !w);
   const t = (state.cl.tickets || []).filter(x => !['resolved', 'closed'].includes(x.status)).length;
   $('#navCl').textContent = t; $('#navCl').classList.toggle('hidden', !t);
+  const ub = (state.bill.docs || []).filter(x => x.doc_type === 'invoice' && ['sent', 'partly_paid'].includes(x.status) && x.due_date && x.due_date < istDate()).length;
+  if ($('#navBill')) { $('#navBill').textContent = ub; $('#navBill').classList.toggle('hidden', !ub); }
   const u = (state.kb.unanswered || []).length;
   $('#navKb').textContent = u; $('#navKb').classList.toggle('hidden', !u);
 }
 async function loadAll() {
-  const [e, p, m, r, w, tk, kb] = await Promise.allSettled([API.listEnquiries(), API.listProjects(), API.listImages(), API.listReviews(), API.waChats(), API.listTickets(), API.knowledge()]);
+  const [e, p, m, r, w, tk, kb] = await Promise.allSettled([API.listEnquiries(), API.listProjects(), API.listImages(), API.listReviews(), API.waChats(), API.listTickets(), API.knowledge(), loadExtras()]);
   if (e.status === 'rejected' || p.status === 'rejected') {
     paintConn('err', 'Database not reachable');
     throw (e.status === 'rejected' ? e.reason : p.reason);
@@ -1192,6 +1246,7 @@ function filteredEnquiries() {
     (f.status === 'all' || e.status === f.status) &&
     (f.source === 'all' || e.source === f.source || e.submitted_via === f.source) &&
     (f.lang === 'all' || e.language === f.lang) &&
+    (f.temp === 'all' || ((state.v4.extras.leads[e.id] || {}).temp || '') === f.temp) &&
     (!q || [e.name, e.phone, e.email, e.business_name, e.message, e.notes, ...e.services].join(' ').toLowerCase().includes(q) || digits(e.phone).includes(digits(q) || '§')));
   const t = e => new Date(e.created_at).getTime();
   rows.sort(f.sort === 'old' ? (a, b) => t(a) - t(b) : f.sort === 'name' ? (a, b) => a.name.localeCompare(b.name) : (a, b) => t(b) - t(a));
@@ -1216,6 +1271,7 @@ function renderEnquiries() {
     <div class="toolbar">
       <div class="search">${icon('search')}<input class="inp" id="eqSearch" placeholder="Search name, phone, business, message…" value="${esc(f.q)}"></div>
       <select class="inp" id="eqSource" style="width:auto"><option value="all">All sources</option><option value="home">Home page</option><option value="contact">Contact page</option><option value="whatsapp">Sent via WhatsApp</option><option value="bot">WhatsApp bot</option></select>
+      <select class="inp" id="eqTemp" style="width:auto" title="Lead score from the bot"><option value="all">All leads</option><option value="hot">🔥 Hot</option><option value="warm">🌤️ Warm</option><option value="cold">❄️ Cold</option></select>
       <select class="inp" id="eqLang" style="width:auto"><option value="all">All languages</option><option value="en">English</option><option value="ta">Tamil</option></select>
       <select class="inp" id="eqSort" style="width:auto"><option value="new">Newest first</option><option value="old">Oldest first</option><option value="name">Name A–Z</option></select>
       <div class="spacer"></div>
@@ -1232,7 +1288,7 @@ function renderEnquiries() {
         <tbody>${pageRows.map(e => `
           <tr data-id="${e.id}" class="${e.status === 'new' ? 'unread' : ''} ${f.selected.has(e.id) ? 'sel' : ''}">
             <td class="c-cb"><input type="checkbox" class="cb" data-sel="${e.id}" ${f.selected.has(e.id) ? 'checked' : ''} aria-label="Select"></td>
-            <td class="nm"><b class="${taCls(e.name)}">${esc(e.name)}</b><small class="${taCls(e.business_name)}">${e.source === 'bot' ? '<span class="badge b-won plain" style="height:18px;font-size:10.5px;margin-right:6px">WhatsApp bot</span>' : ''}${esc(e.business_name || '—')}</small></td>
+            <td class="nm"><b class="${taCls(e.name)}">${esc(e.name)}</b><small class="${taCls(e.business_name)}">${tempBadge(e.id)}${e.source === 'bot' ? '<span class="badge b-won plain" style="height:18px;font-size:10.5px;margin-right:6px">WhatsApp bot</span>' : ''}${esc(e.business_name || '—')}</small></td>
             <td style="white-space:nowrap">${esc(e.phone)}</td>
             <td><div class="svc ${taCls(e.services.join())}">${esc(e.services.join(', ') || '—')}</div></td>
             <td class="c-hide" style="white-space:nowrap"><span class="muted" style="font-size:12.5px">${SOURCE[e.source] || e.source}${e.submitted_via === 'whatsapp' ? ' · WA' : ''} · ${e.language.toUpperCase()}</span></td>
@@ -1250,7 +1306,8 @@ function renderEnquiries() {
       : `<div class="empty">${icon('inbox')}<b>No enquiries found</b>Try a different filter or search.</div>`}
     </div></div>`;
 
-  $('#eqSource').value = f.source; $('#eqLang').value = f.lang; $('#eqSort').value = f.sort;
+  $('#eqSource').value = f.source; $('#eqLang').value = f.lang; $('#eqSort').value = f.sort; $('#eqTemp').value = f.temp;
+  $('#eqTemp').onchange = e => { f.temp = e.target.value; f.page = 1; renderEnquiries(); };
   $$('[data-st]').forEach(b => b.onclick = () => { f.status = b.dataset.st; f.page = 1; renderEnquiries(); });
   const s = $('#eqSearch');
   s.oninput = () => { f.q = s.value; f.page = 1; clearTimeout(s._t); s._t = setTimeout(() => { renderEnquiries(); const n = $('#eqSearch'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }, 250); };
@@ -1316,7 +1373,10 @@ function openEnquiry(id) {
         <dt>Prefers</dt><dd>${METHOD[e.contact_method]}</dd>
         <dt>Came from</dt><dd>${e.source === 'bot' ? `<span class="badge b-won plain">${icon('bot')}Received from the WhatsApp bot</span>` : `${SOURCE[e.source] || e.source} · ${VIA[e.submitted_via] || e.submitted_via}`}</dd>
         <dt>Language</dt><dd>${LANG[e.language]}</dd>
+        ${state.v4.extras.leads[e.id] ? `<dt>Lead score</dt><dd>${tempBadge(e.id)}<b>${state.v4.extras.leads[e.id].score}/100</b> <span class="muted">· ${esc(state.v4.extras.leads[e.id].reason || '')}</span></dd>` : ''}
       </dl>
+      <div class="btn-row" style="margin:-6px 0 20px"><a class="btn" href="#/billing?new=quote&enquiry=${e.id}" data-close-dr>${icon('file')}Create quotation</a>
+        <a class="btn ghost" href="#/billing?new=invoice&enquiry=${e.id}" data-close-dr>${icon('receipt')}Invoice</a></div>
       <div class="sec-t">Message</div>
       <div class="msgbox ${taCls(e.message)}">${esc(e.message) || '<span class="muted">No message.</span>'}</div>
       <div class="sec-t">Private notes</div>
@@ -1450,6 +1510,7 @@ function renderProjects() {
           ${p.live_url ? `<a class="btn sm icon ghost" href="${esc(p.live_url)}" target="_blank" rel="noopener" title="Open live site">${icon('ext')}</a>` : ''}
           <div class="spacer"></div>
           <button class="btn sm icon ghost" data-pdel="${p.id}" title="Delete">${icon('trash')}</button>
+          <button class="btn sm ${(state.v4.extras.cases[p.id] || {}).case_study ? 'primary' : ''}" data-case="${p.id}" title="Case study page on the website">${icon('book')}<span class="hide-xs">Case</span></button>
           <button class="btn sm" data-edit="${p.id}">${icon('edit')}Edit</button>
         </div>
       </article>`; }).join('')}</div>`
@@ -1465,6 +1526,7 @@ function renderProjects() {
   if ($('#delSamples')) $('#delSamples').onclick = deleteSamples;
   $$('[data-edit]').forEach(b => b.onclick = () => projectForm(state.projects.find(p => p.id === +b.dataset.edit)));
   $$('[data-pdel]').forEach(b => b.onclick = () => deleteProject(+b.dataset.pdel));
+  $$('[data-case]').forEach(b => b.onclick = () => { if (!state.v4.extras.ready) return toast('Run supabase_upgrade_v4.sql in Supabase first', 'err'); caseForm(state.projects.find(p => p.id === +b.dataset.case)); });
   $$('[data-vis]').forEach(b => b.onclick = async () => {
     const p = state.projects.find(x => x.id === +b.dataset.vis);
     Object.assign(p, await API.updateProject(p.id, { is_published: !p.is_published }));
@@ -2593,12 +2655,13 @@ function paintClientProjects() {
         <div class="cp-h"><div class="t"><b class="${taCls(p.title)}">${esc(p.title)}</b><small class="${taCls(p.client_name)}">${esc(p.client_name)}${p.business_name ? ' · ' + esc(p.business_name) : ''}</small></div>
           <span class="badge plain st-${p.stage}">${STAGE[p.stage]}</span></div>
         <div class="prog-row"><div class="bar"><i style="width:${p.progress}%"></i></div>${p.progress}%</div>
-        <div class="nums">${p.wa_ids.map(n => `<span>${icon('wa')}${esc(waPhone(n))}</span>`).join('')}${p.open_tickets ? `<span style="color:var(--danger)">${icon('alert')}${p.open_tickets} open request${p.open_tickets > 1 ? 's' : ''}</span>` : ''}</div>
+        <div class="nums">${p.wa_ids.map(n => `<span>${icon('wa')}${esc(waPhone(n))}</span>`).join('')}${reviewLine(p)}${p.open_tickets ? `<span style="color:var(--danger)">${icon('alert')}${p.open_tickets} open request${p.open_tickets > 1 ? 's' : ''}</span>` : ''}</div>
         ${p.client_note ? `<div class="note ${taCls(p.client_note)}">${esc(p.client_note)}</div>` : ''}
         <div class="acts">
           <button class="btn sm" data-cpe="${p.id}">${icon('edit')}Edit</button>
           <button class="btn sm" data-cpn="${p.id}" title="Send the status to the client on WhatsApp">${icon('send')}Update</button>
           <button class="btn sm" data-cpr="${p.id}" title="Add a domain / hosting / AMC renewal">${icon('plus')}Renewal</button>
+          ${['live', 'support'].includes(p.stage) && state.v4.extras.ready ? `<button class="btn sm" data-cpg="${p.id}" title="Ask the client for a Google review on WhatsApp">${icon('star')}Review</button>` : ''}
           <button class="btn sm icon ghost" data-cpd="${p.id}" title="Delete" aria-label="Delete" style="margin-left:auto">${icon('trash')}</button>
         </div>
       </div>`).join('')}</div>`
@@ -2611,6 +2674,7 @@ function paintClientProjects() {
   $$('[data-cpe]').forEach(b => b.onclick = () => clientProjectForm(find(b.dataset.cpe)));
   $$('[data-cpn]').forEach(b => b.onclick = () => sendProjectUpdate(find(b.dataset.cpn)));
   $$('[data-cpr]').forEach(b => b.onclick = () => renewalForm(null, +b.dataset.cpr));
+  $$('[data-cpg]').forEach(b => b.onclick = () => askGoogleReview(find(b.dataset.cpg)));
   $$('[data-cpd]').forEach(b => b.onclick = async () => {
     const p = find(b.dataset.cpd);
     const ok = await confirmBox({ title: 'Delete this client project?', text: `<b>${esc(p.title)}</b> and its renewals will be deleted. Support requests stay. This cannot be undone.` });
@@ -2954,6 +3018,809 @@ async function renderWaReports() {
   $$('[data-rd]').forEach(b => b.onclick = () => { w.reportDays = +b.dataset.rd; renderWaReports(); });
 }
 
+/* =====================================================================
+   UPGRADE v4: Billing (quotations + invoices), Money, Subscriptions, Blog,
+   lead scores, case studies, Google review requests
+   ===================================================================== */
+Object.assign(API, {
+  extras:        ()          => request('GET', '/api/v4/extras/'),
+  billDocs:      ()          => request('GET', '/api/billing/docs/'),
+  billDoc:       id          => request('GET', `/api/billing/docs/${id}/`),
+  billCreate:    data        => request('POST', '/api/billing/docs/', data).then(d => d.item),
+  billUpdate:    (id, patch) => request('PATCH', `/api/billing/docs/${id}/`, patch).then(d => d.item),
+  billDelete:    id          => request('DELETE', `/api/billing/docs/${id}/`),
+  billSend:      id          => request('POST', `/api/billing/docs/${id}/send/`, {}),
+  billConvert:   (id, body)  => request('POST', `/api/billing/docs/${id}/convert/`, body),
+  billLink:      (id, amount)=> request('POST', `/api/billing/docs/${id}/link/`, { amount }).then(d => d.item),
+  billPay:       (id, data)  => request('POST', `/api/billing/docs/${id}/payments/`, data),
+  billPayments:  ()          => request('GET', '/api/billing/payments/').then(d => d.items),
+  billPayDelete: id          => request('DELETE', `/api/billing/payments/${id}/`).then(d => d.item),
+  billSettings:  ()          => request('GET', '/api/billing/settings/'),
+  billSaveSettings: patch    => request('PATCH', '/api/billing/settings/', patch),
+  billPdfUrl:    (id, dl)    => `/api/billing/docs/${id}/pdf/${dl ? '?download=1' : ''}`,
+  money:         (from, to)  => request('GET', `/api/money/?from=${from}&to=${to}`),
+  expenses:      ()          => request('GET', '/api/money/expenses/').then(d => d.items),
+  expenseCreate: data        => request('POST', '/api/money/expenses/', data).then(d => d.item),
+  expenseUpdate: (id, patch) => request('PATCH', `/api/money/expenses/${id}/`, patch).then(d => d.item),
+  expenseDelete: id          => request('DELETE', `/api/money/expenses/${id}/`),
+  subs:          ()          => request('GET', '/api/subscriptions/').then(d => d.items),
+  subCreate:     data        => request('POST', '/api/subscriptions/', data).then(d => d.item),
+  subUpdate:     (id, patch) => request('PATCH', `/api/subscriptions/${id}/`, patch).then(d => d.item),
+  subDelete:     id          => request('DELETE', `/api/subscriptions/${id}/`),
+  subRenewed:    (id, next)  => request('POST', `/api/subscriptions/${id}/renewed/`, next ? { next_date: next } : {}).then(d => d.item),
+  blog:          ()          => request('GET', '/api/blog/'),
+  blogCreate:    data        => request('POST', '/api/blog/', data).then(d => d.item),
+  blogUpdate:    (id, patch) => request('PATCH', `/api/blog/${id}/`, patch).then(d => d.item),
+  blogDelete:    id          => request('DELETE', `/api/blog/${id}/`),
+  projectCase:   (id, patch) => request('PATCH', `/api/projects/${id}/case/`, patch),
+  askReview:     (id, body)  => request('POST', `/api/clients/projects/${id}/review/`, body),
+});
+
+state.v4 = { extras: { ready: false, leads: {}, cases: {}, reviews: {} } };
+state.bill = { tab: 'quote', docs: null, payments: null, settings: null, razorpay: false, whatsapp: true, q: '', status: 'all', error: '', errorCode: '' };
+state.money = { period: 'month', from: '', to: '', data: null, expenses: null, error: '', errorCode: '' };
+state.subs = { items: null, error: '', errorCode: '' };
+state.blog = { items: null, site: '', error: '', errorCode: '' };
+state.eq.temp = 'all';
+
+Object.assign(PAGES, {
+  billing: { title: 'Billing', crumb: 'Quotations · invoices · payments', render: renderBilling },
+  money:   { title: 'Money', crumb: 'Income & profit', render: renderMoney },
+  subs:    { title: 'Subscriptions', crumb: 'Your own renewals (Render, domain, OpenAI …)', render: renderSubs },
+  blog:    { title: 'Blog', crumb: 'Posts on your website', render: renderBlog },
+});
+
+/* ---------- helpers ---------- */
+function inr(n, sym = true) {
+  const v = Math.round((+n || 0) * 100) / 100, neg = v < 0, a = Math.abs(v);
+  const whole = Math.floor(a), frac = Math.round((a - whole) * 100);
+  let s = String(whole);
+  if (s.length > 3) s = s.slice(0, -3).replace(/\B(?=(\d{2})+(?!\d))/g, ',') + ',' + s.slice(-3);
+  return (neg ? '-' : '') + (sym ? '₹' : '') + s + (frac ? '.' + String(frac).padStart(2, '0') : '');
+}
+const DOC_STATUS = { draft: 'Draft', sent: 'Sent', accepted: 'Accepted', rejected: 'Declined', expired: 'Expired', partly_paid: 'Part paid', paid: 'Paid', cancelled: 'Cancelled' };
+const DOC_CLS = { draft: 'b-soft', sent: 'b-new', accepted: 'b-won', rejected: 'b-closed', expired: 'b-closed', partly_paid: 'b-contacted', paid: 'b-won', cancelled: 'b-closed' };
+const PAY_METHOD = { razorpay: 'Razorpay', upi: 'UPI', bank: 'Bank transfer', cash: 'Cash', cheque: 'Cheque', other: 'Other' };
+const EXP_CAT = { hosting: 'Hosting', domain: 'Domain', software: 'Software / tools', ads: 'Ads', salary: 'Salary', freelancer: 'Freelancer', office: 'Office / rent', internet: 'Internet / phone', travel: 'Travel', other: 'Other' };
+const SUB_CYCLE = { monthly: 'Every month', yearly: 'Every year', none: 'One-time / no renewal' };
+const SUB_CHECK = { none: 'No automatic check', domain: 'Domain expiry (automatic)', ssl: 'SSL certificate (automatic)', meta_token: 'Meta token (automatic)', openai: 'OpenAI credits (automatic)' };
+const docBadge = s => `<span class="badge ${DOC_CLS[s] || 'b-soft'}">${DOC_STATUS[s] || s}</span>`;
+const TEMP = { hot: ['🔥', 'Hot', 'var(--danger)'], warm: ['🌤️', 'Warm', 'var(--warn)'], cold: ['❄️', 'Cold', 'var(--brand)'] };
+function tempBadge(id) {
+  const l = state.v4.extras.leads[id]; if (!l || !TEMP[l.temp]) return '';
+  const [e, t, c] = TEMP[l.temp];
+  return `<span class="badge plain" title="${esc(l.reason || '')} (${l.score}/100)" style="height:18px;font-size:10.5px;margin-right:6px;color:${c};background:color-mix(in srgb,${c} 12%,transparent)">${e} ${t}</span>`;
+}
+function v4Blocked(box, err, again) {
+  const code = (err && err.data && err.data.code) || '';
+  box.innerHTML = `<div class="view"><div class="card"><div class="empty">${icon(code === 'no_table' ? 'db' : 'alert')}<b>${code === 'no_table' ? 'Set up the new tables first' : 'Could not load this page'}</b><span style="display:block;max-width:540px;margin:0 auto">${esc(err.message)}</span><br><button class="btn primary" id="v4Retry">${icon('refresh')}${code === 'no_table' ? 'I have run it, check again' : 'Try again'}</button></div></div></div>`;
+  $('#v4Retry').onclick = again;
+}
+async function loadExtras() {
+  try { state.v4.extras = await API.extras(); } catch { /* old screens keep working */ }
+}
+function modalHead(title) { return `<div class="m-h"><h3>${title}</h3><div class="spacer"></div><button class="icon-btn" data-x aria-label="Close">${icon('x')}</button></div>`; }
+function bindClose() { $$('[data-x]', modal).forEach(b => b.onclick = closeModal); }
+function markErrors(form, errs) {
+  $$('.field', form).forEach(f => f.classList.toggle('has-err', !!errs[f.dataset.f]));
+  return Object.keys(errs).length === 0;
+}
+
+/* =====================================================================
+   BILLING
+   ===================================================================== */
+async function loadBilling(force = false) {
+  const b = state.bill;
+  if (b.docs && !force) return;
+  try {
+    const [d, s] = await Promise.all([API.billDocs(), API.billSettings()]);
+    b.docs = d.items; b.razorpay = d.razorpay; b.whatsapp = d.whatsapp; b.settings = s.item; b.webhook = s.webhook_url;
+    b.error = ''; b.errorCode = '';
+  } catch (err) { b.docs = null; b.error = err; }
+}
+async function renderBilling() {
+  const b = state.bill;
+  if (!b.docs) {
+    $('#content').innerHTML = '<div class="empty">Loading…</div>';
+    await loadBilling();
+    if (currentPage() !== 'billing') return;
+    if (!b.docs) return v4Blocked($('#content'), b.error, () => renderBilling());
+  }
+  const want = hashParam('new'), enq = hashParam('enquiry');
+  if (want && enq) { history.replaceState(null, '', '#/billing'); setTimeout(() => docForm(want, null, enquiryPrefill(+enq)), 30); }
+  const Q = b.docs.filter(d => d.doc_type === 'quote'), I = b.docs.filter(d => d.doc_type === 'invoice');
+  const due = I.filter(d => ['sent', 'partly_paid'].includes(d.status)).reduce((a, d) => a + d.balance, 0);
+  const waiting = Q.filter(d => d.status === 'sent').length;
+  $('#content').innerHTML = `<div class="view">
+    <div class="wa-top">
+      <div class="seg" id="bTabs">
+        <button data-tab="quote" class="${b.tab === 'quote' ? 'on' : ''}">${icon('file')}Quotations${waiting ? `<span class="n" style="background:var(--brand)">${waiting}</span>` : ''}</button>
+        <button data-tab="invoice" class="${b.tab === 'invoice' ? 'on' : ''}">${icon('receipt')}Invoices${due ? `<span class="n" style="background:var(--warn)">${I.filter(d => ['sent', 'partly_paid'].includes(d.status)).length}</span>` : ''}</button>
+        <button data-tab="payments" class="${b.tab === 'payments' ? 'on' : ''}">${icon('rupee')}Payments</button>
+        <button data-tab="details" class="${b.tab === 'details' ? 'on' : ''}">${icon('settings')}Details</button>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn" id="bReload" title="Refresh" aria-label="Refresh">${icon('refresh')}</button>
+    </div>
+    ${!b.razorpay ? `<div class="notice info">${icon('lock')}<span>Razorpay payment links are off. Add <b>RAZORPAY_KEY_ID</b> and <b>RAZORPAY_KEY_SECRET</b> in Render → this dashboard → Environment (see the Razorpay guide). Everything else works now.</span></div>` : ''}
+    <div id="bBody"></div></div>`;
+  $$('#bTabs [data-tab]').forEach(x => x.onclick = () => { b.tab = x.dataset.tab; b.status = 'all'; renderBilling(); });
+  $('#bReload').onclick = async () => { b.payments = null; await loadBilling(true); renderBilling(); toast('Refreshed'); };
+  if (b.tab === 'payments') return paintPayments();
+  if (b.tab === 'details') return paintBillingDetails();
+  paintDocs();
+}
+function paintDocs() {
+  const b = state.bill, kind = b.tab, q = b.q.trim().toLowerCase();
+  const all = b.docs.filter(d => d.doc_type === kind);
+  const statuses = kind === 'quote' ? ['draft', 'sent', 'accepted', 'rejected', 'expired'] : ['draft', 'sent', 'partly_paid', 'paid', 'cancelled'];
+  const rows = all.filter(d => (b.status === 'all' || d.status === b.status) &&
+    (!q || [d.number, d.client_name, d.business_name, d.title, d.client_wa_id].join(' ').toLowerCase().includes(q)));
+  const word = kind === 'quote' ? 'quotation' : 'invoice';
+  $('#bBody').innerHTML = `
+    <div class="toolbar"><div class="chips">
+      <button class="chip ${b.status === 'all' ? 'on' : ''}" data-bs="all">All <span class="n">${all.length}</span></button>
+      ${statuses.map(s => `<button class="chip ${b.status === s ? 'on' : ''}" data-bs="${s}">${DOC_STATUS[s]} <span class="n">${all.filter(d => d.status === s).length}</span></button>`).join('')}
+    </div></div>
+    <div class="toolbar">
+      <div class="search">${icon('search')}<input class="inp" id="bSearch" placeholder="Search number, client, project…" value="${esc(b.q)}"></div>
+      <div class="spacer"></div>
+      <button class="btn primary" id="bAdd">${icon('plus')}New ${word}</button>
+    </div>
+    <div class="card">${rows.length ? `<div class="table-wrap"><table class="tbl">
+      <thead><tr><th>Number</th><th>Client</th><th>Project</th><th style="text-align:right">${kind === 'quote' ? 'Total' : 'Balance'}</th><th>Status</th><th>Date</th><th></th></tr></thead>
+      <tbody>${rows.map(d => `<tr data-doc="${d.id}">
+        <td class="nm" style="white-space:nowrap"><b>${esc(d.number)}</b><small class="hide-lg">${esc(d.client_name)}</small></td>
+        <td class="c-hide"><b style="font-size:13px" class="${taCls(d.client_name)}">${esc(d.client_name)}</b><br><small class="muted">${esc(d.business_name || (d.client_wa_id ? waPhone(d.client_wa_id) : '—'))}</small></td>
+        <td><div class="svc">${esc(d.title || '—')}</div></td>
+        <td style="text-align:right;white-space:nowrap"><b>${inr(kind === 'quote' ? d.total : d.balance)}</b>${kind === 'invoice' && d.amount_paid ? `<br><small class="muted">of ${inr(d.total)}</small>` : ''}</td>
+        <td class="c-status">${docBadge(d.status)}</td>
+        <td class="c-hide" style="white-space:nowrap"><span class="muted" style="font-size:12.5px">${fmtDay(d.issue_date)}</span></td>
+        <td class="c-acts"><div class="acts">
+          <a class="btn sm icon ghost" href="${API.billPdfUrl(d.id)}" target="_blank" rel="noopener" title="Open PDF" data-stop>${icon('file')}</a>
+          <button class="btn sm icon ghost" data-bsend="${d.id}" title="Send on WhatsApp">${icon('send')}</button>
+        </div></td></tr>`).join('')}</tbody></table></div>`
+      : `<div class="empty">${icon(kind === 'quote' ? 'file' : 'receipt')}<b>${all.length ? 'Nothing matches' : `No ${word}s yet`}</b>${all.length ? 'Try another filter.' : `Create your first ${word}. Tip: open an enquiry and tap “Create quotation” to fill in the client details automatically.`}</div>`}</div>`;
+  $$('[data-bs]').forEach(x => x.onclick = () => { b.status = x.dataset.bs; paintDocs(); });
+  const s = $('#bSearch');
+  s.oninput = () => { b.q = s.value; clearTimeout(s._t); s._t = setTimeout(() => { paintDocs(); const n = $('#bSearch'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }, 250); };
+  $('#bAdd').onclick = () => docForm(kind);
+  $$('[data-stop]').forEach(a => a.onclick = ev => ev.stopPropagation());
+  $$('[data-bsend]').forEach(x => x.onclick = ev => { ev.stopPropagation(); sendDoc(b.docs.find(d => d.id === +x.dataset.bsend)); });
+  $$('tr[data-doc]').forEach(tr => tr.onclick = () => openDoc(+tr.dataset.doc));
+}
+function enquiryPrefill(id) {
+  const e = state.enquiries.find(x => x.id === id); if (!e) return {};
+  return { enquiry_id: e.id, client_name: e.name, business_name: e.business_name, client_wa_id: waNum(e.phone), client_email: e.email,
+    title: (e.services || []).join(', '), items: (e.services || []).map(s => ({ description: s, details: '', qty: 1, rate: 0 })) };
+}
+function docForm(kind, d = null, pre = {}) {
+  const st = state.bill.settings || {};
+  const v = d ? clone(d) : { client_name: '', business_name: '', client_wa_id: '', client_email: '', client_address: '', title: '', issue_date: istDate(),
+    due_date: '', items: [{ description: '', details: '', qty: 1, rate: 0 }], discount: 0, notes: '', terms: '', private_notes: '', enquiry_id: null, ...pre };
+  if (!v.items || !v.items.length) v.items = [{ description: '', details: '', qty: 1, rate: 0 }];
+  if (!d && !v.due_date) { const x = new Date(v.issue_date + 'T12:00:00+05:30'); x.setDate(x.getDate() + (kind === 'quote' ? (st.quote_valid_days || 15) : (st.invoice_due_days || 7))); v.due_date = istDate(x); }
+  const word = kind === 'quote' ? 'quotation' : 'invoice';
+  openModal(`${modalHead(d ? `Edit ${word} ${esc(d.number)}` : `New ${word}`)}
+    <form class="m-b" id="docF" novalidate>
+      ${v.enquiry_id ? `<div class="notice info" style="margin-bottom:14px">${icon('inbox')}<span>Linked to enquiry #${v.enquiry_id}. When you send it, the enquiry moves to <b>Quoted</b>; when the client accepts or pays, it becomes <b>Won</b>.</span></div>` : ''}
+      <div class="sec-t" style="margin-top:0">Client</div>
+      <div class="grid2">
+        ${fld('client_name', 'Client name', `<input class="inp" name="client_name" maxlength="120" value="${esc(v.client_name)}">`, true, 'Client name is required.')}
+        ${fld('business_name', 'Business name', `<input class="inp" name="business_name" maxlength="160" value="${esc(v.business_name)}">`)}
+        ${fld('client_wa_id', 'WhatsApp number', `<input class="inp" name="client_wa_id" inputmode="tel" value="${esc(v.client_wa_id ? waPhone(v.client_wa_id) : '')}" placeholder="+91 98765 43210">`, false, 'Enter a valid number with country code.')}
+        ${fld('client_email', 'Email', `<input class="inp" name="client_email" type="email" maxlength="254" value="${esc(v.client_email)}">`, false, 'Invalid email.')}
+      </div>
+      <div style="margin-top:14px">${fld('client_address', 'Address (optional)', `<textarea class="inp" name="client_address" style="min-height:56px" maxlength="1000">${esc(v.client_address)}</textarea>`)}</div>
+      <div class="sec-t">Details</div>
+      <div class="grid3">
+        ${fld('title', 'Project', `<input class="inp" name="title" maxlength="200" value="${esc(v.title)}" placeholder="e.g. Online store website">`)}
+        ${fld('issue_date', 'Date', `<input class="inp" type="date" name="issue_date" value="${esc(v.issue_date)}">`)}
+        ${fld('due_date', kind === 'quote' ? 'Valid until' : 'Pay by', `<input class="inp" type="date" name="due_date" value="${esc(v.due_date)}">`)}
+      </div>
+      <div class="sec-t">Items <small class="muted" style="font-weight:500;text-transform:none;letter-spacing:0">· no GST</small></div>
+      <div class="items-ed" id="itemsEd"></div>
+      <button type="button" class="btn sm" id="itAdd" style="margin-top:8px">${icon('plus')}Add item</button>
+      <div class="tot-box">
+        <div><span>Subtotal</span><b id="tSub">₹0</b></div>
+        <div><span>Discount (₹)</span><input class="inp" name="discount" type="number" min="0" step="1" value="${+v.discount || 0}" style="width:130px;text-align:right"></div>
+        <div class="big"><span>Total</span><b id="tTot">₹0</b></div>
+      </div>
+      <div class="field" data-f="discount"><div class="msg">Discount is more than the subtotal.</div></div>
+      <div class="sec-t">On the PDF</div>
+      ${fld('notes', 'Notes for the client (optional)', `<textarea class="inp" name="notes" maxlength="3000" style="min-height:60px" placeholder="e.g. Delivery in 3 weeks after the advance.">${esc(v.notes)}</textarea>`)}
+      <div style="margin-top:14px">${fld('terms', 'Terms (empty = your default terms)', `<textarea class="inp" name="terms" maxlength="3000" style="min-height:70px" placeholder="${esc((kind === 'quote' ? st.quote_terms : st.invoice_terms) || '')}">${esc(v.terms)}</textarea>`)}</div>
+      <div style="margin-top:14px">${fld('private_notes', 'Private notes (only you)', `<textarea class="inp" name="private_notes" maxlength="3000" style="min-height:50px">${esc(v.private_notes)}</textarea>`)}</div>
+    </form>
+    <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button>
+      <button class="btn" data-save="0">${icon('check')}Save</button>
+      <button class="btn primary" data-save="1">${icon('send')}Save &amp; send</button></div>`, 'lg');
+  bindClose();
+  const fm = $('#docF'), items = v.items;
+  const paintItems = () => {
+    $('#itemsEd').innerHTML = items.map((it, i) => `<div class="it-row" data-i="${i}">
+      <div class="it-d"><input class="inp" data-k="description" maxlength="300" placeholder="Item, e.g. Website design & development" value="${esc(it.description)}">
+        <input class="inp it-sub" data-k="details" maxlength="600" placeholder="Details (optional)" value="${esc(it.details || '')}"></div>
+      <input class="inp it-q" data-k="qty" type="number" min="0.01" step="any" value="${it.qty}" aria-label="Quantity" title="Quantity">
+      <input class="inp it-r" data-k="rate" type="number" min="0" step="any" value="${it.rate}" aria-label="Rate (₹)" title="Rate (₹)">
+      <b class="it-a">${inr((+it.qty || 0) * (+it.rate || 0))}</b>
+      <button type="button" class="btn sm icon ghost" data-rm="${i}" ${items.length < 2 ? 'disabled' : ''} aria-label="Remove item">${icon('trash')}</button></div>`).join('');
+    $$('#itemsEd [data-k]').forEach(inp => inp.oninput = () => {
+      const i = +inp.closest('.it-row').dataset.i, k = inp.dataset.k;
+      items[i][k] = ['qty', 'rate'].includes(k) ? inp.value : inp.value;
+      inp.closest('.it-row').querySelector('.it-a').textContent = inr((+items[i].qty || 0) * (+items[i].rate || 0));
+      totals();
+    });
+    $$('#itemsEd [data-rm]').forEach(x => x.onclick = () => { items.splice(+x.dataset.rm, 1); paintItems(); totals(); });
+  };
+  const totals = () => {
+    const sub = items.reduce((a, it) => a + (+it.qty || 0) * (+it.rate || 0), 0), disc = +fm.elements.discount.value || 0;
+    $('#tSub').textContent = inr(sub); $('#tTot').textContent = inr(Math.max(0, sub - disc));
+    return { sub, disc };
+  };
+  paintItems(); totals();
+  fm.elements.discount.oninput = totals;
+  $('#itAdd').onclick = () => { items.push({ description: '', details: '', qty: 1, rate: 0 }); paintItems(); totals(); $$('#itemsEd .it-row:last-child input')[0].focus(); };
+  $$('[data-save]', modal).forEach(btn => btn.onclick = async () => {
+    const g = n => fm.elements[n].value.trim();
+    const clean = items.map(it => ({ description: it.description.trim(), details: (it.details || '').trim(), qty: +it.qty || 0, rate: +it.rate || 0 }))
+      .filter(it => it.description || it.rate);
+    const { sub, disc } = totals();
+    const wa = digits(g('client_wa_id'));
+    const errs = {};
+    if (!g('client_name')) errs.client_name = 1;
+    if (wa && (wa.length < 10 || wa.length > 15)) errs.client_wa_id = 1;
+    if (g('client_email') && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(g('client_email'))) errs.client_email = 1;
+    if (disc > sub) errs.discount = 1;
+    if (!clean.length || clean.some(it => !it.description || it.qty <= 0)) { toast('Each item needs a description and a quantity', 'err'); return; }
+    if (!markErrors(fm, errs)) return toast('Please fix the highlighted fields', 'err');
+    const data = { client_name: g('client_name'), business_name: g('business_name'), client_wa_id: wa, client_email: g('client_email'),
+      client_address: g('client_address'), title: g('title'), issue_date: g('issue_date'), due_date: g('due_date'), items: clean, discount: disc,
+      notes: g('notes'), terms: g('terms'), private_notes: g('private_notes') };
+    if (v.enquiry_id) data.enquiry_id = v.enquiry_id;
+    const send = btn.dataset.save === '1';
+    if (send && !wa) { markErrors(fm, { client_wa_id: 1 }); return toast('Add the WhatsApp number to send it', 'err'); }
+    $$('[data-save]', modal).forEach(x => x.disabled = true);
+    try {
+      const item = d ? await API.billUpdate(d.id, data) : await API.billCreate({ ...data, doc_type: kind });
+      if (d) Object.assign(d, item); else state.bill.docs.unshift(item);
+      closeModal(); toast(d ? 'Saved' : `${item.number} created`);
+      state.bill.tab = kind;
+      if (send) await sendDoc(d || item, true);
+      if (currentPage() === 'billing') renderBilling(); else location.hash = '#/billing';
+    } finally { $$('[data-save]', modal).forEach(x => x.disabled = false); }
+  });
+}
+async function sendDoc(d, silent = false) {
+  if (!d.client_wa_id) { toast('Add the client\'s WhatsApp number first (Edit)', 'err'); return; }
+  const word = d.doc_type === 'quote' ? 'quotation' : 'invoice';
+  if (!silent) {
+    const linkNote = d.doc_type === 'invoice' && !d.razorpay_link_url && state.bill.razorpay ? ' A Razorpay payment link for the balance is created and added automatically.' : '';
+    const ok = await confirmBox({ title: `Send ${d.number} on WhatsApp?`, danger: false, ok: 'Send',
+      text: `The PDF goes to <b>${esc(d.client_name)}</b> at ${esc(waPhone(d.client_wa_id))}${d.doc_type === 'quote' ? ', with <b>Accept quote</b> and <b>Ask a question</b> buttons' : ''}.${linkNote} If they have not messaged in 24 hours, the approved <b>billing_document</b> template is used.` });
+    if (!ok) return;
+  }
+  toast(`Sending the ${word}…`);
+  const r = await API.billSend(d.id);
+  Object.assign(d, r.item);
+  toast(r.via === 'template' ? `${d.number} sent (template)` : `${d.number} sent on WhatsApp`);
+  if (currentPage() === 'billing') renderBilling();
+  if (drawer.classList.contains('show') && drawer.dataset.doc == d.id) openDoc(d.id);
+}
+async function openDoc(id) {
+  const b = state.bill, d = b.docs.find(x => x.id === id); if (!d) return;
+  let payments = [];
+  if (d.doc_type === 'invoice') { try { payments = (await API.billDoc(id)).payments; } catch {} }
+  const isQ = d.doc_type === 'quote';
+  drawer.dataset.doc = id;
+  openDrawer(`
+    <div class="dr-h"><div class="avatar">${icon(isQ ? 'file' : 'receipt')}</div>
+      <div style="min-width:0;flex:1"><h3>${esc(d.number)}</h3><small>${isQ ? 'Quotation' : 'Invoice'} · ${fmtDay(d.issue_date)}</small></div>
+      <button class="icon-btn" data-close aria-label="Close">${icon('x')}</button></div>
+    <div class="dr-b">
+      <div class="doc-sum"><div><small>${isQ ? 'Total' : 'Balance due'}</small><b>${inr(isQ ? d.total : d.balance)}</b></div>${docBadge(d.status)}</div>
+      <div class="quick">
+        <a href="${API.billPdfUrl(d.id)}" target="_blank" rel="noopener">${icon('eye')}View PDF</a>
+        <a href="${API.billPdfUrl(d.id, 1)}">${icon('download')}Download</a>
+        <a href="#" class="wa" data-send>${icon('send')}${d.sent_at ? 'Send again' : 'Send'}</a>
+      </div>
+      ${d.sent_at ? `<p class="muted" style="font-size:12px;margin:-6px 0 10px">Sent ${fmtDate(d.sent_at)}${d.accepted_at ? ` · accepted ${fmtDate(d.accepted_at)}` : ''}${d.paid_at ? ` · paid ${fmtDate(d.paid_at)}` : ''}</p>` : ''}
+      ${isQ ? `<div class="sec-t">Next step</div><div class="btn-row">
+          <button class="btn primary" data-conv>${icon('receipt')}Convert to invoice</button>
+          ${d.status === 'sent' ? `<button class="btn" data-st="accepted">${icon('check')}Mark accepted</button><button class="btn" data-st="rejected">${icon('x')}Declined</button>` : ''}
+        </div>`
+      : `<div class="sec-t">Payment</div>
+        ${d.razorpay_link_url ? `<div class="kv"><span>Razorpay link (${inr(d.razorpay_amount)})</span><b><a href="${esc(d.razorpay_link_url)}" target="_blank" rel="noopener">${esc(d.razorpay_link_url.replace('https://', ''))}</a> <button class="btn sm icon ghost" data-copy="${esc(d.razorpay_link_url)}" title="Copy">${icon('copy')}</button></b></div>` : ''}
+        ${!['paid', 'cancelled'].includes(d.status) ? `<div class="btn-row">
+          <button class="btn primary" data-pay>${icon('rupee')}Record payment</button>
+          <button class="btn" data-link ${b.razorpay ? '' : 'disabled title="Add the Razorpay keys first"'}>${icon('globe')}${d.razorpay_link_url ? 'New pay link' : 'Payment link'}</button>
+        </div>` : ''}
+        ${payments.length ? `<ul class="pay-list">${payments.map(p => `<li><div><b>${inr(p.amount)}</b><small>${PAY_METHOD[p.method]} · ${fmtDay(p.paid_on)}${p.reference ? ' · ' + esc(p.reference) : ''}</small></div>${p.method === 'razorpay' ? '' : `<button class="btn sm icon ghost" data-pdel="${p.id}" title="Delete payment">${icon('trash')}</button>`}</li>`).join('')}</ul>` : '<p class="muted" style="font-size:12.5px">No payments yet. Razorpay payments are added automatically.</p>'}`}
+      <div class="sec-t">Client</div>
+      <dl class="dl">
+        <dt>Name</dt><dd class="${taCls(d.client_name)}">${esc(d.client_name)}${d.business_name ? ' · ' + esc(d.business_name) : ''}</dd>
+        <dt>WhatsApp</dt><dd>${d.client_wa_id ? `<a href="#/whatsapp?chat=${esc(d.client_wa_id)}" data-close-dr>${esc(waPhone(d.client_wa_id))}</a>` : '—'}</dd>
+        <dt>Email</dt><dd>${esc(d.client_email || '—')}</dd>
+        <dt>Project</dt><dd>${esc(d.title || '—')}</dd>
+        <dt>${isQ ? 'Valid until' : 'Pay by'}</dt><dd>${d.due_date ? fmtDay(d.due_date) : '—'}</dd>
+        ${d.enquiry_id ? `<dt>Enquiry</dt><dd>#${d.enquiry_id}</dd>` : ''}
+        ${d.converted_from ? `<dt>From quote</dt><dd>${esc((b.docs.find(x => x.id === d.converted_from) || {}).number || '#' + d.converted_from)}</dd>` : ''}
+      </dl>
+      <div class="sec-t">Items</div>
+      <ul class="pay-list">${d.items.map(it => `<li><div><b class="${taCls(it.description)}">${esc(it.description)}</b><small>${+it.qty} × ${inr(it.rate)}</small></div><b>${inr(it.qty * it.rate)}</b></li>`).join('')}
+        ${d.discount ? `<li><div><small>Discount</small></div><b>- ${inr(d.discount)}</b></li>` : ''}
+        <li><div><b>Total</b></div><b>${inr(d.total)}</b></li></ul>
+      ${d.private_notes ? `<div class="sec-t">Private notes</div><div class="msgbox">${esc(d.private_notes)}</div>` : ''}
+    </div>
+    <div class="dr-f">
+      <button class="btn danger" data-del title="Delete">${icon('trash')}</button>
+      ${!['cancelled', 'paid'].includes(d.status) ? `<button class="btn ghost" data-cancel>${icon('x')}Cancel</button>` : ''}
+      <div class="spacer"></div>
+      <button class="btn primary" data-edit>${icon('edit')}Edit</button>
+    </div>`);
+  $('[data-close]', drawer).onclick = closeDrawer;
+  $$('[data-close-dr]', drawer).forEach(a => a.addEventListener('click', closeDrawer));
+  $('[data-send]', drawer).onclick = ev => { ev.preventDefault(); sendDoc(d); };
+  $('[data-edit]', drawer).onclick = () => { closeDrawer(); docForm(d.doc_type, d); };
+  $$('[data-copy]', drawer).forEach(x => x.onclick = () => { navigator.clipboard.writeText(x.dataset.copy); toast('Link copied'); });
+  const setStatus = async (s, msg) => { Object.assign(d, await API.billUpdate(d.id, { status: s })); toast(msg); renderBilling(); openDoc(d.id); };
+  $$('[data-st]', drawer).forEach(x => x.onclick = () => setStatus(x.dataset.st, x.dataset.st === 'accepted' ? 'Marked accepted' : 'Marked declined'));
+  if ($('[data-cancel]', drawer)) $('[data-cancel]', drawer).onclick = async () => {
+    if (!await confirmBox({ title: `Cancel ${d.number}?`, text: 'It stays in the list as Cancelled (the number is not reused).', ok: 'Cancel it' })) return;
+    setStatus('cancelled', 'Cancelled');
+  };
+  $('[data-del]', drawer).onclick = async () => {
+    if (!await confirmBox({ title: `Delete ${d.number}?`, text: 'It is removed permanently. To keep a record, use Cancel instead.' })) return;
+    await API.billDelete(d.id); b.docs = b.docs.filter(x => x.id !== d.id); closeDrawer(); toast('Deleted'); renderBilling();
+  };
+  if ($('[data-conv]', drawer)) $('[data-conv]', drawer).onclick = () => convertForm(d);
+  if ($('[data-pay]', drawer)) $('[data-pay]', drawer).onclick = () => paymentForm(d);
+  if ($('[data-link]', drawer)) $('[data-link]', drawer).onclick = () => linkForm(d);
+  $$('[data-pdel]', drawer).forEach(x => x.onclick = async () => {
+    if (!await confirmBox({ title: 'Delete this payment?', text: 'The invoice balance goes back up.' })) return;
+    Object.assign(d, await API.billPayDelete(+x.dataset.pdel)); b.payments = null; toast('Payment deleted'); renderBilling(); openDoc(d.id);
+  });
+}
+function convertForm(q) {
+  openModal(`${modalHead(`Invoice from ${esc(q.number)}`)}
+    <div class="m-b">
+      <p class="muted" style="margin:0 0 14px;font-size:13px">Quotation total: <b style="color:var(--text)">${inr(q.total)}</b>. The quotation is marked <b>Accepted</b>.</p>
+      <label class="radio-card"><input type="radio" name="cv" value="adv" checked><div><b>Advance invoice</b><small>Ask for part of the amount first</small>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px"><input class="inp" id="cvPct" type="number" min="1" max="99" value="50" style="width:90px"> % = <b id="cvAmt">${inr(q.total / 2)}</b></div></div></label>
+      <label class="radio-card"><input type="radio" name="cv" value="full"><div><b>Full invoice</b><small>All items of the quotation (${inr(q.total)})</small></div></label>
+    </div>
+    <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-ok>${icon('receipt')}Create invoice</button></div>`);
+  bindClose();
+  const pct = $('#cvPct');
+  pct.oninput = () => { $('#cvAmt').textContent = inr(Math.round(q.total * (+pct.value || 0)) / 100); $('[value=adv]', modal).checked = true; };
+  $('[data-ok]', modal).onclick = async ev => {
+    const full = $('[value=full]', modal).checked, p = +pct.value;
+    if (!full && !(p >= 1 && p <= 99)) return toast('Advance must be 1 to 99 %', 'err');
+    ev.currentTarget.disabled = true;
+    const r = await API.billConvert(q.id, full ? {} : { advance_percent: p });
+    Object.assign(q, r.quote); state.bill.docs.unshift(r.item);
+    closeModal(); closeDrawer(); state.bill.tab = 'invoice'; renderBilling();
+    toast(`${r.item.number} created`); openDoc(r.item.id);
+  };
+}
+function paymentForm(d) {
+  openModal(`${modalHead(`Payment for ${esc(d.number)}`)}
+    <form class="m-b" id="payF" novalidate>
+      <p class="muted" style="margin:0 0 14px;font-size:13px">Balance due: <b style="color:var(--text)">${inr(d.balance)}</b>. Razorpay payments are recorded automatically; add UPI, bank, cash or cheque payments here.</p>
+      <div class="grid2">
+        ${fld('amount', 'Amount (₹)', `<input class="inp" name="amount" type="number" min="1" step="any" value="${d.balance}">`, true, `1 to ${inr(d.balance)}`)}
+        ${fld('method', 'Paid by', sel('method', { upi: 'UPI', bank: 'Bank transfer', cash: 'Cash', cheque: 'Cheque', other: 'Other' }, 'upi'))}
+        ${fld('paid_on', 'Date', `<input class="inp" type="date" name="paid_on" value="${istDate()}">`)}
+        ${fld('reference', 'UTR / reference (optional)', `<input class="inp" name="reference" maxlength="120">`)}
+      </div>
+      <div style="margin-top:14px">${fld('notes', 'Notes (optional)', `<input class="inp" name="notes" maxlength="1000">`)}</div>
+    </form>
+    <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-save>${icon('check')}Save payment</button></div>`);
+  bindClose();
+  const fm = $('#payF');
+  $('[data-save]', modal).onclick = async ev => {
+    const amt = +fm.elements.amount.value;
+    if (!markErrors(fm, { amount: !(amt > 0 && amt <= d.balance + 0.001) })) return;
+    ev.currentTarget.disabled = true;
+    const r = await API.billPay(d.id, { amount: amt, method: fm.elements.method.value, paid_on: fm.elements.paid_on.value,
+      reference: fm.elements.reference.value.trim(), notes: fm.elements.notes.value.trim() });
+    Object.assign(d, r.item); state.bill.payments = null;
+    closeModal(); toast(d.status === 'paid' ? 'Paid in full ✅' : 'Payment saved'); renderBilling(); openDoc(d.id);
+  };
+}
+function linkForm(d) {
+  openModal(`${modalHead('Razorpay payment link')}
+    <form class="m-b" id="lkF" novalidate>
+      <p class="muted" style="margin:0 0 14px;font-size:13px">The client pays by UPI, card or net banking. When they pay, the invoice is updated, they get a thank-you on WhatsApp and you get an alert, automatically.${d.razorpay_link_url ? ' The old link is cancelled.' : ''}</p>
+      ${fld('amount', 'Amount (₹)', `<input class="inp" name="amount" type="number" min="1" step="any" value="${d.balance}">`, true, `1 to ${inr(d.balance)}`)}
+    </form>
+    <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-save>${icon('globe')}Create link</button></div>`);
+  bindClose();
+  const fm = $('#lkF');
+  $('[data-save]', modal).onclick = async ev => {
+    const amt = +fm.elements.amount.value;
+    if (!markErrors(fm, { amount: !(amt >= 1 && amt <= d.balance + 0.001) })) return;
+    ev.currentTarget.disabled = true;
+    try {
+      Object.assign(d, await API.billLink(d.id, amt));
+      closeModal(); toast('Payment link created. Send the invoice to share it.'); renderBilling(); openDoc(d.id);
+    } finally { ev.currentTarget.disabled = false; }
+  };
+}
+async function paintPayments() {
+  const b = state.bill;
+  if (!b.payments) { $('#bBody').innerHTML = '<div class="card"><div class="empty">Loading…</div></div>'; b.payments = await API.billPayments(); if (b.tab !== 'payments' || !$('#bBody')) return; }
+  const total = b.payments.reduce((a, p) => a + p.amount, 0);
+  $('#bBody').innerHTML = `<div class="card"><div class="card-h"><h3>Money received</h3><div class="spacer"></div><span class="badge b-won plain">${inr(total)} · ${b.payments.length} payments</span></div>
+    ${b.payments.length ? `<div class="table-wrap"><table class="tbl"><thead><tr><th>Date</th><th>Client</th><th>Invoice</th><th>Method</th><th style="text-align:right">Amount</th></tr></thead>
+    <tbody>${b.payments.map(p => `<tr data-pdoc="${p.document_id || ''}"><td class="nm" style="white-space:nowrap"><b>${fmtDay(p.paid_on)}</b><small>${esc(p.reference || '')}</small></td>
+      <td><span class="${taCls(p.client_name)}">${esc(p.client_name || '—')}</span></td><td class="c-hide">${esc(p.number || '—')}</td>
+      <td class="c-hide">${PAY_METHOD[p.method] || p.method}</td><td class="c-status" style="text-align:right"><b>${inr(p.amount)}</b></td></tr>`).join('')}</tbody></table></div>`
+    : `<div class="empty">${icon('rupee')}<b>No payments yet</b>Razorpay payments appear here automatically; add others from an invoice.</div>`}</div>`;
+  $$('tr[data-pdoc]').forEach(tr => tr.onclick = () => { if (tr.dataset.pdoc) openDoc(+tr.dataset.pdoc); });
+}
+function paintBillingDetails() {
+  const s = state.bill.settings || {};
+  $('#bBody').innerHTML = `<form class="card" id="bsF" novalidate><div class="card-h"><h3>Shown on every quotation and invoice</h3></div><div class="card-b">
+    <div class="grid2">
+      ${fld('business_name', 'Business name', `<input class="inp" name="business_name" maxlength="160" value="${esc(s.business_name)}">`, true, 'Required.')}
+      ${fld('tagline', 'Tagline', `<input class="inp" name="tagline" maxlength="160" value="${esc(s.tagline)}">`)}
+      ${fld('phone', 'Phone', `<input class="inp" name="phone" maxlength="40" value="${esc(s.phone)}">`)}
+      ${fld('email', 'Email', `<input class="inp" name="email" maxlength="254" value="${esc(s.email)}">`, false, 'Invalid email.')}
+      ${fld('website', 'Website', `<input class="inp" name="website" maxlength="200" value="${esc(s.website)}">`, false, 'Must start with https://')}
+      ${fld('upi_id', 'UPI ID (shown on invoices)', `<input class="inp" name="upi_id" maxlength="100" value="${esc(s.upi_id)}" placeholder="e.g. ajtech@okaxis">`)}
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      ${fld('address', 'Address', `<textarea class="inp" name="address" maxlength="600" style="min-height:70px">${esc(s.address)}</textarea>`)}
+      ${fld('bank_details', 'Bank details (shown on invoices)', `<textarea class="inp" name="bank_details" maxlength="600" style="min-height:70px" placeholder="Account name, account number, IFSC, bank">${esc(s.bank_details)}</textarea>`)}
+    </div>
+    <div class="sec-t">Numbers and dates</div>
+    <div class="grid2">
+      ${fld('quote_prefix', 'Quotation number prefix', `<input class="inp" name="quote_prefix" maxlength="10" value="${esc(s.quote_prefix)}">`, true, 'Letters / numbers.')}
+      ${fld('invoice_prefix', 'Invoice number prefix', `<input class="inp" name="invoice_prefix" maxlength="10" value="${esc(s.invoice_prefix)}">`, true, 'Letters / numbers.')}
+      ${fld('quote_valid_days', 'Quotation valid for (days)', `<input class="inp" type="number" min="1" max="365" name="quote_valid_days" value="${s.quote_valid_days}">`, false, '1 to 365')}
+      ${fld('invoice_due_days', 'Invoice due in (days)', `<input class="inp" type="number" min="0" max="365" name="invoice_due_days" value="${s.invoice_due_days}">`, false, '0 to 365')}
+    </div>
+    <p class="muted" style="font-size:12px;margin:8px 0 0">Numbers look like ${esc(s.quote_prefix)}-${new Date().getFullYear()}-0001 and start again at 0001 every year. No GST is added.</p>
+    <div class="sec-t">Default terms</div>
+    <div class="grid2">
+      ${fld('quote_terms', 'Quotation terms', `<textarea class="inp" name="quote_terms" maxlength="3000" style="min-height:100px">${esc(s.quote_terms)}</textarea>`)}
+      ${fld('invoice_terms', 'Invoice terms', `<textarea class="inp" name="invoice_terms" maxlength="3000" style="min-height:100px">${esc(s.invoice_terms)}</textarea>`)}
+    </div>
+    <div style="margin-top:14px">${fld('footer_note', 'Thank-you line', `<input class="inp" name="footer_note" maxlength="300" value="${esc(s.footer_note)}">`)}</div>
+    <div class="sec-t">Google reviews</div>
+    <div class="grid2">
+      ${fld('google_review_url', 'Your Google review link', `<input class="inp" name="google_review_url" maxlength="500" value="${esc(s.google_review_url)}" placeholder="https://g.page/r/…/review">`, false, 'Must start with https://')}
+      ${fld('review_after_days', 'Ask for a review this many days after a project goes Live', `<input class="inp" type="number" min="0" max="60" name="review_after_days" value="${s.review_after_days}">`, false, '0 to 60')}
+    </div>
+    <p class="muted" style="font-size:12px;margin:8px 0 0">The WhatsApp bot asks the client how happy they are (11 AM–7 PM). Happy clients get this Google link; unhappy ones are sent to you privately.</p>
+    <div class="sec-t">Razorpay</div>
+    <div class="kv"><span>Payment links</span><b>${state.bill.razorpay ? '✅ On' : 'Off: add RAZORPAY_KEY_ID + RAZORPAY_KEY_SECRET (dashboard service on Render)'}</b></div>
+    <div class="kv"><span>Webhook URL (paste in Razorpay)</span><b>${esc(state.bill.webhook || '')} <button type="button" class="btn sm icon ghost" data-copy="${esc(state.bill.webhook || '')}" title="Copy">${icon('copy')}</button></b></div>
+    <div class="kv"><span>Webhook event</span><b>payment_link.paid</b></div>
+  </div><div class="m-f" style="border-top:1px solid var(--line)"><div class="spacer"></div><button type="button" class="btn primary" data-save>${icon('check')}Save details</button></div></form>`;
+  const fm = $('#bsF');
+  $$('[data-copy]', fm).forEach(x => x.onclick = () => { navigator.clipboard.writeText(x.dataset.copy); toast('Copied'); });
+  $('[data-save]', fm).onclick = async ev => {
+    const g = n => fm.elements[n].value.trim();
+    const data = {}; ['business_name', 'tagline', 'phone', 'email', 'website', 'upi_id', 'address', 'bank_details', 'quote_prefix', 'invoice_prefix', 'quote_terms', 'invoice_terms', 'footer_note', 'google_review_url'].forEach(k => data[k] = g(k));
+    ['quote_valid_days', 'invoice_due_days', 'review_after_days'].forEach(k => data[k] = +g(k));
+    const errs = { business_name: !data.business_name, email: data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email),
+      website: data.website && !/^https?:\/\//.test(data.website), google_review_url: data.google_review_url && !/^https?:\/\//.test(data.google_review_url),
+      quote_prefix: !/^[A-Za-z0-9-]+$/.test(data.quote_prefix), invoice_prefix: !/^[A-Za-z0-9-]+$/.test(data.invoice_prefix) };
+    Object.keys(errs).forEach(k => { if (!errs[k]) delete errs[k]; });
+    if (!markErrors(fm, errs)) return toast('Please fix the highlighted fields', 'err');
+    ev.currentTarget.disabled = true;
+    try { const r = await API.billSaveSettings(data); state.bill.settings = r.item; toast('Billing details saved'); paintBillingDetails(); }
+    finally { if ($('[data-save]', fm)) $('[data-save]', fm).disabled = false; }
+  };
+}
+
+/* =====================================================================
+   MONEY: income & profit
+   ===================================================================== */
+function moneyRange(p) {
+  const t = new Date(istDate() + 'T12:00:00+05:30'), y = t.getFullYear(), m = t.getMonth();
+  const d = (Y, M, D) => istDate(new Date(Y, M, D, 12));
+  if (p === 'last') return [d(y, m - 1, 1), d(y, m, 0)];
+  if (p === 'quarter') { const q = Math.floor(m / 3) * 3; return [d(y, q, 1), istDate(t)]; }
+  if (p === 'fy') { const fy = m >= 3 ? y : y - 1; return [d(fy, 3, 1), istDate(t)]; }
+  if (p === 'year') return [d(y, 0, 1), istDate(t)];
+  return [d(y, m, 1), istDate(t)];
+}
+async function renderMoney() {
+  const M = state.money;
+  if (!M.from) [M.from, M.to] = moneyRange(M.period);
+  $('#content').innerHTML = M.data ? $('#content').innerHTML : '<div class="empty">Loading…</div>';
+  try { [M.data, M.expenses] = await Promise.all([API.money(M.from, M.to), API.expenses()]); }
+  catch (err) { if (currentPage() === 'money') v4Blocked($('#content'), err, () => renderMoney()); return; }
+  if (currentPage() !== 'money') return;
+  const r = M.data, maxM = Math.max(1, ...r.months.map(x => Math.max(x.income, x.expenses)));
+  const exp = M.expenses.filter(e => e.spent_on >= M.from && e.spent_on <= M.to);
+  const maxC = Math.max(1, ...r.by_category.map(x => x.amount)), maxT = Math.max(1, ...r.top_clients.map(x => x.amount));
+  $('#content').innerHTML = `<div class="view">
+    <div class="toolbar"><div class="chips">${[['month', 'This month'], ['last', 'Last month'], ['quarter', 'This quarter'], ['fy', 'This financial year'], ['year', 'This year'], ['custom', 'Custom']].map(([k, l]) => `<button class="chip ${M.period === k ? 'on' : ''}" data-mp="${k}">${l}</button>`).join('')}</div>
+      ${M.period === 'custom' ? `<input class="inp" type="date" id="mFrom" value="${M.from}" style="width:auto"><input class="inp" type="date" id="mTo" value="${M.to}" style="width:auto">` : ''}
+      <div class="spacer"></div><span class="muted" style="font-size:12px">${fmtDay(M.from)} – ${fmtDay(M.to)}</span></div>
+    <div class="kpis">
+      ${kpi('rupee', 'var(--ok)', 'var(--ok-soft)', inr(r.income), 'Money received', `${r.payments} payments`, 'var(--muted)')}
+      ${kpi('receipt', 'var(--danger)', 'var(--danger-soft)', inr(r.expenses), 'Expenses', '', '')}
+      ${kpi('trophy', r.profit >= 0 ? 'var(--brand)' : 'var(--danger)', 'var(--brand-soft)', inr(r.profit), 'Profit', r.margin !== null ? r.margin + '% margin' : '', 'var(--muted)')}
+      ${kpi('clock', 'var(--warn)', 'var(--warn-soft)', inr(r.outstanding), 'Still to collect', r.overdue ? `${inr(r.overdue)} overdue` : `${r.outstanding_count} invoices`, r.overdue ? 'var(--danger)' : 'var(--muted)')}
+    </div>
+    <div class="dash-grid">
+      <div class="card"><div class="card-h"><h3>Last 12 months</h3><div class="spacer"></div><span class="legend-i"><i style="background:var(--ok)"></i>Income</span><span class="legend-i"><i style="background:var(--danger)"></i>Expenses</span></div>
+        <div class="card-b"><div class="bars2">${r.months.map(x => `<div class="col" title="${x.month}: income ${inr(x.income)}, expenses ${inr(x.expenses)}"><div class="pair"><div class="b in" style="height:${Math.max(2, x.income / maxM * 100)}%"></div><div class="b out" style="height:${Math.max(2, x.expenses / maxM * 100)}%"></div></div><small>${new Date(x.month + '-15').toLocaleDateString('en-IN', { month: 'short' })}</small></div>`).join('')}</div></div></div>
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        <div class="card"><div class="card-h"><h3>Pipeline</h3></div><div class="card-b"><div class="mini-stats">
+          <div><b>${inr(r.quoted)}</b><small>${r.quoted_count} quotes waiting</small></div>
+          <div><b>${r.quote_win !== null ? r.quote_win + '%' : '–'}</b><small>Quotes accepted</small></div>
+          <div><b>${inr(r.subs_month)}</b><small>Subscriptions / month</small></div>
+          <div><b>${r.overdue_count}</b><small>Overdue invoices</small></div></div></div></div>
+        <div class="card"><div class="card-h"><h3>Top clients</h3></div><div class="card-b">${r.top_clients.map(c => `<div class="hbar"><div class="t"><span class="${taCls(c.name)}">${esc(c.name)}</span><b>${inr(c.amount)}</b></div><div class="track"><div class="fill" style="width:${c.amount / maxT * 100}%"></div></div></div>`).join('') || '<p class="muted">No payments in this period.</p>'}</div></div>
+      </div>
+    </div>
+    <div class="dash-grid">
+      <div class="card"><div class="card-h"><h3>Expenses</h3><div class="spacer"></div><button class="btn sm primary" id="exAdd">${icon('plus')}Add expense</button></div>
+        ${exp.length ? `<div class="table-wrap"><table class="tbl"><thead><tr><th>Date</th><th>What</th><th>Category</th><th style="text-align:right">Amount</th><th></th></tr></thead><tbody>
+        ${exp.map(e => `<tr data-ex="${e.id}"><td class="nm" style="white-space:nowrap"><b>${fmtDay(e.spent_on)}</b></td><td><span class="${taCls(e.description)}">${esc(e.description || '—')}</span></td><td class="c-hide">${EXP_CAT[e.category]}</td><td class="c-status" style="text-align:right"><b>${inr(e.amount)}</b></td>
+          <td class="c-acts"><div class="acts"><button class="btn sm icon ghost" data-exdel="${e.id}" title="Delete">${icon('trash')}</button></div></td></tr>`).join('')}</tbody></table></div>`
+        : `<div class="empty">${icon('receipt')}<b>No expenses in this period</b>Add hosting, ads, tools, freelancer payments… to see your real profit.</div>`}</div>
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        <div class="card"><div class="card-h"><h3>Spent on</h3></div><div class="card-b">${r.by_category.map(c => `<div class="hbar"><div class="t"><span>${EXP_CAT[c.name] || c.name}</span><b>${inr(c.amount)}</b></div><div class="track"><div class="fill" style="width:${c.amount / maxC * 100}%;background:var(--danger)"></div></div></div>`).join('') || '<p class="muted">No expenses yet.</p>'}</div></div>
+        <div class="card"><div class="card-h"><h3>Unpaid invoices</h3></div><ul class="pay-list" style="padding:8px 18px">${r.unpaid.map(u => `<li data-udoc="${u.id}" style="cursor:pointer"><div><b>${esc(u.client_name)}</b><small>${esc(u.number)}${u.due_date ? ' · due ' + fmtDay(u.due_date) : ''}${u.due_date && u.due_date < istDate() ? ' · <span style="color:var(--danger)">overdue</span>' : ''}</small></div><b>${inr(u.balance)}</b></li>`).join('') || '<li class="muted">All invoices are paid 🎉</li>'}</ul></div>
+      </div>
+    </div></div>`;
+  $$('[data-mp]').forEach(x => x.onclick = () => { M.period = x.dataset.mp; if (M.period !== 'custom') [M.from, M.to] = moneyRange(M.period); renderMoney(); });
+  if ($('#mFrom')) ['#mFrom', '#mTo'].forEach(id => $(id).onchange = () => { M.from = $('#mFrom').value; M.to = $('#mTo').value; if (M.from && M.to) renderMoney(); });
+  $('#exAdd').onclick = () => expenseForm();
+  $$('tr[data-ex]').forEach(tr => tr.onclick = () => expenseForm(M.expenses.find(e => e.id === +tr.dataset.ex)));
+  $$('[data-exdel]').forEach(x => x.onclick = async ev => {
+    ev.stopPropagation();
+    if (!await confirmBox({ title: 'Delete this expense?', text: 'This cannot be undone.' })) return;
+    await API.expenseDelete(+x.dataset.exdel); toast('Expense deleted'); renderMoney();
+  });
+  $$('[data-udoc]').forEach(li => li.onclick = async () => { state.bill.tab = 'invoice'; location.hash = '#/billing'; await loadBilling(); openDoc(+li.dataset.udoc); });
+}
+function expenseForm(e = null) {
+  const v = e || { spent_on: istDate(), category: 'hosting', description: '', amount: '' };
+  openModal(`${modalHead(e ? 'Edit expense' : 'Add expense')}
+    <form class="m-b" id="exF" novalidate><div class="grid2">
+      ${fld('amount', 'Amount (₹)', `<input class="inp" name="amount" type="number" min="1" step="any" value="${v.amount}">`, true, 'Enter the amount.')}
+      ${fld('spent_on', 'Date', `<input class="inp" type="date" name="spent_on" value="${v.spent_on}">`, true, 'Pick a date.')}
+      ${fld('category', 'Category', sel('category', EXP_CAT, v.category))}
+      ${fld('description', 'What for', `<input class="inp" name="description" maxlength="300" value="${esc(v.description)}" placeholder="e.g. Render hosting, Meta ads">`)}
+    </div></form>
+    <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-save>${icon('check')}Save</button></div>`);
+  bindClose();
+  const fm = $('#exF');
+  $('[data-save]', modal).onclick = async ev => {
+    const data = { amount: +fm.elements.amount.value, spent_on: fm.elements.spent_on.value, category: fm.elements.category.value, description: fm.elements.description.value.trim() };
+    if (!markErrors(fm, { amount: !(data.amount > 0), spent_on: !data.spent_on })) return;
+    ev.currentTarget.disabled = true;
+    try { e ? await API.expenseUpdate(e.id, data) : await API.expenseCreate(data); closeModal(); toast('Expense saved'); renderMoney(); }
+    finally { ev.currentTarget.disabled = false; }
+  };
+}
+
+/* =====================================================================
+   YOUR SUBSCRIPTIONS
+   ===================================================================== */
+async function renderSubs() {
+  const S = state.subs;
+  if (!S.items) {
+    $('#content').innerHTML = '<div class="empty">Loading…</div>';
+    try { S.items = await API.subs(); } catch (err) { if (currentPage() === 'subs') v4Blocked($('#content'), err, () => renderSubs()); return; }
+    if (currentPage() !== 'subs') return;
+  }
+  const items = S.items.slice().sort((a, b) => (b.is_active - a.is_active) || ((a.renews_on || '9999') > (b.renews_on || '9999') ? 1 : -1));
+  const month = items.filter(s => s.is_active).reduce((a, s) => a + (s.cycle === 'monthly' ? s.cost_inr : s.cycle === 'yearly' ? s.cost_inr / 12 : 0), 0);
+  const soon = items.filter(s => s.is_active && s.renews_on && daysLeft(s.renews_on) <= 7).length;
+  const probs = items.filter(s => s.is_active && s.last_problem).length;
+  $('#content').innerHTML = `<div class="view">
+    <div class="notice info">${icon('wa')}<span>Every day at <b>12 PM</b> the WhatsApp bot reminds you about anything renewing in the next <b>7 days</b>, until you tap <b>Renewed</b> here (or tell the bot “Render renewed”). Domain, SSL, Meta token and OpenAI credits are also checked automatically every day.</span></div>
+    <div class="kpis">
+      ${kpi('refresh', 'var(--brand)', 'var(--brand-soft)', items.filter(s => s.is_active).length, 'Active subscriptions', '', '')}
+      ${kpi('clock', soon ? 'var(--danger)' : 'var(--ok)', soon ? 'var(--danger-soft)' : 'var(--ok-soft)', soon, 'Renewing within 7 days', '', '')}
+      ${kpi('rupee', 'var(--brand2)', 'color-mix(in srgb,var(--brand2) 12%,transparent)', inr(Math.round(month)), 'Cost per month', inr(Math.round(month * 12)) + ' / year', 'var(--muted)')}
+      ${kpi('alert', probs ? 'var(--danger)' : 'var(--ok)', probs ? 'var(--danger-soft)' : 'var(--ok-soft)', probs, 'Problems found', probs ? 'See below' : 'All good', probs ? 'var(--danger)' : 'var(--ok)')}
+    </div>
+    <div class="toolbar"><div class="spacer"></div><button class="btn primary" id="sbAdd">${icon('plus')}Add subscription</button></div>
+    <div class="cl-grid">${items.map(s => {
+      const d = s.renews_on ? daysLeft(s.renews_on) : null;
+      const cls = !s.is_active ? 'b-soft' : d === null ? 'b-soft' : d < 0 ? 'days-red' : d <= 7 ? 'days-red' : d <= 30 ? 'days-amber' : 'days-ok';
+      const txt = !s.is_active ? 'Not tracked' : d === null ? (s.check_kind !== 'none' ? 'Checked automatically' : 'No date') : d < 0 ? `${-d} day${d === -1 ? '' : 's'} overdue` : d === 0 ? 'Renews today' : `in ${d} day${d === 1 ? '' : 's'}`;
+      return `<div class="card cp ${s.is_active ? '' : 'off'}">
+        <div class="cp-h"><div class="t"><b>${esc(s.name)}</b><small>${SUB_CYCLE[s.cycle]}${s.auto_renew ? ' · auto-pay' : ''}${s.cost_inr ? ' · ' + inr(s.cost_inr) : s.amount_text ? ' · ' + esc(s.amount_text) : ''}</small></div>
+          <span class="badge plain ${cls}">${txt}</span></div>
+        ${s.renews_on ? `<div class="nums"><span>${icon('cal')}${fmtDay(s.renews_on)}</span></div>` : ''}
+        ${s.last_problem ? `<div class="note" style="color:var(--danger)">${icon('alert')} ${esc(s.last_problem)}</div>` : s.last_check_note ? `<div class="note">${esc(s.last_check_note)}</div>` : ''}
+        <div class="acts">
+          ${s.is_active && s.renews_on && s.cycle !== 'none' ? `<button class="btn sm primary" data-sbr="${s.id}">${icon('check')}Renewed</button>` : ''}
+          <button class="btn sm" data-sbe="${s.id}">${icon('edit')}Edit</button>
+          <button class="btn sm icon ghost" data-sbd="${s.id}" title="Delete" aria-label="Delete" style="margin-left:auto">${icon('trash')}</button>
+        </div></div>`; }).join('') || `<div class="card"><div class="empty">${icon('refresh')}<b>No subscriptions yet</b>Add Render, your domain, OpenAI …</div></div>`}</div></div>`;
+  const find = id => S.items.find(x => x.id === +id);
+  $('#sbAdd').onclick = () => subForm();
+  $$('[data-sbe]').forEach(x => x.onclick = () => subForm(find(x.dataset.sbe)));
+  $$('[data-sbr]').forEach(x => x.onclick = async () => {
+    const s = find(x.dataset.sbr); x.disabled = true;
+    Object.assign(s, await API.subRenewed(s.id)); toast(`${s.name}: next renewal ${fmtDay(s.renews_on)}`); renderSubs();
+  });
+  $$('[data-sbd]').forEach(x => x.onclick = async () => {
+    const s = find(x.dataset.sbd);
+    if (!await confirmBox({ title: `Delete ${esc(s.name)}?`, text: 'The bot stops reminding you about it.' })) return;
+    await API.subDelete(s.id); S.items = S.items.filter(y => y.id !== s.id); toast('Deleted'); renderSubs();
+  });
+}
+function subForm(s = null) {
+  const v = s || { name: '', renews_on: '', cycle: 'monthly', auto_renew: false, check_kind: 'none', check_target: '', amount_text: '', cost_inr: 0, notes: '', is_active: true };
+  openModal(`${modalHead(s ? 'Edit subscription' : 'Add subscription')}
+    <form class="m-b" id="sbF" novalidate>
+      <div class="grid2">
+        ${fld('name', 'Name', `<input class="inp" name="name" maxlength="120" value="${esc(v.name)}" placeholder="e.g. Render (website + bot)">`, true, 'Name is required.')}
+        ${fld('renews_on', 'Next renewal / expiry date', `<input class="inp" type="date" name="renews_on" value="${esc(v.renews_on)}">`)}
+        ${fld('cycle', 'Renews', sel('cycle', SUB_CYCLE, v.cycle))}
+        ${fld('cost_inr', 'Cost each time (₹, for the profit report)', `<input class="inp" type="number" min="0" step="any" name="cost_inr" value="${v.cost_inr || ''}">`)}
+        ${fld('check_kind', 'Automatic check', sel('check_kind', SUB_CHECK, v.check_kind))}
+        ${fld('check_target', 'Domain name(s) to check', `<input class="inp" name="check_target" maxlength="300" value="${esc(v.check_target)}" placeholder="e.g. ajtechnologiesltd.com">`)}
+      </div>
+      <div style="margin-top:14px">${fld('notes', 'Notes', `<textarea class="inp" name="notes" maxlength="2000" style="min-height:60px">${esc(v.notes)}</textarea>`)}</div>
+      <label class="switch" style="margin-top:14px"><div><b>Paid automatically</b><small>Your card is charged on the date</small></div><input type="checkbox" name="auto_renew" ${v.auto_renew ? 'checked' : ''}><span class="tgl"></span></label>
+      <label class="switch" style="margin-top:10px"><div><b>Remind me</b><small>Off = not tracked any more</small></div><input type="checkbox" name="is_active" ${v.is_active ? 'checked' : ''}><span class="tgl"></span></label>
+    </form>
+    <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-save>${icon('check')}Save</button></div>`);
+  bindClose();
+  const fm = $('#sbF');
+  $('[data-save]', modal).onclick = async ev => {
+    const g = n => fm.elements[n].value.trim();
+    const data = { name: g('name'), renews_on: g('renews_on'), cycle: g('cycle'), cost_inr: +g('cost_inr') || 0, check_kind: g('check_kind'),
+      check_target: g('check_target'), notes: g('notes'), auto_renew: fm.elements.auto_renew.checked, is_active: fm.elements.is_active.checked };
+    if (!markErrors(fm, { name: !data.name })) return;
+    ev.currentTarget.disabled = true;
+    try {
+      const item = s ? await API.subUpdate(s.id, data) : await API.subCreate(data);
+      if (s) Object.assign(s, item); else state.subs.items.push(item);
+      closeModal(); toast('Saved'); renderSubs();
+    } finally { ev.currentTarget.disabled = false; }
+  };
+}
+
+/* =====================================================================
+   BLOG
+   ===================================================================== */
+const slugify = s => String(s || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 120);
+async function renderBlog() {
+  const B = state.blog;
+  if (!B.items) {
+    $('#content').innerHTML = '<div class="empty">Loading…</div>';
+    try { const r = await API.blog(); B.items = r.items; B.site = r.site; }
+    catch (err) { if (currentPage() === 'blog') v4Blocked($('#content'), err, () => renderBlog()); return; }
+    if (currentPage() !== 'blog') return;
+  }
+  $('#content').innerHTML = `<div class="view">
+    <div class="notice info">${icon('globe')}<span>Posts appear at <a href="${esc(B.site)}/blog/" target="_blank" rel="noopener">${esc(B.site.replace('https://', ''))}/blog/</a> in English and Tamil, and are added to Google's sitemap automatically. Regular, helpful posts bring visitors from Google.</span></div>
+    <div class="toolbar"><div class="spacer"></div><button class="btn primary" id="blAdd">${icon('plus')}New post</button></div>
+    <div class="cl-grid">${B.items.map(p => `<div class="card cp ${p.is_published ? '' : 'off'}">
+      <div class="cp-h"><div class="t"><b>${esc(p.title_en)}</b><small class="ta">${esc(p.title_ta || 'No Tamil title yet')}</small></div>
+        <span class="badge ${p.is_published ? 'b-won' : 'b-soft'}">${p.is_published ? 'Published' : 'Draft'}</span></div>
+      <div class="note">${esc(p.excerpt_en || '').slice(0, 160)}</div>
+      <div class="nums">${p.tags.map(t => `<span>#${esc(t)}</span>`).join('')}${p.published_at ? `<span>${icon('cal')}${fmtDate(p.published_at, false)}</span>` : ''}</div>
+      <div class="acts">
+        <button class="btn sm" data-ble="${p.id}">${icon('edit')}Edit</button>
+        ${p.is_published ? `<a class="btn sm ghost" href="${esc(B.site)}/blog/${esc(p.slug)}/" target="_blank" rel="noopener">${icon('ext')}View</a>` : ''}
+        <button class="btn sm icon ghost" data-bld="${p.id}" title="Delete" aria-label="Delete" style="margin-left:auto">${icon('trash')}</button>
+      </div></div>`).join('') || `<div class="card"><div class="empty">${icon('edit')}<b>No posts yet</b>Write your first post.</div></div>`}</div></div>`;
+  $('#blAdd').onclick = () => blogForm();
+  $$('[data-ble]').forEach(x => x.onclick = () => blogForm(B.items.find(p => p.id === +x.dataset.ble)));
+  $$('[data-bld]').forEach(x => x.onclick = async () => {
+    const p = B.items.find(y => y.id === +x.dataset.bld);
+    if (!await confirmBox({ title: 'Delete this post?', text: `<b>${esc(p.title_en)}</b> is removed from the website.` })) return;
+    await API.blogDelete(p.id); B.items = B.items.filter(y => y.id !== p.id); toast('Post deleted'); renderBlog();
+  });
+}
+function blogForm(p = null) {
+  const v = p || { slug: '', title_en: '', title_ta: '', excerpt_en: '', excerpt_ta: '', body_en: '', body_ta: '', cover_image_path: '', tags: [], is_published: false };
+  let lang = 'en', slugTouched = !!p;
+  openModal(`${modalHead(p ? 'Edit post' : 'New post')}
+    <form class="m-b" id="blF" novalidate>
+      <div class="seg" id="blLang" style="margin-bottom:14px"><button type="button" data-l="en" class="on">English</button><button type="button" data-l="ta">தமிழ்</button></div>
+      ${['en', 'ta'].map(L => `<div data-pane="${L}" ${L === 'ta' ? 'hidden' : ''}>
+        ${fld('title_' + L, L === 'en' ? 'Title' : 'Title (Tamil)', `<input class="inp ${L === 'ta' ? 'ta' : ''}" name="title_${L}" maxlength="${L === 'en' ? 200 : 300}" value="${esc(v['title_' + L])}">`, L === 'en', 'Title is required.')}
+        <div style="margin-top:14px">${fld('excerpt_' + L, 'Short summary (shown in the list and on Google)', `<textarea class="inp ${L === 'ta' ? 'ta' : ''}" name="excerpt_${L}" maxlength="${L === 'en' ? 400 : 600}" style="min-height:56px">${esc(v['excerpt_' + L])}</textarea>`)}</div>
+        <div style="margin-top:14px">${fld('body_' + L, 'Post', `<textarea class="inp mono-ish ${L === 'ta' ? 'ta' : ''}" name="body_${L}" style="min-height:280px">${esc(v['body_' + L])}</textarea>`)}</div>
+      </div>`).join('')}
+      <p class="muted" style="font-size:12px;margin:6px 0 0">Formatting: <code>## Heading</code> · <code>- bullet</code> · <code>**bold**</code> · <code>[link text](https://…)</code> · empty line = new paragraph. Empty Tamil = the English post is shown.</p>
+      <div class="grid2" style="margin-top:14px">
+        ${fld('slug', 'Link', `<div style="display:flex;align-items:center;gap:6px"><span class="muted" style="font-size:12px;white-space:nowrap">/blog/</span><input class="inp" name="slug" maxlength="120" value="${esc(v.slug)}"></div>`, true, 'Letters, numbers and - only.')}
+        ${fld('tags', 'Tags (comma separated)', `<input class="inp" name="tags" value="${esc(v.tags.join(', '))}" placeholder="Websites, SEO">`)}
+      </div>
+      <div style="margin-top:14px">${fld('cover_image_path', 'Cover image (optional)', `<div style="display:flex;gap:8px"><input class="inp" name="cover_image_path" maxlength="500" value="${esc(v.cover_image_path)}" placeholder="Pick from your images or paste a link"><button type="button" class="btn" id="blImg">${icon('image')}Pick</button></div>`)}</div>
+      <label class="switch" style="margin-top:14px"><div><b>Published</b><small>Visible on the website</small></div><input type="checkbox" name="is_published" ${v.is_published ? 'checked' : ''}><span class="tgl"></span></label>
+    </form>
+    <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-save>${icon('check')}${p ? 'Save' : 'Create post'}</button></div>`, 'lg');
+  bindClose();
+  const fm = $('#blF');
+  $$('#blLang [data-l]').forEach(b => b.onclick = () => { lang = b.dataset.l; $$('#blLang [data-l]').forEach(x => x.classList.toggle('on', x === b)); $$('[data-pane]', fm).forEach(x => x.hidden = x.dataset.pane !== lang); });
+  fm.elements.slug.oninput = () => { slugTouched = true; };
+  fm.elements.title_en.oninput = () => { if (!slugTouched) fm.elements.slug.value = slugify(fm.elements.title_en.value); };
+  $('#blImg').onclick = () => imagePicker(path => { fm.elements.cover_image_path.value = path; });
+  $('[data-save]', modal).onclick = async ev => {
+    const g = n => fm.elements[n].value.trim();
+    const data = { title_en: g('title_en'), title_ta: g('title_ta'), excerpt_en: g('excerpt_en'), excerpt_ta: g('excerpt_ta'), body_en: fm.elements.body_en.value,
+      body_ta: fm.elements.body_ta.value, slug: slugify(g('slug') || g('title_en')), tags: g('tags').split(',').map(s => s.trim()).filter(Boolean),
+      cover_image_path: g('cover_image_path'), is_published: fm.elements.is_published.checked };
+    if (!markErrors(fm, { title_en: !data.title_en, slug: !data.slug })) {
+      if (!data.title_en) $('#blLang [data-l=en]').click();
+      return toast('Please fix the highlighted fields', 'err');
+    }
+    ev.currentTarget.disabled = true;
+    try {
+      const item = p ? await API.blogUpdate(p.id, data) : await API.blogCreate(data);
+      if (p) Object.assign(p, item); else state.blog.items.unshift(item);
+      closeModal(); toast(item.is_published ? 'Post saved and live' : 'Draft saved'); renderBlog();
+    } finally { ev.currentTarget.disabled = false; }
+  };
+}
+
+/* =====================================================================
+   Case study (portfolio projects) + Google review requests (client projects)
+   ===================================================================== */
+function caseForm(p) {
+  const c = state.v4.extras.cases[p.id] || {};
+  const v = { slug: c.slug || slugify(p.title_en), case_study: !!c.case_study, challenge_en: c.challenge_en || '', challenge_ta: c.challenge_ta || '', solution_en: c.solution_en || '',
+    solution_ta: c.solution_ta || '', results_en: c.results_en || '', results_ta: c.results_ta || '', tech_used: c.tech_used || [], duration_text: c.duration_text || '' };
+  const site = (state.blog.site || 'https://ajtechnologiesltd.com');
+  openModal(`${modalHead(`Case study · ${esc(p.title_en)}`)}
+    <form class="m-b" id="csF" novalidate>
+      <label class="switch" style="margin-bottom:14px"><div><b>Show the case study page</b><small>${esc(site.replace('https://', ''))}/portfolio/<span id="csSlugV">${esc(v.slug)}</span>/ · the project card links to it</small></div><input type="checkbox" name="case_study" ${v.case_study ? 'checked' : ''}><span class="tgl"></span></label>
+      <div class="grid2">
+        ${fld('slug', 'Link', `<input class="inp" name="slug" maxlength="120" value="${esc(v.slug)}">`, true, 'Letters, numbers and - only.')}
+        ${fld('duration_text', 'Time taken', `<input class="inp" name="duration_text" maxlength="60" value="${esc(v.duration_text)}" placeholder="e.g. 3 weeks">`)}
+      </div>
+      <div style="margin-top:14px">${fld('tech_used', 'Built with (comma separated)', `<input class="inp" name="tech_used" value="${esc(v.tech_used.join(', '))}" placeholder="Django, Razorpay, WhatsApp">`)}</div>
+      ${[['challenge', 'The challenge (what the client needed)'], ['solution', 'What we built'], ['results', 'Results (numbers if you have them)']].map(([k, l]) => `
+        <div class="grid2" style="margin-top:14px">
+          ${fld(k + '_en', l, `<textarea class="inp" name="${k}_en" maxlength="4000" style="min-height:80px">${esc(v[k + '_en'])}</textarea>`)}
+          ${fld(k + '_ta', l + ' · தமிழ்', `<textarea class="inp ta" name="${k}_ta" maxlength="6000" style="min-height:80px">${esc(v[k + '_ta'])}</textarea>`)}
+        </div>`).join('')}
+      <p class="muted" style="font-size:12px;margin:10px 0 0">The page also shows the project photo, tags, the live link and a review linked to this project (Reviews → link to project).</p>
+    </form>
+    <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-save>${icon('check')}Save case study</button></div>`, 'lg');
+  bindClose();
+  const fm = $('#csF');
+  fm.elements.slug.oninput = () => { $('#csSlugV').textContent = slugify(fm.elements.slug.value); };
+  $('[data-save]', modal).onclick = async ev => {
+    const g = n => fm.elements[n].value.trim();
+    const data = { case_study: fm.elements.case_study.checked, slug: slugify(g('slug')), duration_text: g('duration_text'),
+      tech_used: g('tech_used').split(',').map(s => s.trim()).filter(Boolean) };
+    ['challenge', 'solution', 'results'].forEach(k => { data[k + '_en'] = g(k + '_en'); data[k + '_ta'] = g(k + '_ta'); });
+    if (!markErrors(fm, { slug: !data.slug })) return;
+    if (data.case_study && !data.challenge_en && !data.solution_en) return toast('Write at least the challenge or what we built', 'err');
+    ev.currentTarget.disabled = true;
+    try {
+      const r = await API.projectCase(p.id, data);
+      state.v4.extras.cases[p.id] = { ...v, ...data, ...(r.values || {}) };
+      closeModal(); toast(data.case_study ? 'Case study is live' : 'Case study saved (hidden)'); renderProjects();
+    } finally { ev.currentTarget.disabled = false; }
+  };
+}
+async function askGoogleReview(p) {
+  const ok = await confirmBox({ title: `Ask ${esc(p.client_name)} for a Google review?`, danger: false, ok: 'Ask now',
+    text: `Within a minute the bot asks “How happy are you with <b>${esc(p.title)}</b>?” with 3 buttons. Happy clients get your Google review link; if they are not happy, only you are told.` });
+  if (!ok) return;
+  await API.askReview(p.id, { ask_now: true });
+  const r = state.v4.extras.reviews[p.id] || {}; r.review_requested_at = null; r.ask_review = true; state.v4.extras.reviews[p.id] = r;
+  toast('The bot will ask within a minute');
+}
+function reviewLine(p) {
+  const r = state.v4.extras.reviews[p.id]; if (!r) return '';
+  if (r.review_rating) return `<span title="Client's answer">${icon('star')}${r.review_rating >= 5 ? 'Excellent' : r.review_rating >= 4 ? 'Good' : 'Not happy'}</span>`;
+  if (r.review_requested_at) return `<span>${icon('star')}Review asked ${fmtDate(r.review_requested_at, false)}</span>`;
+  if (['live', 'support'].includes(p.stage) && r.ask_review && r.went_live_at) return `<span>${icon('star')}Review request in ${Math.max(0, (state.v4.extras.review_after_days || 3) - Math.floor((Date.now() - new Date(r.went_live_at)) / 864e5))} day(s)</span>`;
+  return '';
+}
+
 {% endverbatim %}
 /* =====================================================================
    SETTINGS
@@ -2973,6 +3840,11 @@ function renderSettings() {
 
     <div class="card"><div class="card-h"><h3>WhatsApp bot</h3><div class="spacer"></div><span class="badge b-soft plain" id="waStBadge">Checking…</span></div>
       <div class="card-b" id="waStBody"><p class="muted">Checking…</p></div></div>
+
+    <div class="card"><div class="card-h"><h3>Billing, payments & reviews</h3></div><div class="card-b">
+      <p class="muted" style="font-size:12.5px;margin:0 0 12px">Your business details on quotations and invoices, UPI and bank details, number prefixes, default terms, the Google review link and the Razorpay webhook URL.</p>
+      <a class="btn" href="#/billing" onclick="state.bill.tab='details'">${icon('settings')}Open billing details</a>
+    </div></div>
 
     <div class="card"><div class="card-h"><h3>Data & appearance</h3></div><div class="card-b">
       <label class="switch" style="margin-bottom:10px"><div><b>Dark mode</b><small>Remembered on this device</small></div><input type="checkbox" id="setDark" ${document.documentElement.dataset.theme === 'dark' ? 'checked' : ''}><span class="tgl"></span></label>

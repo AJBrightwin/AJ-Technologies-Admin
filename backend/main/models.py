@@ -498,3 +498,229 @@ class BotUnanswered(models.Model):
     def to_dict(self):
         return {'id': self.pk, 'wa_id': self.wa_id, 'question': self.question, 'status': self.status,
                 'created_at': _iso(self.created_at)}
+
+# ===========================================================================
+# Upgrade v4 (tables from supabase_upgrade_v4.sql)
+# ===========================================================================
+def _num(value):
+    return float(value or 0)
+
+
+class BusinessSettings(models.Model):
+    """One row (id = 1): your billing details, shown on every quotation / invoice PDF."""
+
+    id = models.SmallIntegerField(primary_key=True, default=1)
+    business_name = models.CharField(max_length=160, default='AJ Technologies')
+    tagline = models.CharField(max_length=160, blank=True, default='')
+    address = models.TextField(blank=True, default='')
+    phone = models.CharField(max_length=40, blank=True, default='')
+    email = models.CharField(max_length=254, blank=True, default='')
+    website = models.CharField(max_length=200, blank=True, default='')
+    upi_id = models.CharField(max_length=100, blank=True, default='')
+    bank_details = models.TextField(blank=True, default='')
+    quote_prefix = models.CharField(max_length=12, default='AJQ')
+    invoice_prefix = models.CharField(max_length=12, default='AJINV')
+    quote_valid_days = models.SmallIntegerField(default=15)
+    invoice_due_days = models.SmallIntegerField(default=7)
+    quote_terms = models.TextField(blank=True, default='')
+    invoice_terms = models.TextField(blank=True, default='')
+    footer_note = models.CharField(max_length=300, blank=True, default='')
+    google_review_url = models.CharField(max_length=500, blank=True, default='')
+    review_after_days = models.SmallIntegerField(default=3)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = 'business_settings'
+
+    FIELDS = ('business_name', 'tagline', 'address', 'phone', 'email', 'website', 'upi_id', 'bank_details',
+              'quote_prefix', 'invoice_prefix', 'quote_valid_days', 'invoice_due_days', 'quote_terms', 'invoice_terms',
+              'footer_note', 'google_review_url', 'review_after_days')
+
+    @classmethod
+    def load(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
+
+    def to_dict(self):
+        return {f: getattr(self, f) for f in self.FIELDS}
+
+
+class BillingDocument(models.Model):
+    """A quotation or an invoice."""
+
+    TYPES = ('quote', 'invoice')
+    STATUSES = ('draft', 'sent', 'accepted', 'rejected', 'expired', 'partly_paid', 'paid', 'cancelled')
+
+    id = models.BigAutoField(primary_key=True)
+    doc_type = models.CharField(max_length=8)
+    number = models.CharField(max_length=40, unique=True)
+    enquiry_id = models.BigIntegerField(null=True, blank=True)
+    project_id = models.BigIntegerField(null=True, blank=True)
+    converted_from = models.BigIntegerField(null=True, blank=True)
+    client_name = models.CharField(max_length=120)
+    business_name = models.CharField(max_length=160, blank=True, default='')
+    client_wa_id = models.CharField(max_length=20, blank=True, default='')
+    client_email = models.CharField(max_length=254, blank=True, default='')
+    client_address = models.TextField(blank=True, default='')
+    title = models.CharField(max_length=200, blank=True, default='')
+    issue_date = models.DateField(default=date.today)
+    due_date = models.DateField(null=True, blank=True)
+    items = models.JSONField(default=list, blank=True)
+    discount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    amount_paid = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    status = models.CharField(max_length=12, default='draft')
+    notes = models.TextField(blank=True, default='')
+    terms = models.TextField(blank=True, default='')
+    private_notes = models.TextField(blank=True, default='')
+    razorpay_link_id = models.CharField(max_length=60, blank=True, default='')
+    razorpay_link_url = models.CharField(max_length=300, blank=True, default='')
+    razorpay_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    sent_at = models.DateTimeField(null=True, blank=True)
+    accepted_at = models.DateTimeField(null=True, blank=True)
+    paid_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = 'billing_documents'
+        ordering = ['-created_at']
+
+    @property
+    def subtotal(self):
+        from decimal import Decimal
+        return sum((Decimal(str(i.get('qty') or 0)) * Decimal(str(i.get('rate') or 0)) for i in self.items or []),
+                   Decimal(0))
+
+    @property
+    def balance(self):
+        return max(self.total - self.amount_paid, 0)
+
+    def to_dict(self):
+        return {
+            'id': self.pk, 'doc_type': self.doc_type, 'number': self.number, 'enquiry_id': self.enquiry_id,
+            'project_id': self.project_id, 'converted_from': self.converted_from, 'client_name': self.client_name,
+            'business_name': self.business_name, 'client_wa_id': self.client_wa_id, 'client_email': self.client_email,
+            'client_address': self.client_address, 'title': self.title, 'issue_date': self.issue_date.isoformat(),
+            'due_date': self.due_date.isoformat() if self.due_date else '', 'items': list(self.items or []),
+            'discount': _num(self.discount), 'subtotal': _num(self.subtotal), 'total': _num(self.total),
+            'amount_paid': _num(self.amount_paid), 'balance': _num(self.balance), 'status': self.status,
+            'notes': self.notes, 'terms': self.terms, 'private_notes': self.private_notes,
+            'razorpay_link_url': self.razorpay_link_url, 'razorpay_amount': _num(self.razorpay_amount),
+            'sent_at': _iso(self.sent_at), 'accepted_at': _iso(self.accepted_at), 'paid_at': _iso(self.paid_at),
+            'created_at': _iso(self.created_at), 'updated_at': _iso(self.updated_at),
+        }
+
+
+class BillingPayment(models.Model):
+    METHODS = ('razorpay', 'upi', 'bank', 'cash', 'cheque', 'other')
+
+    id = models.BigAutoField(primary_key=True)
+    document_id = models.BigIntegerField(null=True, blank=True)
+    client_name = models.CharField(max_length=120, blank=True, default='')
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    method = models.CharField(max_length=10, default='upi')
+    paid_on = models.DateField(default=date.today)
+    reference = models.CharField(max_length=120, blank=True, default='')
+    notes = models.TextField(blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        managed = False
+        db_table = 'billing_payments'
+        ordering = ['-paid_on', '-id']
+
+    def to_dict(self):
+        return {'id': self.pk, 'document_id': self.document_id, 'client_name': self.client_name,
+                'amount': _num(self.amount), 'method': self.method, 'paid_on': self.paid_on.isoformat(),
+                'reference': self.reference, 'notes': self.notes, 'created_at': _iso(self.created_at)}
+
+
+class BusinessExpense(models.Model):
+    CATEGORIES = ('hosting', 'domain', 'software', 'ads', 'salary', 'freelancer', 'office', 'internet', 'travel', 'other')
+
+    id = models.BigAutoField(primary_key=True)
+    spent_on = models.DateField(default=date.today)
+    category = models.CharField(max_length=20, default='other')
+    description = models.CharField(max_length=300, blank=True, default='')
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    project_id = models.BigIntegerField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        managed = False
+        db_table = 'business_expenses'
+        ordering = ['-spent_on', '-id']
+
+    def to_dict(self):
+        return {'id': self.pk, 'spent_on': self.spent_on.isoformat(), 'category': self.category,
+                'description': self.description, 'amount': _num(self.amount), 'project_id': self.project_id,
+                'created_at': _iso(self.created_at)}
+
+
+class MySubscription(models.Model):
+    """AJ's own services (Render, Supabase, Meta, OpenAI, domain ...). Reminders are sent by the WhatsApp bot."""
+
+    CYCLES = ('monthly', 'yearly', 'none')
+    CHECKS = ('none', 'domain', 'ssl', 'meta_token', 'openai')
+
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=120)
+    renews_on = models.DateField(null=True, blank=True)
+    cycle = models.CharField(max_length=8, default='monthly')
+    auto_renew = models.BooleanField(default=False)
+    check_kind = models.CharField(max_length=12, default='none')
+    check_target = models.CharField(max_length=300, blank=True, default='')
+    amount_text = models.CharField(max_length=60, blank=True, default='')
+    cost_inr = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    notes = models.TextField(blank=True, default='')
+    is_active = models.BooleanField(default=True)
+    last_checked_at = models.DateTimeField(null=True, blank=True)
+    last_check_note = models.CharField(max_length=500, blank=True, default='')
+    last_problem = models.CharField(max_length=500, blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = 'my_subscriptions'
+        ordering = ['renews_on', 'name']
+
+    def to_dict(self):
+        return {'id': self.pk, 'name': self.name, 'renews_on': self.renews_on.isoformat() if self.renews_on else '',
+                'cycle': self.cycle, 'auto_renew': self.auto_renew, 'check_kind': self.check_kind,
+                'check_target': self.check_target, 'amount_text': self.amount_text, 'cost_inr': _num(self.cost_inr),
+                'notes': self.notes, 'is_active': self.is_active, 'last_checked_at': _iso(self.last_checked_at),
+                'last_check_note': self.last_check_note, 'last_problem': self.last_problem,
+                'updated_at': _iso(self.updated_at)}
+
+
+class BlogPost(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    slug = models.CharField(max_length=120, unique=True)
+    title_en = models.CharField(max_length=200)
+    title_ta = models.CharField(max_length=300, blank=True, default='')
+    excerpt_en = models.CharField(max_length=400, blank=True, default='')
+    excerpt_ta = models.CharField(max_length=600, blank=True, default='')
+    body_en = models.TextField(blank=True, default='')
+    body_ta = models.TextField(blank=True, default='')
+    cover_image_path = models.CharField(max_length=500, blank=True, default='')
+    tags = models.JSONField(default=list, blank=True)
+    is_published = models.BooleanField(default=False)
+    published_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = 'blog_posts'
+        ordering = ['-published_at', '-created_at']
+
+    def to_dict(self):
+        return {'id': self.pk, 'slug': self.slug, 'title_en': self.title_en, 'title_ta': self.title_ta,
+                'excerpt_en': self.excerpt_en, 'excerpt_ta': self.excerpt_ta, 'body_en': self.body_en,
+                'body_ta': self.body_ta, 'cover_image_path': self.cover_image_path, 'tags': list(self.tags or []),
+                'is_published': self.is_published, 'published_at': _iso(self.published_at),
+                'created_at': _iso(self.created_at), 'updated_at': _iso(self.updated_at)}
