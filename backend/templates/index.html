@@ -716,6 +716,24 @@ input[type=range].inp{padding:0;height:auto;accent-color:var(--brand);border:0;b
   .media-grid{grid-template-columns:minmax(0,1fr)}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- client portal panel ---------- */
+.pt-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 0 16px;padding-bottom:2px}
+.pt-tabs::-webkit-scrollbar{display:none}
+.pt-tabs button{flex:none;border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:999px;padding:7px 13px;font:600 12.5px var(--font,inherit);cursor:pointer}
+.pt-tabs button.on{background:var(--accent,#2563eb);border-color:transparent;color:#fff}
+.pt-tabs b{margin-left:4px}
+.pt-item{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--panel2)}
+.pt-item .top{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.pt-item p{margin:6px 0 0;white-space:pre-wrap;font-size:13px;overflow-wrap:anywhere}
+.pt-item img{max-width:100%;border-radius:10px;margin-top:8px;max-height:180px;object-fit:cover}
+.pt-files{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pt-files a{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:9px;background:var(--panel);border:1px solid var(--line);font-size:12px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pt-state{display:flex;align-items:center;gap:12px;padding:14px;border-radius:14px;border:1px solid var(--line);margin-bottom:14px}
+.pt-state .ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--panel2);flex:none}
+.pt-form{border:1px dashed var(--line);border-radius:12px;padding:12px;margin-bottom:16px;display:flex;flex-direction:column;gap:10px}
+.pt-act{font-size:12.5px;padding:8px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
+.pt-act:last-child{border-bottom:0}
 </style>
 </head>
 <body>
@@ -2674,6 +2692,7 @@ function paintClientProjects() {
           <button class="btn sm" data-cpe="${p.id}">${icon('edit')}Edit</button>
           <button class="btn sm" data-cpn="${p.id}" title="Send the status to the client on WhatsApp">${icon('send')}Update</button>
           <button class="btn sm" data-cpr="${p.id}" title="Add a domain / hosting / AMC renewal">${icon('plus')}Renewal</button>
+          <button class="btn sm" data-cpp="${p.id}" title="Client portal: updates, approvals, files, login link">${icon('lock')}Portal</button>
           ${['live', 'support'].includes(p.stage) && state.v4.extras.ready ? `<button class="btn sm" data-cpg="${p.id}" title="Ask the client for a Google review on WhatsApp">${icon('star')}Review</button>` : ''}
           <button class="btn sm icon ghost" data-cpd="${p.id}" title="Delete" aria-label="Delete" style="margin-left:auto">${icon('trash')}</button>
         </div>
@@ -2687,6 +2706,7 @@ function paintClientProjects() {
   $$('[data-cpe]').forEach(b => b.onclick = () => clientProjectForm(find(b.dataset.cpe)));
   $$('[data-cpn]').forEach(b => b.onclick = () => sendProjectUpdate(find(b.dataset.cpn)));
   $$('[data-cpr]').forEach(b => b.onclick = () => renewalForm(null, +b.dataset.cpr));
+  $$('[data-cpp]').forEach(b => b.onclick = () => openPortal(+b.dataset.cpp));
   $$('[data-cpg]').forEach(b => b.onclick = () => askGoogleReview(find(b.dataset.cpg)));
   $$('[data-cpd]').forEach(b => b.onclick = async () => {
     const p = find(b.dataset.cpd);
@@ -2866,6 +2886,7 @@ function ticketForm(t) {
     <div class="m-h"><h3>Support request #${t.id}</h3><div class="spacer"></div><button class="icon-btn" data-x aria-label="Close">${icon('x')}</button></div>
     <form class="m-b" id="tkForm" novalidate>
       <div class="msgbox ${taCls(t.description)}">${esc(t.description)}</div>
+      <div id="tkFiles"></div>
       <div class="grid2">
         ${fld('status', 'Status', sel('status', TK_STATUS, t.status))}
         ${fld('priority', 'Priority', sel('priority', { normal: 'Normal', urgent: 'Urgent' }, t.priority))}
@@ -2876,6 +2897,7 @@ function ticketForm(t) {
     </form>
     <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-save>${icon('check')}Save</button></div>`);
   const fm = $('#tkForm'); $$('[data-x]', modal).forEach(b => b.onclick = closeModal);
+  paintTicketFiles(t.id);
   fm.elements.client_update.addEventListener('input', () => { if (fm.elements.client_update.value.trim()) fm.elements.notify.checked = true; });
   $('[data-save]', modal).onclick = async ev => {
     const g = n => fm.elements[n].value.trim();
@@ -3987,6 +4009,189 @@ $('#logoutBtn').onclick = signOut;
 
 // On page load: already signed in? go straight in, otherwise show the login screen.
 API.me().then(startApp).catch(err => showLogin(err.status === 401 ? '' : err.message));
+
+/* =====================================================================
+   Client portal (ajtechnologiesltd.com/my/): updates, approvals, what we need, project files, login link
+   ===================================================================== */
+Object.assign(API, {
+  ptGet:        id         => request('GET', `/api/portal/projects/${id}/`).then(d => d.item),
+  ptPatch:      (id, data) => request('PATCH', `/api/portal/projects/${id}/`, data).then(d => d.item),
+  ptUpdate:     (id, data) => request('POST', `/api/portal/projects/${id}/updates/`, data),
+  ptDelUpdate:  id         => request('DELETE', `/api/portal/updates/${id}/`),
+  ptApproval:   (id, data) => request('POST', `/api/portal/projects/${id}/approvals/`, data),
+  ptReopen:     (id, data) => request('POST', `/api/portal/approvals/${id}/reopen/`, data),
+  ptDelApproval:id         => request('DELETE', `/api/portal/approvals/${id}/`),
+  ptRequest:    (id, data) => request('POST', `/api/portal/projects/${id}/requests/`, data),
+  ptReqStatus:  (id, s)    => request('PATCH', `/api/portal/requests/${id}/`, { status: s }),
+  ptDelRequest: id         => request('DELETE', `/api/portal/requests/${id}/`),
+  ptLink:       id         => request('POST', `/api/portal/projects/${id}/link/`, {}),
+  ptTicketFiles:id         => request('GET', `/api/portal/tickets/${id}/files/`).then(d => d.items),
+});
+const PT_ACT = { login: 'Logged in', approved: 'Approved', changes: 'Asked for changes', uploaded: 'Uploaded files', quote_accepted: 'Accepted a quotation',
+  pay_opened: 'Opened a payment', pdf: 'Viewed a PDF', files_invoice: 'Asked for project files', files_download: 'Downloaded the project files',
+  renew_request: 'Asked to renew', ticket: 'Raised a support request', profile: 'Updated business details', number_added: 'Added a number',
+  number_removed: 'Removed a number', logout_all: 'Logged out everywhere' };
+const ptSent = r => { const s = (r && r.sent) || []; if (!s.length) return ''; if (s.every(x => x === 'failed')) return ' (WhatsApp failed)';
+  return s.includes('template') ? ' · client told (template)' : ' · client told on WhatsApp'; };
+const kb = n => n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
+async function openPortal(id, tab) {
+  state.pt = state.pt && state.pt.id === id ? state.pt : { id, tab: 'updates' };
+  if (tab) state.pt.tab = tab;
+  try { state.pt.data = await API.ptGet(id); }
+  catch (err) { toast(err.message, 'err'); return; }
+  paintPortal();
+}
+function paintPortal() {
+  const s = state.pt, d = s.data, f = d.files;
+  const pend = d.approvals.filter(a => a.status === 'pending').length, need = d.requests.filter(r => r.status !== 'done').length;
+  const up = d.requests.filter(r => r.status === 'uploaded').length;
+  const tabs = [['updates', 'Updates', d.updates.length], ['approvals', 'Approvals', pend], ['needs', 'What we need', up ? up + ' new' : need],
+                ['files', 'Project files', f.state === 'paid' ? '!' : ''], ['info', 'Info', '']];
+  const body = { updates: ptUpdates, approvals: ptApprovals, needs: ptNeeds, files: ptFiles, info: ptInfo }[s.tab](d);
+  drawer.dataset.doc = '';
+  openDrawer(`
+    <div class="dr-h"><div class="avatar">${icon('lock')}</div>
+      <div style="min-width:0;flex:1"><h3>Client portal</h3><small class="${taCls(d.title)}">${esc(d.title)}</small></div>
+      <button class="icon-btn" data-close aria-label="Close">${icon('x')}</button></div>
+    <div class="dr-b">
+      <div class="notice info" style="margin-bottom:12px">${icon('eye')}<span>${d.seen_at ? `Client last opened the portal <b>${fmtDate(d.seen_at)}</b>` : 'The client has <b>not opened</b> the portal yet'} · ${d.devices} device${d.devices === 1 ? '' : 's'} logged in</span></div>
+      <div class="btn-row" style="margin-bottom:16px"><button class="btn primary" id="ptLink">${icon('send')}Send portal link</button>
+        <button class="btn" id="ptCopy" title="${esc(d.portal_url)}">${icon('copy')}Copy portal address</button></div>
+      <div class="pt-tabs">${tabs.map(([k, l, n]) => `<button data-ptab="${k}" class="${s.tab === k ? 'on' : ''}">${l}${n ? `<b>${n}</b>` : ''}</button>`).join('')}</div>
+      ${body}
+    </div>`);
+  $$('[data-ptab]', drawer).forEach(b => b.onclick = () => { s.tab = b.dataset.ptab; paintPortal(); });
+  $('[data-close]', drawer).onclick = closeDrawer;
+  $('#ptCopy').onclick = () => { navigator.clipboard?.writeText(d.portal_url).then(() => toast('Copied: ' + d.portal_url), () => toast(d.portal_url)); };
+  $('#ptLink').onclick = async e => {
+    const btn = e.currentTarget; btn.disabled = true;
+    try { const r = await API.ptLink(d.id);
+      toast(r.results.map(x => `${waPhone(x.wa_id)}: ${x.via === 'link' ? 'login link sent' : x.via === 'template' ? 'asked to reply LOGIN (template)' : 'failed'}`).join(' · ')); }
+    catch (err) { toast(err.message, 'err'); } finally { btn.disabled = false; }
+  };
+  ({ updates: bindPtUpdates, approvals: bindPtApprovals, needs: bindPtNeeds, files: bindPtFiles, info: bindPtInfo })[s.tab](d);
+}
+const ptNotify = (checked = true) => `<label class="switch"><div><b>Tell the client on WhatsApp</b><small>Free message within 24 h, otherwise your project_update template</small></div><input type="checkbox" name="notify" ${checked ? 'checked' : ''}><span class="tgl"></span></label>`;
+const ptPhoto = () => `<div class="btn-row"><button type="button" class="btn sm" data-ptimg>${icon('image')}Add photo</button><span class="muted" style="font-size:12px" data-ptimgname></span><input type="hidden" name="image_path"></div>`;
+function bindPtPhoto(form) {
+  const b = $('[data-ptimg]', form); if (!b) return;
+  b.onclick = () => imagePicker(path => { form.elements.image_path.value = path; $('[data-ptimgname]', form).textContent = path.split('/').pop(); });
+}
+async function ptSubmit(form, fn, okMsg) {
+  const btn = $('button[type=submit]', form); btn.disabled = true;
+  try { const r = await fn(Object.fromEntries(new FormData(form))); toast(okMsg + ptSent(r)); await openPortal(state.pt.id); }
+  catch (err) { markErrors(form, (err.data && err.data.errors) || {}); toast(err.message, 'err'); }
+  finally { if (btn.isConnected) btn.disabled = false; }
+}
+const ptBool = o => ({ ...o, notify: o.notify === 'on' });
+function ptUpdates(d) {
+  return `<form class="pt-form" id="ptUf" novalidate>
+      ${fld('body', 'New update for the client', `<textarea class="inp" name="body" maxlength="4000" placeholder="e.g. Homepage design is ready. Moving to the services page."></textarea>`, true)}
+      ${ptPhoto()}${ptNotify()}
+      <div><button class="btn primary" type="submit">${icon('send')}Post update</button></div></form>
+    ${d.updates.length ? d.updates.map(u => `<div class="pt-item"><div class="top"><small class="muted">${fmtDate(u.at)}</small><button class="btn sm icon ghost" data-ptdu="${u.id}" aria-label="Delete">${icon('trash')}</button></div>
+      <p class="${taCls(u.body)}">${esc(u.body)}</p>${u.image ? `<img src="${esc(u.image)}" alt="" loading="lazy">` : ''}</div>`).join('')
+      : '<p class="muted" style="font-size:13px">No updates yet. The client sees them in the portal, newest first.</p>'}`;
+}
+function bindPtUpdates() {
+  const fm = $('#ptUf'); bindPtPhoto(fm);
+  fm.onsubmit = e => { e.preventDefault(); ptSubmit(fm, v => API.ptUpdate(state.pt.id, ptBool(v)), 'Update posted'); };
+  $$('[data-ptdu]', drawer).forEach(b => b.onclick = async () => { if (!await confirmBox({ title: 'Delete this update?', text: 'The client will not see it any more.' })) return;
+    await API.ptDelUpdate(+b.dataset.ptdu); toast('Update deleted'); openPortal(state.pt.id); });
+}
+function ptApprovals(d) {
+  const st = { pending: ['Waiting', 'b-contacted'], approved: ['Approved', 'b-won'], changes: ['Changes asked', 'b-urgent'] };
+  return `<form class="pt-form" id="ptAf" novalidate>
+      ${fld('title', 'What should they approve?', `<input class="inp" name="title" maxlength="160" placeholder="e.g. Homepage design">`, true)}
+      ${fld('details', 'Details (optional)', `<textarea class="inp" name="details" maxlength="3000" style="min-height:60px" placeholder="What to check"></textarea>`)}
+      ${fld('link', 'Preview link (optional)', `<input class="inp" name="link" maxlength="500" placeholder="https://...">`)}
+      ${ptPhoto()}${ptNotify()}
+      <div><button class="btn primary" type="submit">${icon('check')}Ask for approval</button></div></form>
+    ${d.approvals.length ? d.approvals.map(a => `<div class="pt-item"><div class="top"><b class="${taCls(a.title)}">${esc(a.title)}</b><span class="badge ${st[a.status][1]}">${st[a.status][0]}</span></div>
+      ${a.details ? `<p>${esc(a.details)}</p>` : ''}${a.link ? `<p><a href="${esc(a.link)}" target="_blank" rel="noopener">${esc(a.link)}</a></p>` : ''}${a.image ? `<img src="${esc(a.image)}" alt="" loading="lazy">` : ''}
+      ${a.comment ? `<div class="msgbox" style="margin:8px 0 0"><b>Client:</b> ${esc(a.comment)}</div>` : ''}
+      <small class="muted" style="display:block;margin-top:6px">Asked ${fmtDate(a.at)}${a.decided_at ? ` · answered ${fmtDate(a.decided_at)} by ${esc(waPhone(a.decided_by))}` : ''}</small>
+      <div class="btn-row" style="margin-top:8px">${a.status === 'changes' ? `<button class="btn sm" data-ptra="${a.id}">${icon('refresh')}Changes done, ask again</button>` : ''}
+        <button class="btn sm icon ghost" data-ptda="${a.id}" aria-label="Delete" style="margin-left:auto">${icon('trash')}</button></div></div>`).join('')
+      : '<p class="muted" style="font-size:13px">Nothing sent for approval yet.</p>'}`;
+}
+function bindPtApprovals() {
+  const fm = $('#ptAf'); bindPtPhoto(fm);
+  fm.onsubmit = e => { e.preventDefault(); ptSubmit(fm, v => API.ptApproval(state.pt.id, ptBool(v)), 'Sent for approval'); };
+  $$('[data-ptra]', drawer).forEach(b => b.onclick = async () => { b.disabled = true;
+    try { const r = await API.ptReopen(+b.dataset.ptra, { notify: true }); toast('Asked again' + ptSent(r)); openPortal(state.pt.id); } catch (err) { toast(err.message, 'err'); b.disabled = false; } });
+  $$('[data-ptda]', drawer).forEach(b => b.onclick = async () => { if (!await confirmBox({ title: 'Delete this approval?', text: 'Its answer is deleted too.' })) return;
+    await API.ptDelApproval(+b.dataset.ptda); toast('Deleted'); openPortal(state.pt.id); });
+}
+function ptNeeds(d) {
+  const st = { open: ['Needed', 'b-contacted'], uploaded: ['Uploaded', 'b-new'], done: ['Received', 'b-won'] };
+  return `<form class="pt-form" id="ptRf" novalidate>
+      ${fld('title', 'What do you need from the client?', `<input class="inp" name="title" maxlength="160" placeholder="e.g. Your logo in high quality">`, true)}
+      ${fld('details', 'Details (optional)', `<textarea class="inp" name="details" maxlength="3000" style="min-height:60px" placeholder="e.g. PNG or SVG, at least 1000 px wide"></textarea>`)}
+      ${ptNotify()}
+      <div><button class="btn primary" type="submit">${icon('plus')}Ask the client</button></div></form>
+    ${d.requests.length ? d.requests.map(r => `<div class="pt-item"><div class="top"><b class="${taCls(r.title)}">${esc(r.title)}</b><span class="badge ${st[r.status][1]}">${st[r.status][0]}</span></div>
+      ${r.details ? `<p class="muted">${esc(r.details)}</p>` : ''}${r.note ? `<div class="msgbox" style="margin:8px 0 0"><b>Client:</b> ${esc(r.note)}</div>` : ''}
+      ${r.files.length ? `<div class="pt-files">${r.files.map(f => `<a href="${esc(f.url)}" target="_blank" rel="noopener" title="${esc(f.name)}">${icon('download')}${esc(f.name)} · ${kb(f.size)}</a>`).join('')}</div>` : ''}
+      <div class="btn-row" style="margin-top:8px">${r.status !== 'done' ? `<button class="btn sm" data-ptrs="${r.id}" data-s="done">${icon('check')}Mark received</button>` : `<button class="btn sm" data-ptrs="${r.id}" data-s="open">${icon('refresh')}Ask again</button>`}
+        <button class="btn sm icon ghost" data-ptdr="${r.id}" aria-label="Delete" style="margin-left:auto">${icon('trash')}</button></div></div>`).join('')
+      : '<p class="muted" style="font-size:13px">Nothing requested. Ask for a logo, photos, content or logins here.</p>'}`;
+}
+function bindPtNeeds() {
+  const fm = $('#ptRf');
+  fm.onsubmit = e => { e.preventDefault(); ptSubmit(fm, v => API.ptRequest(state.pt.id, ptBool(v)), 'Request sent'); };
+  $$('[data-ptrs]', drawer).forEach(b => b.onclick = async () => { await API.ptReqStatus(+b.dataset.ptrs, b.dataset.s); toast('Updated'); openPortal(state.pt.id); });
+  $$('[data-ptdr]', drawer).forEach(b => b.onclick = async () => { if (!await confirmBox({ title: 'Delete this item?', text: 'Uploaded files stay in storage.' })) return;
+    await API.ptDelRequest(+b.dataset.ptdr); toast('Deleted'); openPortal(state.pt.id); });
+}
+function ptFiles(d) {
+  const f = d.files;
+  const head = f.state === 'ready' ? [icon('check'), 'Paid and ready: the client can download', 'b-won']
+    : f.state === 'paid' ? [icon('alert'), 'Paid! Add the files link and mark them ready', 'b-contacted']
+    : f.state === 'invoiced' ? [icon('receipt'), `Invoice ${esc(f.invoice.number)} waiting for payment (${inr(f.invoice.balance)})`, 'plain']
+    : [icon('lock'), 'Locked: the client sees "Buy project files ₹7,000"', 'b-soft'];
+  return `<div class="pt-state"><span class="ic">${head[0]}</span><div style="flex:1;min-width:0"><b>${head[1]}</b><small class="muted" style="display:block">
+      ${f.paid ? (f.paid_by === 'razorpay' ? `Paid online · invoice ${esc(f.invoice.number)}` : 'Marked paid by you (cash / bank)') : 'The download stays inactive until it is paid AND you mark the files ready.'}</small></div>
+      <span class="badge ${head[2]}">${{ ready: 'Ready', paid: 'Paid', invoiced: 'Invoiced', locked: 'Locked' }[f.state]}</span></div>
+    <form id="ptFf" novalidate class="pt-form">
+      ${fld('files_link', 'Link to the files (Google Drive, OneDrive, Dropbox…)', `<input class="inp" name="files_link" maxlength="1000" value="${esc(d.files_link)}" placeholder="https://drive.google.com/...">`)}
+      <small class="muted" style="margin-top:-4px">The client never sees this link in the page. It opens only when they press Download after paying.</small>
+      <label class="switch"><div><b>Files are ready</b><small>Switch on when the link above is complete. The client is told on WhatsApp if already paid.</small></div><input type="checkbox" name="files_ready" ${d.files_ready ? 'checked' : ''}><span class="tgl"></span></label>
+      <label class="switch"><div><b>Paid by cash / bank transfer</b><small>Only if they paid outside Razorpay. Online payments unlock by themselves.</small></div><input type="checkbox" name="files_paid" ${d.files_paid ? 'checked' : ''}><span class="tgl"></span></label>
+      <div class="btn-row"><button class="btn primary" type="submit">${icon('check')}Save</button>${d.files_ready || d.files_paid ? `<button class="btn" type="button" id="ptLock">${icon('lock')}Lock again</button>` : ''}</div>
+    </form>`;
+}
+function bindPtFiles() {
+  const fm = $('#ptFf');
+  fm.onsubmit = e => { e.preventDefault();
+    ptSubmit(fm, v => API.ptPatch(state.pt.id, { files_link: v.files_link || '', files_ready: !!fm.elements.files_ready.checked, files_paid: !!fm.elements.files_paid.checked }), 'Project files saved'); };
+  const lock = $('#ptLock');
+  if (lock) lock.onclick = async () => { if (!await confirmBox({ title: 'Lock the project files again?', text: 'The download switches off. A Razorpay payment stays paid.', ok: 'Lock', danger: false })) return;
+    await API.ptPatch(state.pt.id, { files_ready: false, files_paid: false }); toast('Locked'); openPortal(state.pt.id); };
+}
+function ptInfo(d) {
+  return `<form id="ptPf" class="pt-form" novalidate>
+      ${fld('preview_url', 'Preview link shown to the client while you build', `<input class="inp" name="preview_url" maxlength="500" value="${esc(d.preview_url)}" placeholder="https://preview...">`)}
+      <div><button class="btn primary" type="submit">${icon('check')}Save</button></div></form>
+    <div class="sec-t">Numbers that can log in</div>
+    <div class="nums" style="margin-bottom:14px">${d.wa_ids.map(n => `<span>${icon('wa')}${esc(waPhone(n))}</span>`).join('') || '<span class="muted">No number yet: add one in Edit</span>'}</div>
+    ${d.profiles.length ? `<div class="sec-t">Business details from the client</div>${d.profiles.map(p => `<dl class="dl"><dt>Number</dt><dd>${esc(waPhone(p.wa_id))}</dd>
+      <dt>Name</dt><dd>${esc(p.contact_name || '—')}</dd><dt>Business</dt><dd>${esc(p.business_name || '—')}</dd><dt>Email</dt><dd>${esc(p.email || '—')}</dd>
+      <dt>Address</dt><dd>${esc(p.address || '—')}</dd><dt>GSTIN</dt><dd>${esc(p.gstin || '—')}</dd></dl>`).join('')}` : ''}
+    <div class="sec-t">Recent portal activity</div>
+    ${d.activity.length ? d.activity.map(a => `<div class="pt-act"><span>${esc(PT_ACT[a.action] || a.action)}${a.detail ? ` · <span class="muted">${esc(a.detail)}</span>` : ''}</span><small class="muted">${fmtDate(a.at)}</small></div>`).join('')
+      : '<p class="muted" style="font-size:13px">Nothing yet.</p>'}`;
+}
+function bindPtInfo() {
+  const fm = $('#ptPf');
+  fm.onsubmit = e => { e.preventDefault(); ptSubmit(fm, v => API.ptPatch(state.pt.id, { preview_url: v.preview_url || '' }), 'Saved'); };
+}
+async function paintTicketFiles(id) {
+  const box = $('#tkFiles'); if (!box) return;
+  try { const items = await API.ptTicketFiles(id);
+    if (items.length && $('#tkFiles')) $('#tkFiles').innerHTML = `<div class="sec-t">Screenshots from the portal</div><div class="pt-files" style="margin:0 0 16px">${items.map(f => `<a href="${esc(f.url)}" target="_blank" rel="noopener">${icon('download')}${esc(f.name)} · ${kb(f.size)}</a>`).join('')}</div>`; }
+  catch {}
+}
 </script>
 </body>
 </html>

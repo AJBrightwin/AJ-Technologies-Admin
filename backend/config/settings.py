@@ -89,6 +89,7 @@ SUPABASE_URL = env('SUPABASE_URL').rstrip('/')                       # https://Y
 SUPABASE_SERVICE_KEY = env('SUPABASE_SERVICE_KEY')                    # secret key: server only
 SUPABASE_STORAGE_BUCKET = env('SUPABASE_STORAGE_BUCKET', 'project-images')
 SUPABASE_IMAGE_FOLDER = 'projects'
+PORTAL_UPLOAD_BUCKET = env('PORTAL_UPLOAD_BUCKET', 'portal-uploads')   # client uploads (private, supabase_portal.sql)
 MAX_IMAGE_MB = 5
 
 

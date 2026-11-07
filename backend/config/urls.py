@@ -3,7 +3,7 @@ URL configuration for the AJ Technologies admin dashboard.
 """
 from django.urls import path
 
-from main import views, views_v4
+from main import views, views_v4, views_portal
 
 urlpatterns = [
     # The dashboard page
@@ -82,4 +82,16 @@ urlpatterns = [
     path('api/v4/extras/', views_v4.extras, name='api_v4_extras'),
     path('api/projects/<int:pk>/case/', views_v4.project_case, name='api_project_case'),
     path('api/clients/projects/<int:pk>/review/', views_v4.client_project_review, name='api_client_project_review'),
+    # Client portal controls (the client sees them at ajtechnologiesltd.com/my/)
+    path('api/portal/projects/<int:pk>/', views_portal.portal_project),
+    path('api/portal/projects/<int:pk>/updates/', views_portal.portal_update_add),
+    path('api/portal/projects/<int:pk>/approvals/', views_portal.portal_approval_add),
+    path('api/portal/projects/<int:pk>/requests/', views_portal.portal_request_add),
+    path('api/portal/projects/<int:pk>/link/', views_portal.portal_send_link),
+    path('api/portal/updates/<int:pk>/', views_portal.portal_update),
+    path('api/portal/approvals/<int:pk>/', views_portal.portal_approval),
+    path('api/portal/approvals/<int:pk>/reopen/', views_portal.portal_approval, {'action': 'reopen'}),
+    path('api/portal/requests/<int:pk>/', views_portal.portal_request),
+    path('api/portal/tickets/<int:pk>/files/', views_portal.portal_ticket_files),
+    path('api/portal/file/', views_portal.portal_file),
 ]
