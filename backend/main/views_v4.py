@@ -80,8 +80,10 @@ def _money(v, rule):
         d = Decimal(str(v if v not in (None, '') else 0))
     except Exception:
         raise ValueError('must be an amount like 15000')
-    if d < 0 or d > Decimal('100000000'):
+    if d < 0:
         raise ValueError('must be 0 or more')
+    if d > Decimal('100000000'):
+        raise ValueError('is too big (₹10 crore at most)')
     if rule.get('positive') and d <= 0:
         raise ValueError('must be more than 0')
     return D(d)
@@ -356,9 +358,11 @@ def billing_send(request, pk):
     if doc.status == 'cancelled':
         raise ApiError('This document is cancelled.')
     s = BusinessSettings.load()
-    if doc.doc_type == 'invoice' and not doc.razorpay_link_url and billing.razorpay_ready() and doc.balance > 0 \
-            and _json_body(request).get('with_link', True):
-        billing.create_payment_link(doc)
+    if doc.doc_type == 'invoice' and billing.razorpay_ready() and doc.balance > 0 \
+            and _json_body(request).get('with_link', True) and not billing.link_usable(doc):
+        billing.create_payment_link(doc)            # no link yet, or the old one was paid / expired / too big
+    elif doc.doc_type == 'invoice' and doc.balance <= 0 and doc.razorpay_link_url:
+        _save(doc, {'razorpay_link_id': '', 'razorpay_link_url': '', 'razorpay_amount': 0})
     if doc.status == 'draft':
         doc.status = 'sent'                     # the PDF the client gets has no DRAFT mark (saved below)
     data = billing.pdf(doc, s)
@@ -401,7 +405,18 @@ def billing_convert(request, pk):
     s = BusinessSettings.load()
     items = quote.items
     pct = data.get('advance_percent')
-    if pct not in (None, '', 100):
+    earlier = list(BillingDocument.objects.filter(converted_from=quote.pk, doc_type='invoice').exclude(status='cancelled'))
+    if data.get('balance'):
+        # the rest of the quotation, after the advance / part invoices already made from it
+        amount = D(quote.total - sum((d.total for d in earlier), Decimal(0)))
+        if amount <= 0:
+            raise ApiError('This quotation is already fully invoiced.')
+        items = [{'description': f'Balance payment for {quote.title or quote.number}',
+                  'details': f'As per quotation {quote.number} (total {billing.money(quote.total)})'
+                             + (f", less {', '.join(d.number for d in earlier)}" if earlier else ''),
+                  'qty': 1, 'rate': float(amount)}]
+        total, discount = amount, Decimal(0)
+    elif pct not in (None, '', 100):
         try:
             pct = Decimal(str(pct))
             assert 0 < pct < 100
@@ -458,6 +473,9 @@ def billing_add_payment(request, pk):
     values['paid_on'] = values.get('paid_on') or billing.ist_today()
     if values['amount'] > doc.balance:
         raise ApiError(f'More than the balance ({billing.money(doc.balance)}).', 400, errors={'amount': 'too much'})
+    if values.get('method') == 'razorpay' and values.get('reference') and \
+            BillingPayment.objects.filter(method='razorpay', reference=values['reference']).exists():
+        raise ApiError('This Razorpay payment is already recorded.', 400, errors={'reference': 'already recorded'})
     BillingPayment.objects.create(document_id=doc.pk, client_name=doc.client_name, **values)
     _recalc(doc)
     return ok(201, item=doc.to_dict(), payments=[p.to_dict() for p in BillingPayment.objects.filter(document_id=pk)])

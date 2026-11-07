@@ -63,6 +63,7 @@ API (all JSON; everything except login needs the admin to be signed in)
     GET               /api/reports/?days=7                numbers for the Reports tab
 """
 import hmac
+import ipaddress
 import json
 import logging
 import re
@@ -76,7 +77,7 @@ from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.db import DatabaseError, IntegrityError, ProgrammingError, connection, transaction
-from django.db.models import F
+from django.db.models import F, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -230,8 +231,10 @@ def _int(v, rule):
         n = int(v)
     except (TypeError, ValueError):
         raise ValueError('must be a whole number')
-    if n < 0 or n > 1_000_000:
+    if n < 0:
         raise ValueError('must be 0 or more')
+    if n > 1_000_000:
+        raise ValueError('is too big (1,000,000 at most)')
     return n
 
 
@@ -300,7 +303,7 @@ def _date(v, rule):
         d = datetime.strptime(str(v or '').strip(), '%Y-%m-%d').date()
     except ValueError:
         raise ValueError('must be a date like 2026-10-28')
-    if d > date.today():
+    if d > timezone.localdate():            # India date (the server clock is UTC)
         raise ValueError('cannot be in the future')
     return d
 
@@ -371,8 +374,33 @@ MAX_LOGIN_FAILS = 5
 LOCK_SECONDS = 15 * 60
 
 
+CLOUDFLARE_NETS = [ipaddress.ip_network(n) for n in (   # https://www.cloudflare.com/ips/
+    '173.245.48.0/20', '103.21.244.0/22', '103.22.200.0/22', '103.31.4.0/22', '141.101.64.0/18', '108.162.192.0/18',
+    '190.93.240.0/20', '188.114.96.0/20', '197.234.240.0/22', '198.41.128.0/17', '162.158.0.0/15', '104.16.0.0/13',
+    '104.24.0.0/14', '172.64.0.0/13', '131.0.72.0/22', '2400:cb00::/32', '2606:4700::/32', '2803:f800::/32',
+    '2405:b500::/32', '2405:8100::/32', '2a06:98c0::/29', '2c0f:f248::/32')]
+
+
+def _ip(text):
+    try:
+        return ipaddress.ip_address(text.strip())
+    except ValueError:
+        return None
+
+
 def _client_ip(request):
-    return request.META.get('REMOTE_ADDR', '')
+    """The visitor's real address (Render and Cloudflare sit in front, so REMOTE_ADDR is their server).
+    Render adds the address that connected to it as the LAST X-Forwarded-For entry (it cannot be faked).
+    Only when that address is Cloudflare do we trust Cloudflare's CF-Connecting-IP header."""
+    hops = [h for h in request.META.get('HTTP_X_FORWARDED_FOR', '').split(',') if h.strip()]
+    peer = _ip(hops[-1]) if hops else None
+    if peer is None:
+        return request.META.get('REMOTE_ADDR', '')
+    if any(peer in net for net in CLOUDFLARE_NETS):
+        real = _ip(request.META.get('HTTP_CF_CONNECTING_IP', ''))
+        if real is not None:
+            return str(real)
+    return str(peer)
 
 
 def _user():
@@ -626,7 +654,7 @@ def images(request):
         if ctype not in IMAGE_TYPES:
             raise ApiError('Only JPG, PNG or WebP images can be uploaded.')
         base = re.sub(r'[^a-z0-9]+', '-', f.name.rsplit('.', 1)[0].lower()).strip('-')[:40] or 'image'
-        path = f'{settings.SUPABASE_IMAGE_FOLDER}/{date.today().isoformat()}-{base}-{secrets.token_hex(3)}.{IMAGE_TYPES[ctype]}'
+        path = f'{settings.SUPABASE_IMAGE_FOLDER}/{timezone.localdate().isoformat()}-{base}-{secrets.token_hex(3)}.{IMAGE_TYPES[ctype]}'
         storage.upload(path, content, ctype)
         log.info('Image uploaded: %s', path)
         return ok(201, item={'path': path, 'size': len(content), 'type': ctype,
@@ -711,12 +739,26 @@ def _phone_enquiries(wa_id):
                  'services': r[3] if isinstance(r[3], list) else json.loads(r[3] or '[]')} for r in cur.fetchall()]
 
 
+CHAT_LIST_LIMIT = 500
+
+
 @api(['GET'])
 @_wa_guard
 def wa_chats(request):
     now = timezone.now()
-    rows = WaContact.objects.order_by(F('last_message_at').desc(nulls_last=True))[:500]
-    return ok(items=[c.to_dict(now) for c in rows], configured=whatsapp.is_configured(),
+    qs = WaContact.objects.order_by(F('last_message_at').desc(nulls_last=True))
+    q = request.GET.get('q', '').strip()[:60]
+    if q:                                   # search ALL chats (the list itself shows only the latest 500)
+        digits = re.sub(r'\D', '', q)
+        cond = Q(name__icontains=q) | Q(profile_name__icontains=q) | Q(business_name__icontains=q) | \
+            Q(last_message_preview__icontains=q)
+        if len(digits) >= 4:
+            cond |= Q(wa_id__contains=digits)
+        rows = list(qs.filter(cond)[:200])
+        return ok(items=[c.to_dict(now) for c in rows], search=True)
+    rows = list(qs[:CHAT_LIST_LIMIT + 1])
+    more = len(rows) > CHAT_LIST_LIMIT
+    return ok(items=[c.to_dict(now) for c in rows[:CHAT_LIST_LIMIT]], more=more, configured=whatsapp.is_configured(),
               admin=settings.ADMIN_WA_NUMBER, review_template=settings.REVIEW_TEMPLATE_NAME)
 
 

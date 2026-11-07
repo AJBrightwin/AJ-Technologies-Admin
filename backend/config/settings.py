@@ -26,6 +26,10 @@ def env(name, default=''):
 # ---------- Security ----------
 SECRET_KEY = env('SECRET_KEY', 'development-only-key-change-me')
 DEBUG = env('DEBUG', 'False').lower() == 'true'
+if not DEBUG and (SECRET_KEY == 'development-only-key-change-me' or len(SECRET_KEY) < 32):
+    # The login cookie is signed with SECRET_KEY; a missing or short key would let anyone forge a login.
+    raise ImproperlyConfigured('SECRET_KEY is missing or too short. In Render > Environment (dashboard service) add '
+                               'SECRET_KEY with a long random value (50+ characters).')
 ALLOWED_HOSTS = [h.strip() for h in env('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',') if h.strip()]
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in env('CSRF_TRUSTED_ORIGINS').split(',') if o.strip()]
 

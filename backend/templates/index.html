@@ -956,6 +956,7 @@ const API = {
 
   // ----- WhatsApp (tables from supabase_whatsapp.sql, filled by the WhatsApp bot) -----
   waChats:        ()            => request('GET', '/api/wa/chats/'),
+  waSearch:       q             => request('GET', `/api/wa/chats/?q=${encodeURIComponent(q)}`),
   waChat:         (id, q = '')  => request('GET', `/api/wa/chats/${id}/${q}`),
   waUpdateChat:   (id, patch)   => request('PATCH', `/api/wa/chats/${id}/`, patch).then(d => d.contact),
   waDeleteChat:   id            => request('DELETE', `/api/wa/chats/${id}/`),
@@ -1985,13 +1986,16 @@ const waIsAdmin = c => !!c && !!state.wa.admin && c.wa_id === state.wa.admin;
 const waName = c => waIsAdmin(c) ? 'You (alerts)' : (c.name || c.profile_name || waPhone(c.wa_id));
 const waAvatar = c => waIsAdmin(c) ? icon('bot') : (c.name || c.profile_name) ? esc(initials(c.name || c.profile_name)) : icon('wa');
 const istDate = (d = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(d);
+/* same day, n years later, worked out on the text date (no time zone shift); 29 Feb becomes 28 Feb */
+const plusYears = (iso, n = 1) => { const [y, m, d] = iso.split('-').map(Number); const last = new Date(Date.UTC(y + n, m, 0)).getUTCDate();
+  return `${y + n}-${String(m).padStart(2, '0')}-${String(Math.min(d, last)).padStart(2, '0')}`; };
 function waWaiting() { return state.wa.chats.filter(c => !waIsAdmin(c) && (c.needs_reply || c.unread_count > 0)); }
 function waTakeChats(res) {
   const w = state.wa;
   w.loaded = true;
   if (res.status === 'fulfilled') {
     const d = res.value;
-    w.chats = d.items; w.configured = d.configured; w.admin = d.admin; w.reviewTemplate = d.review_template; w.error = ''; w.errorCode = '';
+    w.chats = d.items; w.more = !!d.more; w.configured = d.configured; w.admin = d.admin; w.reviewTemplate = d.review_template; w.error = ''; w.errorCode = '';
   } else {
     w.error = res.reason.message; w.errorCode = (res.reason.data || {}).code || '';
   }
@@ -2074,7 +2078,9 @@ const WA_FILTERS = [
 ];
 function waFiltered() {
   const w = state.wa, q = w.q.trim().toLowerCase(), f = (WA_FILTERS.find(x => x[0] === w.filter) || WA_FILTERS[0])[2];
-  return w.chats.filter(c => f(c) && (!q || [c.name, c.profile_name, c.business_name, c.wa_id, c.last_message_preview].join(' ').toLowerCase().includes(q)
+  /* older chats found by the server search (the list itself holds only the latest 500) */
+  const extra = q && w.extra && w.extra.q === q ? w.extra.items.filter(c => !w.chats.some(x => x.wa_id === c.wa_id)) : [];
+  return w.chats.concat(extra).filter(c => f(c) && (!q || [c.name, c.profile_name, c.business_name, c.wa_id, c.last_message_preview].join(' ').toLowerCase().includes(q)
     || (digits(q) && c.wa_id.includes(digits(q)))));
 }
 function renderWaChats() {
@@ -2089,7 +2095,14 @@ function renderWaChats() {
     </div>
     <div class="wa-main" id="waMain"></div>
   </div>`;
-  $('#waSearch').oninput = e => { w.q = e.target.value; renderWaList(); };
+  $('#waSearch').oninput = e => {
+    w.q = e.target.value; renderWaList();
+    clearTimeout(w.searchTimer);
+    const q = w.q.trim().toLowerCase();
+    if (w.more && q.length >= 3) w.searchTimer = setTimeout(async () => {
+      try { const d = await API.waSearch(q); if (w.q.trim().toLowerCase() === q) { w.extra = { q, items: d.items }; renderWaList(); } } catch {}
+    }, 400);
+  };
   renderWaFilters(); renderWaList(); renderWaConv(true);
   waFitShell();
 }
@@ -2126,7 +2139,7 @@ function renderWaList() {
 }
 async function waOpen(id) {
   const w = state.wa;
-  w.active = { ...(w.chats.find(x => x.wa_id === id) || { wa_id: id, name: '', profile_name: '', language: 'en', bot_enabled: true, window_open: false }) };
+  w.active = { ...(w.chats.find(x => x.wa_id === id) || (w.extra ? w.extra.items.find(x => x.wa_id === id) : null) || { wa_id: id, name: '', profile_name: '', language: 'en', bot_enabled: true, window_open: false }) };
   w.msgs = []; w.hasMore = false; w.links = {}; w.loadingConv = true;
   const shell = $('#waShell'); if (shell) shell.classList.add('conv-open');
   renderWaList(); renderWaConv();
@@ -2345,7 +2358,7 @@ async function waPoll() {
   const w = state.wa;
   try {
     const d = await API.waChats();
-    w.chats = d.items; w.configured = d.configured; w.admin = d.admin; w.reviewTemplate = d.review_template;
+    w.chats = d.items; w.more = !!d.more; w.configured = d.configured; w.admin = d.admin; w.reviewTemplate = d.review_template;
     if (w.error) { w.error = ''; w.errorCode = ''; if (onPage) return renderWhatsApp(); }
     refreshBadge();
     if (!onPage) return;
@@ -2783,7 +2796,7 @@ function paintRenewals() {
 function renewalForm(r = null, projectId = null) {
   const c = state.cl;
   if (!c.projects.length) return toast('Add a client project first', 'err');
-  const nextYear = () => { const d = new Date(); d.setFullYear(d.getFullYear() + 1); return d.toISOString().slice(0, 10); };
+  const nextYear = () => plusYears(istDate());
   const v = r || { project_id: projectId || c.projects[0].id, item: 'domain', label: '', expiry_date: nextYear(), amount_text: '', auto_remind: true, status: 'active' };
   const projMap = Object.fromEntries(c.projects.map(p => [p.id, `${p.title} · ${p.client_name}`]));
   openModal(`
@@ -2815,10 +2828,10 @@ function renewalForm(r = null, projectId = null) {
   };
 }
 function renewedForm(r) {
-  const d = new Date(r.expiry_date + 'T00:00:00'); d.setFullYear(d.getFullYear() + 1);
+  const next = plusYears(r.expiry_date);
   openModal(`
     <div class="m-h"><h3>Renewed: ${esc(RN_ITEM[r.item])} ${esc(r.label)}</h3><div class="spacer"></div><button class="icon-btn" data-x aria-label="Close">${icon('x')}</button></div>
-    <div class="m-b">${fld('expiry_date', 'New expiry date', `<input class="inp" type="date" id="rnNew" value="${d.toISOString().slice(0, 10)}">`)}<p class="hint">Reminders start again for the new date.</p></div>
+    <div class="m-b">${fld('expiry_date', 'New expiry date', `<input class="inp" type="date" id="rnNew" value="${next}">`)}<p class="hint">Reminders start again for the new date.</p></div>
     <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-save>${icon('check')}Save new date</button></div>`);
   $$('[data-x]', modal).forEach(b => b.onclick = closeModal);
   $('[data-save]', modal).onclick = async ev => {
@@ -2858,11 +2871,12 @@ function ticketForm(t) {
         ${fld('priority', 'Priority', sel('priority', { normal: 'Normal', urgent: 'Urgent' }, t.priority))}
       </div>
       <div style="margin-top:14px">${fld('client_update', 'Message to the client (optional)', `<textarea class="inp" name="client_update" maxlength="1000" placeholder="e.g. Fixed! Your contact form works again.">${esc('')}</textarea>`)}</div>
-      <label class="switch" style="margin-top:10px"><div><b>Tell the client on WhatsApp</b><small>Sends the new status and your message</small></div><input type="checkbox" name="notify" checked><span class="tgl"></span></label>
+      <label class="switch" style="margin-top:10px"><div><b>Tell the client on WhatsApp</b><small>Sends the new status and your message (turns on when you type a message)</small></div><input type="checkbox" name="notify"><span class="tgl"></span></label>
       <div style="margin-top:14px">${fld('private_notes', 'Private notes (only you)', `<textarea class="inp" name="private_notes" style="min-height:70px">${esc(t.private_notes)}</textarea>`)}</div>
     </form>
     <div class="m-f"><div class="spacer"></div><button class="btn" data-x>Cancel</button><button class="btn primary" data-save>${icon('check')}Save</button></div>`);
   const fm = $('#tkForm'); $$('[data-x]', modal).forEach(b => b.onclick = closeModal);
+  fm.elements.client_update.addEventListener('input', () => { if (fm.elements.client_update.value.trim()) fm.elements.notify.checked = true; });
   $('[data-save]', modal).onclick = async ev => {
     const g = n => fm.elements[n].value.trim();
     ev.currentTarget.disabled = true;
@@ -3199,7 +3213,7 @@ function docForm(kind, d = null, pre = {}) {
   const v = d ? clone(d) : { client_name: '', business_name: '', client_wa_id: '', client_email: '', client_address: '', title: '', issue_date: istDate(),
     due_date: '', items: [{ description: '', details: '', qty: 1, rate: 0 }], discount: 0, notes: '', terms: '', private_notes: '', enquiry_id: null, ...pre };
   if (!v.items || !v.items.length) v.items = [{ description: '', details: '', qty: 1, rate: 0 }];
-  if (!d && !v.due_date) { const x = new Date(v.issue_date + 'T12:00:00+05:30'); x.setDate(x.getDate() + (kind === 'quote' ? (st.quote_valid_days || 15) : (st.invoice_due_days || 7))); v.due_date = istDate(x); }
+  if (!d && !v.due_date) { const x = new Date(v.issue_date + 'T12:00:00+05:30'); x.setDate(x.getDate() + (kind === 'quote' ? (st.quote_valid_days ?? 15) : (st.invoice_due_days ?? 7))); v.due_date = istDate(x); }
   const word = kind === 'quote' ? 'quotation' : 'invoice';
   openModal(`${modalHead(d ? `Edit ${word} ${esc(d.number)}` : `New ${word}`)}
     <form class="m-b" id="docF" novalidate>
@@ -3335,7 +3349,7 @@ async function openDoc(id) {
           <button class="btn primary" data-pay>${icon('rupee')}Record payment</button>
           <button class="btn" data-link ${b.razorpay ? '' : 'disabled title="Add the Razorpay keys first"'}>${icon('globe')}${d.razorpay_link_url ? 'New pay link' : 'Payment link'}</button>
         </div>` : ''}
-        ${payments.length ? `<ul class="pay-list">${payments.map(p => `<li><div><b>${inr(p.amount)}</b><small>${PAY_METHOD[p.method]} · ${fmtDay(p.paid_on)}${p.reference ? ' · ' + esc(p.reference) : ''}</small></div>${p.method === 'razorpay' ? '' : `<button class="btn sm icon ghost" data-pdel="${p.id}" title="Delete payment">${icon('trash')}</button>`}</li>`).join('')}</ul>` : '<p class="muted" style="font-size:12.5px">No payments yet. Razorpay payments are added automatically.</p>'}`}
+        ${payments.length ? `<ul class="pay-list">${payments.map(p => `<li><div><b>${inr(p.amount)}</b><small>${PAY_METHOD[p.method]} · ${fmtDay(p.paid_on)}${p.reference ? ' · ' + esc(p.reference) : ''}</small></div>${`<button class="btn sm icon ghost" data-pdel="${p.id}" title="Delete payment">${icon('trash')}</button>`}</li>`).join('')}</ul>` : '<p class="muted" style="font-size:12.5px">No payments yet. Razorpay payments are added automatically.</p>'}`}
       <div class="sec-t">Client</div>
       <dl class="dl">
         <dt>Name</dt><dd class="${taCls(d.client_name)}">${esc(d.client_name)}${d.business_name ? ' · ' + esc(d.business_name) : ''}</dd>
@@ -3377,15 +3391,21 @@ async function openDoc(id) {
   if ($('[data-pay]', drawer)) $('[data-pay]', drawer).onclick = () => paymentForm(d);
   if ($('[data-link]', drawer)) $('[data-link]', drawer).onclick = () => linkForm(d);
   $$('[data-pdel]', drawer).forEach(x => x.onclick = async () => {
-    if (!await confirmBox({ title: 'Delete this payment?', text: 'The invoice balance goes back up.' })) return;
+    const pm = payments.find(y => y.id === +x.dataset.pdel) || {};
+    if (!await confirmBox({ title: 'Delete this payment?', text: pm.method === 'razorpay'
+      ? 'Only do this if the payment was <b>refunded</b> in Razorpay. The invoice balance goes back up.' : 'The invoice balance goes back up.' })) return;
     Object.assign(d, await API.billPayDelete(+x.dataset.pdel)); b.payments = null; toast('Payment deleted'); renderBilling(); openDoc(d.id);
   });
 }
 function convertForm(q) {
+  const earlier = (state.bill.docs || []).filter(x => x.doc_type === 'invoice' && x.converted_from === q.id && x.status !== 'cancelled');
+  const invoiced = earlier.reduce((a, x) => a + x.total, 0), rest = Math.round((q.total - invoiced) * 100) / 100;
   openModal(`${modalHead(`Invoice from ${esc(q.number)}`)}
     <div class="m-b">
       <p class="muted" style="margin:0 0 14px;font-size:13px">Quotation total: <b style="color:var(--text)">${inr(q.total)}</b>. The quotation is marked <b>Accepted</b>.</p>
-      <label class="radio-card"><input type="radio" name="cv" value="adv" checked><div><b>Advance invoice</b><small>Ask for part of the amount first</small>
+      ${earlier.length ? `<div class="notice info" style="margin-bottom:12px">${icon('receipt')}<span>Already invoiced: <b>${earlier.map(x => esc(x.number) + ' (' + inr(x.total) + ')').join(', ')}</b>. Remaining: <b>${inr(Math.max(0, rest))}</b>.</span></div>` : ''}
+      ${earlier.length && rest > 0 ? `<label class="radio-card"><input type="radio" name="cv" value="bal" checked><div><b>Balance invoice</b><small>The remaining ${inr(rest)} of this quotation</small></div></label>` : ''}
+      <label class="radio-card"><input type="radio" name="cv" value="adv" ${earlier.length && rest > 0 ? '' : 'checked'}><div><b>Advance invoice</b><small>Ask for part of the amount first</small>
         <div style="display:flex;align-items:center;gap:8px;margin-top:8px"><input class="inp" id="cvPct" type="number" min="1" max="99" value="50" style="width:90px"> % = <b id="cvAmt">${inr(q.total / 2)}</b></div></div></label>
       <label class="radio-card"><input type="radio" name="cv" value="full"><div><b>Full invoice</b><small>All items of the quotation (${inr(q.total)})</small></div></label>
     </div>
@@ -3394,10 +3414,11 @@ function convertForm(q) {
   const pct = $('#cvPct');
   pct.oninput = () => { $('#cvAmt').textContent = inr(Math.round(q.total * (+pct.value || 0)) / 100); $('[value=adv]', modal).checked = true; };
   $('[data-ok]', modal).onclick = async ev => {
-    const full = $('[value=full]', modal).checked, p = +pct.value;
-    if (!full && !(p >= 1 && p <= 99)) return toast('Advance must be 1 to 99 %', 'err');
-    ev.currentTarget.disabled = true;
-    const r = await API.billConvert(q.id, full ? {} : { advance_percent: p });
+    const full = $('[value=full]', modal).checked, bal = !!$('[value=bal]:checked', modal), p = +pct.value;
+    if (!full && !bal && !(p >= 1 && p <= 99)) return toast('Advance must be 1 to 99 %', 'err');
+    const btn = ev.currentTarget; btn.disabled = true;
+    let r;
+    try { r = await API.billConvert(q.id, full ? {} : bal ? { balance: true } : { advance_percent: p }); } finally { btn.disabled = false; }
     Object.assign(q, r.quote); state.bill.docs.unshift(r.item);
     closeModal(); closeDrawer(); state.bill.tab = 'invoice'; renderBilling();
     toast(`${r.item.number} created`); openDoc(r.item.id);
@@ -3409,9 +3430,9 @@ function paymentForm(d) {
       <p class="muted" style="margin:0 0 14px;font-size:13px">Balance due: <b style="color:var(--text)">${inr(d.balance)}</b>. Razorpay payments are recorded automatically; add UPI, bank, cash or cheque payments here.</p>
       <div class="grid2">
         ${fld('amount', 'Amount (₹)', `<input class="inp" name="amount" type="number" min="1" step="any" value="${d.balance}">`, true, `1 to ${inr(d.balance)}`)}
-        ${fld('method', 'Paid by', sel('method', { upi: 'UPI', bank: 'Bank transfer', cash: 'Cash', cheque: 'Cheque', other: 'Other' }, 'upi'))}
+        ${fld('method', 'Paid by', sel('method', { upi: 'UPI', razorpay: 'Razorpay (if not added automatically)', bank: 'Bank transfer', cash: 'Cash', cheque: 'Cheque', other: 'Other' }, 'upi'))}
         ${fld('paid_on', 'Date', `<input class="inp" type="date" name="paid_on" value="${istDate()}">`)}
-        ${fld('reference', 'UTR / reference (optional)', `<input class="inp" name="reference" maxlength="120">`)}
+        ${fld('reference', 'UTR / reference (optional)', `<input class="inp" name="reference" maxlength="120" placeholder="Razorpay: the pay_… id">`)}
       </div>
       <div style="margin-top:14px">${fld('notes', 'Notes (optional)', `<input class="inp" name="notes" maxlength="1000">`)}</div>
     </form>
@@ -3645,11 +3666,12 @@ async function renderSubs() {
   $$('[data-sbe]').forEach(x => x.onclick = () => subForm(find(x.dataset.sbe)));
   $$('[data-sbr]').forEach(x => x.onclick = async () => {
     const s = find(x.dataset.sbr); x.disabled = true;
-    Object.assign(s, await API.subRenewed(s.id)); toast(`${s.name}: next renewal ${fmtDay(s.renews_on)}`); renderSubs();
+    try { Object.assign(s, await API.subRenewed(s.id)); } finally { x.disabled = false; }
+    toast(`${s.name}: next renewal ${fmtDay(s.renews_on)}`); renderSubs();
   });
   $$('[data-sbd]').forEach(x => x.onclick = async () => {
     const s = find(x.dataset.sbd);
-    if (!await confirmBox({ title: `Delete ${esc(s.name)}?`, text: 'The bot stops reminding you about it.' })) return;
+    if (!await confirmBox({ title: `Delete ${s.name}?`, text: 'The bot stops reminding you about it.' })) return;
     await API.subDelete(s.id); S.items = S.items.filter(y => y.id !== s.id); toast('Deleted'); renderSubs();
   });
 }
@@ -3806,7 +3828,7 @@ function caseForm(p) {
   };
 }
 async function askGoogleReview(p) {
-  const ok = await confirmBox({ title: `Ask ${esc(p.client_name)} for a Google review?`, danger: false, ok: 'Ask now',
+  const ok = await confirmBox({ title: `Ask ${p.client_name} for a Google review?`, danger: false, ok: 'Ask now',
     text: `Within a minute the bot asks “How happy are you with <b>${esc(p.title)}</b>?” with 3 buttons. Happy clients get your Google review link; if they are not happy, only you are told.` });
   if (!ok) return;
   await API.askReview(p.id, { ask_now: true });

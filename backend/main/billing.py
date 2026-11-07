@@ -349,6 +349,24 @@ def create_payment_link(doc, amount=None):
     return doc
 
 
+def link_usable(doc):
+    """True when the saved payment link can still be paid and asks for no more than the balance.
+    A link that was already paid, cancelled or expired (or is bigger than the balance) must not be sent again."""
+    if not doc.razorpay_link_url:
+        return False
+    if doc.razorpay_amount is not None and D(doc.razorpay_amount) > D(doc.balance):
+        return False
+    if doc.razorpay_link_id:
+        try:
+            status = _razorpay('GET', f'/v1/payment_links/{doc.razorpay_link_id}').get('status')
+        except BillingError as e:
+            log.info('Could not check the payment link: %s', e)
+            return True                         # Razorpay unreachable: keep the link rather than fail the send
+        if status not in ('created', 'partially_paid'):
+            return False
+    return True
+
+
 # ---------------------------------------------------------------------------
 # Send on WhatsApp
 # ---------------------------------------------------------------------------
